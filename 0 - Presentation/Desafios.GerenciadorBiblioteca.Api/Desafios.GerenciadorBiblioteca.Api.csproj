@@ -10,4 +10,10 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\1 - Services\Desafios.GerenciadorBiblioteca.Service\Desafios.GerenciadorBiblioteca.Service.csproj" />
+    <ProjectReference Include="..\..\2 - Core\Desafios.GerenciadorBiblioteca.Domain\Desafios.GerenciadorBiblioteca.Domain.csproj" />
+    <ProjectReference Include="..\..\3 - Infra\Desafios.GerenciadorBiblioteca.Infra\Desafios.GerenciadorBiblioteca.Infra.csproj" />
+  </ItemGroup>
+
 </Project>

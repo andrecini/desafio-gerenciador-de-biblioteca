@@ -1,4 +1,4 @@
-using Desafios.GerenciadorBiblioteca.Front.Components;
+using Desafios.GerenciadorBiblioteca.Website.Components;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
