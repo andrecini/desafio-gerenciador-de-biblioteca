@@ -2,7 +2,7 @@
 
 namespace Desafios.GerenciadorBiblioteca.Domain.Repositories
 {
-    public interface IInventoryRepository : IGenericRepository<Invetory, int>
+    public interface IInventoryRepository : IGenericRepository<Inventory, int>
     {
     }
 }

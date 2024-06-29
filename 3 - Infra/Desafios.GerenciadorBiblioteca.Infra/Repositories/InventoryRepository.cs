@@ -4,7 +4,7 @@ using Desafios.GerenciadorBiblioteca.Infra.Context;
 
 namespace Desafios.GerenciadorBiblioteca.Infra.Repositories
 {
-    public class InventoryRepository(LibraryDbContext context) : GenericRepository<Invetory, int>(context), IInventoryRepository
+    public class InventoryRepository(LibraryDbContext context) : GenericRepository<Inventory, int>(context), IInventoryRepository
     {
     }
 }
