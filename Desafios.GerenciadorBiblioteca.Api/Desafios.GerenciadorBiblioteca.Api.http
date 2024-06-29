@@ -1,0 +1,6 @@
+@Desafios.GerenciadorBiblioteca.Api_HostAddress = http://localhost:5264
+
+GET {{Desafios.GerenciadorBiblioteca.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
