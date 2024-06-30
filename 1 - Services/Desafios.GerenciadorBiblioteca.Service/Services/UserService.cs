@@ -5,7 +5,7 @@ using Desafios.GerenciadorBiblioteca.Service.Services.Base;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Services
 {
-    public class UserSevice(IUnitOfWork unitOfWork) : ServiceBase, IUserService
+    public class UserService(IUnitOfWork unitOfWork) : ServiceBase, IUserService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
 

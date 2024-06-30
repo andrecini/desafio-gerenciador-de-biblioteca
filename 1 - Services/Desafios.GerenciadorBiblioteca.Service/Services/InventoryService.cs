@@ -7,7 +7,7 @@ using Desafios.GerenciadorBiblioteca.Service.Services.Base;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Services
 {
-    public class InventorySevice(IUnitOfWork unitOfWork) : ServiceBase, IInventoryService
+    public class InventoryService(IUnitOfWork unitOfWork) : ServiceBase, IInventoryService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
 

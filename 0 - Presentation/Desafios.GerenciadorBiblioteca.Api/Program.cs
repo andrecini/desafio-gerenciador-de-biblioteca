@@ -1,4 +1,5 @@
 using Desafios.GerenciadorBiblioteca.Infra;
+using Desafios.GerenciadorBiblioteca.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddInfraModule(builder.Configuration);
+builder.Services.AddApplicationModule();
 
 var app = builder.Build();
 

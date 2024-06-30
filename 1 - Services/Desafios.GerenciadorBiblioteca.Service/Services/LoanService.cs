@@ -7,7 +7,7 @@ using Desafios.GerenciadorBiblioteca.Service.Services.Base;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Services
 {
-    public class LoanSevice(IUnitOfWork unitOfWork) : ServiceBase, ILoanService
+    public class LoanService(IUnitOfWork unitOfWork) : ServiceBase, ILoanService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
