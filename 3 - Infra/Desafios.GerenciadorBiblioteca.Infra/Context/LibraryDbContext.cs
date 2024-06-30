@@ -17,6 +17,9 @@ namespace Desafios.GerenciadorBiblioteca.Infra.Context
             base.OnModelCreating(builder);
 
             // Aplicar configurações
+            builder.ApplyConfiguration(new LibraryConfigurator());
+            builder.ApplyConfiguration(new BookConfigurator());
+            builder.ApplyConfiguration(new UserConfigurator());
             builder.ApplyConfiguration(new InventoryConfigurator());
             builder.ApplyConfiguration(new LoanConfigurator());
         }

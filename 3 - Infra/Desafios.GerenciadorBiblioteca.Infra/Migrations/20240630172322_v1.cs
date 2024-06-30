@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Desafios.GerenciadorBiblioteca.Infra.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class v1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -65,8 +65,7 @@ namespace Desafios.GerenciadorBiblioteca.Infra.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     LibraryId = table.Column<int>(type: "int", nullable: false),
                     BookId = table.Column<int>(type: "int", nullable: false),
-                    Amount = table.Column<int>(type: "int", nullable: false),
-                    Available = table.Column<int>(type: "int", nullable: false)
+                    Available = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -96,10 +95,7 @@ namespace Desafios.GerenciadorBiblioteca.Infra.Migrations
                     BookId = table.Column<int>(type: "int", nullable: false),
                     LoanDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LoanValidity = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Returned = table.Column<bool>(type: "bit", nullable: false),
-                    BookId1 = table.Column<int>(type: "int", nullable: true),
-                    LibraryId1 = table.Column<int>(type: "int", nullable: true),
-                    UserId1 = table.Column<int>(type: "int", nullable: true)
+                    Returned = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -111,32 +107,17 @@ namespace Desafios.GerenciadorBiblioteca.Infra.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Loans_Books_BookId1",
-                        column: x => x.BookId1,
-                        principalTable: "Books",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_Loans_Libraries_LibraryId",
                         column: x => x.LibraryId,
                         principalTable: "Libraries",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Loans_Libraries_LibraryId1",
-                        column: x => x.LibraryId1,
-                        principalTable: "Libraries",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_Loans_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Loans_Users_UserId1",
-                        column: x => x.UserId1,
-                        principalTable: "Users",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -155,29 +136,14 @@ namespace Desafios.GerenciadorBiblioteca.Infra.Migrations
                 column: "BookId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Loans_BookId1",
-                table: "Loans",
-                column: "BookId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Loans_LibraryId",
                 table: "Loans",
                 column: "LibraryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Loans_LibraryId1",
-                table: "Loans",
-                column: "LibraryId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Loans_UserId",
                 table: "Loans",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Loans_UserId1",
-                table: "Loans",
-                column: "UserId1");
         }
 
         /// <inheritdoc />

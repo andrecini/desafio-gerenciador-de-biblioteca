@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 
-namespace Desafios.GerenciadorBiblioteca.Infra.Repositories
+namespace Desafios.GerenciadorBiblioteca.Infra.Repositories.Base
 {
     public abstract class GenericRepository<TEntity, T> : IGenericRepository<TEntity, T>
-        where TEntity : class, IEntity<T>, new() 
+        where TEntity : class, IEntity<T>, new()
         where T : IComparable, IEquatable<T>
     {
         protected readonly LibraryDbContext _context;
@@ -26,8 +26,8 @@ namespace Desafios.GerenciadorBiblioteca.Infra.Repositories
 
         public async Task<TEntity> GetByIdAsync(int id) => await _dbSet.FindAsync(id);
 
-        public async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate) => 
-            await _dbSet.Where(predicate).ToListAsync(); 
+        public async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate) =>
+            await _dbSet.Where(predicate).ToListAsync();
 
         public async Task AddAsync(TEntity entity) => await _dbSet.AddAsync(entity);
 

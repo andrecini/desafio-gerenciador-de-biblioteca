@@ -87,7 +87,7 @@ namespace Desafios.GerenciadorBiblioteca.Infra.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Prone")
+                    b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -106,13 +106,7 @@ namespace Desafios.GerenciadorBiblioteca.Infra.Migrations
                     b.Property<int>("BookId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("BookId1")
-                        .HasColumnType("int");
-
                     b.Property<int>("LibraryId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("LibraryId1")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("LoanDate")
@@ -127,22 +121,13 @@ namespace Desafios.GerenciadorBiblioteca.Infra.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserId1")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("BookId");
 
-                    b.HasIndex("BookId1");
-
                     b.HasIndex("LibraryId");
 
-                    b.HasIndex("LibraryId1");
-
                     b.HasIndex("UserId");
-
-                    b.HasIndex("UserId1");
 
                     b.ToTable("Loans");
                 });
@@ -191,34 +176,22 @@ namespace Desafios.GerenciadorBiblioteca.Infra.Migrations
             modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Infra.Entities.Loan", b =>
                 {
                     b.HasOne("Desafios.GerenciadorBiblioteca.Domain.Infra.Entities.Book", "Book")
-                        .WithMany()
+                        .WithMany("Loans")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Desafios.GerenciadorBiblioteca.Domain.Infra.Entities.Book", null)
-                        .WithMany("Loans")
-                        .HasForeignKey("BookId1");
-
                     b.HasOne("Desafios.GerenciadorBiblioteca.Domain.Infra.Entities.Library", "Library")
-                        .WithMany()
+                        .WithMany("Loans")
                         .HasForeignKey("LibraryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Desafios.GerenciadorBiblioteca.Domain.Infra.Entities.Library", null)
-                        .WithMany("Loans")
-                        .HasForeignKey("LibraryId1");
-
                     b.HasOne("Desafios.GerenciadorBiblioteca.Domain.Infra.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("Loans")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Desafios.GerenciadorBiblioteca.Domain.Infra.Entities.User", null)
-                        .WithMany("Loans")
-                        .HasForeignKey("UserId1");
 
                     b.Navigation("Book");
 

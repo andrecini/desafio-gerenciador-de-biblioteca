@@ -9,6 +9,7 @@ namespace Desafios.GerenciadorBiblioteca.Infra.Context.Configurators
         public void Configure(EntityTypeBuilder<Inventory> builder)
         {
             builder.HasKey(i => i.Id);
+            builder.Property(i => i.Id).ValueGeneratedOnAdd();
 
             // Library Relationship
             builder.HasOne(i => i.Library)

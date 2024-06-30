@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Desafios.GerenciadorBiblioteca.Infra.Migrations
 {
     [DbContext(typeof(LibraryDbContext))]
-    [Migration("20240629222627_Init")]
-    partial class Init
+    [Migration("20240630172322_v1")]
+    partial class v1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace Desafios.GerenciadorBiblioteca.Infra.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Entities.Book", b =>
+            modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Infra.Entities.Book", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -50,7 +50,7 @@ namespace Desafios.GerenciadorBiblioteca.Infra.Migrations
                     b.ToTable("Books");
                 });
 
-            modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Entities.Inventory", b =>
+            modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Infra.Entities.Inventory", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -58,11 +58,8 @@ namespace Desafios.GerenciadorBiblioteca.Infra.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Amount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Available")
-                        .HasColumnType("int");
+                    b.Property<bool>("Available")
+                        .HasColumnType("bit");
 
                     b.Property<int>("BookId")
                         .HasColumnType("int");
@@ -79,7 +76,7 @@ namespace Desafios.GerenciadorBiblioteca.Infra.Migrations
                     b.ToTable("Inventories");
                 });
 
-            modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Entities.Library", b =>
+            modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Infra.Entities.Library", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -101,7 +98,7 @@ namespace Desafios.GerenciadorBiblioteca.Infra.Migrations
                     b.ToTable("Libraries");
                 });
 
-            modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Entities.Loan", b =>
+            modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Infra.Entities.Loan", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -112,13 +109,7 @@ namespace Desafios.GerenciadorBiblioteca.Infra.Migrations
                     b.Property<int>("BookId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("BookId1")
-                        .HasColumnType("int");
-
                     b.Property<int>("LibraryId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("LibraryId1")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("LoanDate")
@@ -133,27 +124,18 @@ namespace Desafios.GerenciadorBiblioteca.Infra.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserId1")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("BookId");
 
-                    b.HasIndex("BookId1");
-
                     b.HasIndex("LibraryId");
 
-                    b.HasIndex("LibraryId1");
-
                     b.HasIndex("UserId");
-
-                    b.HasIndex("UserId1");
 
                     b.ToTable("Loans");
                 });
 
-            modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Entities.User", b =>
+            modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Infra.Entities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -175,15 +157,15 @@ namespace Desafios.GerenciadorBiblioteca.Infra.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Entities.Inventory", b =>
+            modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Infra.Entities.Inventory", b =>
                 {
-                    b.HasOne("Desafios.GerenciadorBiblioteca.Domain.Entities.Book", "Book")
+                    b.HasOne("Desafios.GerenciadorBiblioteca.Domain.Infra.Entities.Book", "Book")
                         .WithMany("Inventories")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Desafios.GerenciadorBiblioteca.Domain.Entities.Library", "Library")
+                    b.HasOne("Desafios.GerenciadorBiblioteca.Domain.Infra.Entities.Library", "Library")
                         .WithMany("Inventories")
                         .HasForeignKey("LibraryId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -194,37 +176,25 @@ namespace Desafios.GerenciadorBiblioteca.Infra.Migrations
                     b.Navigation("Library");
                 });
 
-            modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Entities.Loan", b =>
+            modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Infra.Entities.Loan", b =>
                 {
-                    b.HasOne("Desafios.GerenciadorBiblioteca.Domain.Entities.Book", "Book")
-                        .WithMany()
+                    b.HasOne("Desafios.GerenciadorBiblioteca.Domain.Infra.Entities.Book", "Book")
+                        .WithMany("Loans")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Desafios.GerenciadorBiblioteca.Domain.Entities.Book", null)
+                    b.HasOne("Desafios.GerenciadorBiblioteca.Domain.Infra.Entities.Library", "Library")
                         .WithMany("Loans")
-                        .HasForeignKey("BookId1");
-
-                    b.HasOne("Desafios.GerenciadorBiblioteca.Domain.Entities.Library", "Library")
-                        .WithMany()
                         .HasForeignKey("LibraryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Desafios.GerenciadorBiblioteca.Domain.Entities.Library", null)
+                    b.HasOne("Desafios.GerenciadorBiblioteca.Domain.Infra.Entities.User", "User")
                         .WithMany("Loans")
-                        .HasForeignKey("LibraryId1");
-
-                    b.HasOne("Desafios.GerenciadorBiblioteca.Domain.Entities.User", "User")
-                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Desafios.GerenciadorBiblioteca.Domain.Entities.User", null)
-                        .WithMany("Loans")
-                        .HasForeignKey("UserId1");
 
                     b.Navigation("Book");
 
@@ -233,21 +203,21 @@ namespace Desafios.GerenciadorBiblioteca.Infra.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Entities.Book", b =>
+            modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Infra.Entities.Book", b =>
                 {
                     b.Navigation("Inventories");
 
                     b.Navigation("Loans");
                 });
 
-            modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Entities.Library", b =>
+            modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Infra.Entities.Library", b =>
                 {
                     b.Navigation("Inventories");
 
                     b.Navigation("Loans");
                 });
 
-            modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Entities.User", b =>
+            modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Infra.Entities.User", b =>
                 {
                     b.Navigation("Loans");
                 });

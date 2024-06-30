@@ -10,22 +10,23 @@ namespace Desafios.GerenciadorBiblioteca.Infra.Context.Configurators
         {
             // Primary Key
             builder.HasKey(l => l.Id);
+            builder.Property(l => l.Id).ValueGeneratedOnAdd();
 
             // Library Relationship
             builder.HasOne(l => l.Library)
-                   .WithMany()
+                   .WithMany(l => l.Loans)
                    .HasForeignKey(l => l.LibraryId)
                    .OnDelete(DeleteBehavior.Cascade);
 
             // User Relationship
             builder.HasOne(l => l.User)
-                   .WithMany()
+                   .WithMany(u => u.Loans)
                    .HasForeignKey(l => l.UserId)
                    .OnDelete(DeleteBehavior.Cascade);
 
             // Book Relationship
             builder.HasOne(l => l.Book)
-                   .WithMany()
+                   .WithMany(b => b.Loans)
                    .HasForeignKey(l => l.BookId)
                    .OnDelete(DeleteBehavior.Cascade);
 
