@@ -1,4 +1,4 @@
-﻿using Desafios.GerenciadorBiblioteca.Domain.Entities;
+﻿using Desafios.GerenciadorBiblioteca.Domain.Infra.Entities;
 using Desafios.GerenciadorBiblioteca.Infra.Context.Configurators;
 using Microsoft.EntityFrameworkCore;
 

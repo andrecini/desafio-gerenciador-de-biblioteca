@@ -1,6 +1,6 @@
-﻿using Desafios.GerenciadorBiblioteca.Domain.Repositories;
+﻿using Desafios.GerenciadorBiblioteca.Domain.Infra.Repositories;
 
-namespace Desafios.GerenciadorBiblioteca.Domain.UnitOfWork
+namespace Desafios.GerenciadorBiblioteca.Domain.Infra.UnitOfWork
 {
     public interface IUnitOfWork
     {

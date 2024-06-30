@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\2 - Core\Desafios.GerenciadorBiblioteca.Domain\Desafios.GerenciadorBiblioteca.Domain.csproj" />
+    <ProjectReference Include="..\..\3 - Infra\Desafios.GerenciadorBiblioteca.Infra\Desafios.GerenciadorBiblioteca.Infra.csproj" />
+  </ItemGroup>
+
 </Project>

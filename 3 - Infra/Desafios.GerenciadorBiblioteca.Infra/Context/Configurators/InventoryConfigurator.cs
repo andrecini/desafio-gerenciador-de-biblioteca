@@ -1,4 +1,4 @@
-﻿using Desafios.GerenciadorBiblioteca.Domain.Entities;
+﻿using Desafios.GerenciadorBiblioteca.Domain.Infra.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -21,10 +21,6 @@ namespace Desafios.GerenciadorBiblioteca.Infra.Context.Configurators
                    .WithMany(b => b.Inventories)
                    .HasForeignKey(i => i.BookId)
                    .OnDelete(DeleteBehavior.Cascade);
-
-            // Properties Configure
-            builder.Property(i => i.Amount)
-                   .IsRequired();
 
             builder.Property(i => i.Available)
                    .IsRequired();

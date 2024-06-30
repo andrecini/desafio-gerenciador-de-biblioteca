@@ -1,4 +1,6 @@
-﻿namespace Desafios.GerenciadorBiblioteca.Domain.Entities
+﻿using Desafios.GerenciadorBiblioteca.Domain.Infra.Entities.Base;
+
+namespace Desafios.GerenciadorBiblioteca.Domain.Infra.Entities
 {
     public class Library : IEntity<int>
     {

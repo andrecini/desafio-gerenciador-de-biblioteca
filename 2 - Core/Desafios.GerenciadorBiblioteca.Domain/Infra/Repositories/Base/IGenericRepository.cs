@@ -1,7 +1,7 @@
-﻿using Desafios.GerenciadorBiblioteca.Domain.Entities;
+﻿using Desafios.GerenciadorBiblioteca.Domain.Infra.Entities.Base;
 using System.Linq.Expressions;
 
-namespace Desafios.GerenciadorBiblioteca.Domain.Repositories
+namespace Desafios.GerenciadorBiblioteca.Domain.Infra.Repositories.Base
 {
     public interface IGenericRepository<TEntity, T>
         where TEntity : class, IEntity<T>, new()
