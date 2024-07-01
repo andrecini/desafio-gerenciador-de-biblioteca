@@ -1,15 +1,17 @@
-﻿using Desafios.GerenciadorBiblioteca.Domain.Application.Services;
+﻿using AutoMapper;
+using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
-using Desafios.GerenciadorBiblioteca.Domain.Infra.Entities;
-using Desafios.GerenciadorBiblioteca.Domain.Infra.UnitOfWork;
-using Desafios.GerenciadorBiblioteca.Service.Services.Base;
+using Desafios.GerenciadorBiblioteca.Domain.Services;
+using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
+using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
 using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Services
 {
-    public class UserService(IUnitOfWork unitOfWork) : ServiceBase, IUserService
+    public class UserService(IUnitOfWork unitOfWork, IMapper mapper) : IUserService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IMapper _mapper = mapper;
 
         public async Task<IEnumerable<User>> GetAllAsync()
         {
@@ -35,9 +37,11 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
             return await GetAllAsync();
         }
 
-        public async Task<bool> AddAsync(User entity)
+        public async Task<bool> AddAsync(UserDTO dto)
         {
-            CustomException.ThrowIfNull(entity, "Usuário");
+            CustomException.ThrowIfNull(dto, "Usuário");
+
+            var entity = _mapper.Map<User>(dto);
 
             await _unitOfWork.Users.AddAsync(entity);
             var result = await _unitOfWork.SaveAsync();
@@ -47,12 +51,14 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
                 HttpStatusCode.InternalServerError);
         }
 
-        public async Task<bool> Update(User entity)
+        public async Task<bool> Update(int id, UserDTO dto)
         {
-            CustomException.ThrowIfNull(entity, "Usuário");
+            CustomException.ThrowIfNull(dto, "Usuário");
 
-            var userRegistered = await GetByIdAsync(entity.Id) ??
+            var userRegistered = await GetByIdAsync(id) ??
                 throw new CustomException("Nenhum Usuário foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
+
+            var entity = _mapper.Map<User>(dto);
 
             _unitOfWork.Users.Update(entity);
             var result = await _unitOfWork.SaveAsync();

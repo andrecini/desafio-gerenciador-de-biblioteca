@@ -1,5 +1,5 @@
-using Desafios.GerenciadorBiblioteca.Domain.Application.Services;
-using Desafios.GerenciadorBiblioteca.Domain.Infra.Entities;
+using Desafios.GerenciadorBiblioteca.Domain.Services;
+using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Desafios.GerenciadorBiblioteca.Api.Controllers
@@ -42,17 +42,17 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddAsync(Library library)
+        public async Task<IActionResult> AddAsync(LibraryDTO request)
         {
-            var data = await _service.AddAsync(library);
+            var data = await _service.AddAsync(request);
 
             return Ok(data);
         }
 
-        [HttpPut]
-        public IActionResult Update(Library library)
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, LibraryDTO request)
         {
-            var data = _service.Update(library);
+            var data = _service.Update(id, request);
 
             return Ok(data);
         }

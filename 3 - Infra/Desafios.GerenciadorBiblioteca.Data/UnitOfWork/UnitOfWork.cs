@@ -1,5 +1,5 @@
-﻿using Desafios.GerenciadorBiblioteca.Domain.Infra.Repositories;
-using Desafios.GerenciadorBiblioteca.Domain.Infra.UnitOfWork;
+﻿using Desafios.GerenciadorBiblioteca.Domain.Repositories;
+using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
 using Desafios.GerenciadorBiblioteca.Infra.Context;
 using Desafios.GerenciadorBiblioteca.Infra.Repositories;
 

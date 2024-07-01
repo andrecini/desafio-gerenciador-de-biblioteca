@@ -1,17 +1,19 @@
-﻿using Desafios.GerenciadorBiblioteca.Domain.Application.Entities.Loans;
-using Desafios.GerenciadorBiblioteca.Domain.Application.Enums;
-using Desafios.GerenciadorBiblioteca.Domain.Application.Services;
+﻿using AutoMapper;
+using Desafios.GerenciadorBiblioteca.Domain.Entities;
+using Desafios.GerenciadorBiblioteca.Domain.Entities.Filters;
+using Desafios.GerenciadorBiblioteca.Domain.Enums;
 using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
-using Desafios.GerenciadorBiblioteca.Domain.Infra.Entities;
-using Desafios.GerenciadorBiblioteca.Domain.Infra.UnitOfWork;
-using Desafios.GerenciadorBiblioteca.Service.Services.Base;
+using Desafios.GerenciadorBiblioteca.Domain.Services;
+using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
+using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
 using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Services
 {
-    public class LoanService(IUnitOfWork unitOfWork) : ServiceBase, ILoanService
+    public class LoanService(IUnitOfWork unitOfWork, IMapper mapper) : ILoanService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IMapper _mapper = mapper;
 
         public async Task<IEnumerable<Loan>> GetAllAsync()
         {
@@ -38,9 +40,11 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
             return data;
         }
 
-        public async Task<bool> AddAsync(Loan entity)
+        public async Task<bool> AddAsync(LoanDTO dto)
         {
             CustomException.ThrowIfLessThan(0, "Empréstimo");
+
+            var entity = _mapper.Map<Loan>(dto);
 
             await _unitOfWork.Loans.AddAsync(entity);
             var result = await _unitOfWork.SaveAsync();
@@ -50,12 +54,14 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
                 HttpStatusCode.InternalServerError);
         }
 
-        public async Task<bool> Update(Loan entity)
+        public async Task<bool> Update(int id, LoanDTO dto)
         {
             CustomException.ThrowIfLessThan(0, "Empréstimo");
 
-            var loanRegistered = await GetByIdAsync(entity.Id) ??
+            var loanRegistered = await GetByIdAsync(id) ??
                 throw new CustomException("Nenhum Emrpéstimo foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
+
+            var entity = _mapper.Map<Loan>(dto);
 
             _unitOfWork.Loans.Update(entity);
             var result = await _unitOfWork.SaveAsync();

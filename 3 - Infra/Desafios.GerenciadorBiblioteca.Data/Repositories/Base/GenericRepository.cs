@@ -1,5 +1,5 @@
-﻿using Desafios.GerenciadorBiblioteca.Domain.Infra.Entities.Base;
-using Desafios.GerenciadorBiblioteca.Domain.Infra.Repositories.Base;
+﻿using Desafios.GerenciadorBiblioteca.Domain.Entities.Base;
+using Desafios.GerenciadorBiblioteca.Domain.Repositories.Base;
 using Desafios.GerenciadorBiblioteca.Infra.Context;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;

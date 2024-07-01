@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\2 - Core\Desafios.GerenciadorBiblioteca.Domain\Desafios.GerenciadorBiblioteca.Domain.csproj" />
     <ProjectReference Include="..\..\3 - Infra\Desafios.GerenciadorBiblioteca.Data\Desafios.GerenciadorBiblioteca.Data.csproj" />
   </ItemGroup>

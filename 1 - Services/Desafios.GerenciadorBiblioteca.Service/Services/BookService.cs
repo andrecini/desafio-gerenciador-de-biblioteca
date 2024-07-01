@@ -1,16 +1,18 @@
-﻿using Desafios.GerenciadorBiblioteca.Domain.Application.Entities.Books;
-using Desafios.GerenciadorBiblioteca.Domain.Application.Services;
+﻿using AutoMapper;
+using Desafios.GerenciadorBiblioteca.Domain.Entities;
+using Desafios.GerenciadorBiblioteca.Domain.Entities.Filters;
 using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
-using Desafios.GerenciadorBiblioteca.Domain.Infra.Entities;
-using Desafios.GerenciadorBiblioteca.Domain.Infra.UnitOfWork;
-using Desafios.GerenciadorBiblioteca.Service.Services.Base;
+using Desafios.GerenciadorBiblioteca.Domain.Services;
+using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
+using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
 using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Services
 {
-    public class BookSevice(IUnitOfWork unitOfWork) : ServiceBase, IBookService
+    public class BookSevice(IUnitOfWork unitOfWork, IMapper mapper) : IBookService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IMapper _mapper = mapper;
 
         public async Task<IEnumerable<Book>> GetAllAsync()
         {
@@ -37,9 +39,11 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
             return data;
         }
 
-        public async Task<bool> AddAsync(Book entity)
+        public async Task<bool> AddAsync(BookDTO dto)
         {
-            CustomException.ThrowIfNull(entity, "Livro");
+            CustomException.ThrowIfNull(dto, "Livro");
+
+            var entity = _mapper.Map<Book>(dto);
 
             await _unitOfWork.Books.AddAsync(entity);
             var result = await _unitOfWork.SaveAsync();
@@ -49,12 +53,14 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
                 HttpStatusCode.InternalServerError);
         }
 
-        public async Task<bool> Update(Book entity)
+        public async Task<bool> Update(int id, BookDTO dto)
         {
-            CustomException.ThrowIfNull(entity, "Livro");
+            CustomException.ThrowIfNull(dto, "Livro");
 
-            var libraryRegistered = await GetByIdAsync(entity.Id) ??
+            var libraryRegistered = await GetByIdAsync(id) ??
                 throw new CustomException("Nenhum Livro foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
+
+            var entity = _mapper.Map<Book>(dto);
 
             _unitOfWork.Books.Update(entity);
             var result = await _unitOfWork.SaveAsync();

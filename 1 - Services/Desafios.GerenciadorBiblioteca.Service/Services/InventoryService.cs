@@ -1,17 +1,19 @@
-﻿using Desafios.GerenciadorBiblioteca.Domain.Application.Entities.Inventory;
-using Desafios.GerenciadorBiblioteca.Domain.Application.Enums;
-using Desafios.GerenciadorBiblioteca.Domain.Application.Services;
+﻿using AutoMapper;
+using Desafios.GerenciadorBiblioteca.Domain.Entities;
+using Desafios.GerenciadorBiblioteca.Domain.Entities.Filters;
+using Desafios.GerenciadorBiblioteca.Domain.Enums;
 using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
-using Desafios.GerenciadorBiblioteca.Domain.Infra.Entities;
-using Desafios.GerenciadorBiblioteca.Domain.Infra.UnitOfWork;
-using Desafios.GerenciadorBiblioteca.Service.Services.Base;
+using Desafios.GerenciadorBiblioteca.Domain.Services;
+using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
+using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
 using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Services
 {
-    public class InventoryService(IUnitOfWork unitOfWork) : ServiceBase, IInventoryService
+    public class InventoryService(IUnitOfWork unitOfWork, IMapper mapper) : IInventoryService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IMapper _mapper = mapper;
 
         public async Task<IEnumerable<Inventory>> GetAllAsync()
         {
@@ -38,9 +40,11 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
             return data;
         }
 
-        public async Task<bool> AddAsync(Inventory entity)
+        public async Task<bool> AddAsync(InventoryDTO dto)
         {
-            CustomException.ThrowIfNull(entity, "Inventário");
+            CustomException.ThrowIfNull(dto, "Inventário");
+
+            var entity = _mapper.Map<Inventory>(dto);
 
             await _unitOfWork.Inventories.AddAsync(entity);
             var result = await _unitOfWork.SaveAsync();
@@ -50,12 +54,14 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
                 HttpStatusCode.InternalServerError);
         }
 
-        public async Task<bool> Update(Inventory entity)
+        public async Task<bool> Update(int id, InventoryDTO dto)
         {
-            CustomException.ThrowIfNull(entity, "Inventário");
+            CustomException.ThrowIfNull(dto, "Inventário");
 
-            var InventoryRegistered = await GetByIdAsync(entity.Id) ??
+            var InventoryRegistered = await GetByIdAsync(id) ??
                 throw new CustomException("Nenhum Inventário foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
+
+            var entity = _mapper.Map<Inventory>(dto);
 
             _unitOfWork.Inventories.Update(entity);
             var result = await _unitOfWork.SaveAsync();
