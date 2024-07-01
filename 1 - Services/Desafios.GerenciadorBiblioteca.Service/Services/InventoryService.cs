@@ -3,9 +3,9 @@ using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Desafios.GerenciadorBiblioteca.Domain.Entities.Filters;
 using Desafios.GerenciadorBiblioteca.Domain.Enums;
 using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
-using Desafios.GerenciadorBiblioteca.Domain.Services;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
+using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces;
 using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Services
@@ -40,7 +40,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
             return data;
         }
 
-        public async Task<bool> AddAsync(InventoryDTO dto)
+        public async Task<bool> AddAsync(InventoryInputDTO dto)
         {
             CustomException.ThrowIfNull(dto, "Inventário");
 
@@ -54,7 +54,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
                 HttpStatusCode.InternalServerError);
         }
 
-        public async Task<bool> Update(int id, InventoryDTO dto)
+        public async Task<bool> Update(int id, InventoryInputDTO dto)
         {
             CustomException.ThrowIfNull(dto, "Inventário");
 

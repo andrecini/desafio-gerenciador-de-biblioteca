@@ -1,6 +1,6 @@
 ﻿using Desafios.GerenciadorBiblioteca.Domain.Entities.Base;
 
-namespace Desafios.GerenciadorBiblioteca.Domain.Services.Base
+namespace Desafios.GerenciadorBiblioteca.Service.Services.Interfaces.Base
 {
     public interface IService<T, TEntity> where TEntity : IEntity<int>
     {

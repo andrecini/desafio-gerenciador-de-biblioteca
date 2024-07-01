@@ -1,9 +1,9 @@
-﻿using Caramel.Pattern.Services.Domain.AutoMapper;
-using Desafios.GerenciadorBiblioteca.Domain.Services;
+﻿using Desafios.GerenciadorBiblioteca.Service.Mapping;
 using Desafios.GerenciadorBiblioteca.Service.Services;
+using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Desafios.GerenciadorBiblioteca.CrossCutting.IoC
+namespace Desafios.GerenciadorBiblioteca.Service
 {
     public static class ApplicationDependencyInjection
     {

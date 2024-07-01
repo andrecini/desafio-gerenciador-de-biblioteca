@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
-using Desafios.GerenciadorBiblioteca.Domain.Services;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
+using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces;
 using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Services
@@ -37,7 +37,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
             return await GetAllAsync();
         }
 
-        public async Task<bool> AddAsync(LibraryDTO dto)
+        public async Task<bool> AddAsync(LibraryInpuDTO dto)
         {
             CustomException.ThrowIfNull(dto, "Biblioteca");
 
@@ -51,7 +51,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
                 HttpStatusCode.InternalServerError);
         }
 
-        public async Task<bool> Update(int id, LibraryDTO dto)
+        public async Task<bool> Update(int id, LibraryInpuDTO dto)
         {
             CustomException.ThrowIfNull(dto, "Biblioteca");
 

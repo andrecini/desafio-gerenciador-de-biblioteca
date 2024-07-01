@@ -1,5 +1,8 @@
-using Desafios.GerenciadorBiblioteca.Domain.Services;
+using Desafios.GerenciadorBiblioteca.Api.Models.Responses;
+using Desafios.GerenciadorBiblioteca.Domain.Entities;
+using Desafios.GerenciadorBiblioteca.Domain.Enums;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
+using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Desafios.GerenciadorBiblioteca.Api.Controllers
@@ -22,7 +25,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         {
             var data = await _service.GetAllAsync();
 
-            return Ok(data);
+            return data.Any() ? Ok(data) : NoContent();
         }
 
         [HttpGet("{id}")]
@@ -30,7 +33,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         {
             var data = await _service.GetByIdAsync(id);
 
-            return Ok(data);
+            return data != null ? Ok(data) : NoContent();
         }
 
         [HttpPost("filter")]
@@ -38,31 +41,31 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         {
             var data = await _service.FindAsync(name);
 
-            return Ok(data);
+            return data.Any() ? Ok(data) : NoContent();
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddAsync(LibraryDTO request)
+        public async Task<IActionResult> AddAsync(LibraryInpuDTO request)
         {
-            var data = await _service.AddAsync(request);
+            await _service.AddAsync(request);
 
-            return Ok(data);
+            return Created();
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, LibraryDTO request)
+        public IActionResult Update(int id, LibraryInpuDTO request)
         {
-            var data = _service.Update(id, request);
+            _service.Update(id, request);
 
-            return Ok(data);
+            return Ok();
         }
         
         [HttpDelete]
         public IActionResult Remove(int id)
         {
-            var data = _service.Remove(id);
+            _service.Remove(id);
 
-            return Ok(data);
+            return Ok();
         }
     }
 }

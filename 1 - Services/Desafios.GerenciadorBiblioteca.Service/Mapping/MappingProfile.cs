@@ -3,14 +3,14 @@ using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Caramel.Pattern.Services.Domain.AutoMapper
+namespace Desafios.GerenciadorBiblioteca.Service.Mapping
 {
     [ExcludeFromCodeCoverage]
     public class MappingProfile : Profile
     {
         public MappingProfile()
         {
-            CreateMap<LibraryDTO, Library>()
+            CreateMap<LibraryInpuDTO, Library>()
                 .ForMember(x => x.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(x => x.CNPJ, opt => opt.MapFrom(src => src.CNPJ))
                 .ForMember(x => x.Phone, opt => opt.MapFrom(src => src.Phone));
@@ -20,13 +20,13 @@ namespace Caramel.Pattern.Services.Domain.AutoMapper
                 .ForMember(x => x.Phone, opt => opt.MapFrom(src => src.Phone))
                 .ForMember(x => x.Email, opt => opt.MapFrom(src => src.Email));
 
-            CreateMap<BookDTO, Book>()
+            CreateMap<BookInputDTO, Book>()
                 .ForMember(x => x.Title, opt => opt.MapFrom(src => src.Title))
                 .ForMember(x => x.Author, opt => opt.MapFrom(src => src.Author))
                 .ForMember(x => x.ISBN, opt => opt.MapFrom(src => src.ISBN))
                 .ForMember(x => x.Year, opt => opt.MapFrom(src => src.Year));
 
-            CreateMap<InventoryDTO, Inventory>()
+            CreateMap<InventoryInputDTO, Inventory>()
                 .ForMember(x => x.LibraryId, opt => opt.MapFrom(src => src.BookId))
                 .ForMember(x => x.BookId, opt => opt.MapFrom(src => src.BookId))
                 .ForMember(x => x.Available, opt => opt.MapFrom(src => src.Available));

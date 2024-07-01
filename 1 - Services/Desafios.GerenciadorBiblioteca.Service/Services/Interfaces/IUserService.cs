@@ -1,8 +1,8 @@
 ﻿using Desafios.GerenciadorBiblioteca.Domain.Entities;
-using Desafios.GerenciadorBiblioteca.Domain.Services.Base;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
+using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces.Base;
 
-namespace Desafios.GerenciadorBiblioteca.Domain.Services
+namespace Desafios.GerenciadorBiblioteca.Service.Services.Interfaces
 {
     public interface IUserService : IService<UserDTO, User>
     {
