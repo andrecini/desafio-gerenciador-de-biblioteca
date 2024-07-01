@@ -5,7 +5,7 @@ using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces.Base;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Services.Interfaces
 {
-    public interface IInventoryService : IService<InventoryInputDTO, Inventory>
+    public interface IInventoryService : IService<InventoryDTO, Inventory>
     {
         Task<IEnumerable<Inventory>> FindAsync(InventoryFilter filter);
     }

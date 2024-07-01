@@ -1,5 +1,5 @@
-﻿using Desafios.GerenciadorBiblioteca.Domain.Entities;
-using Desafios.GerenciadorBiblioteca.Infra.Context.Configurators;
+﻿using Desafios.GerenciadorBiblioteca.Data.Context.Configurators;
+using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Desafios.GerenciadorBiblioteca.Data.Context

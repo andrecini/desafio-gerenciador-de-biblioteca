@@ -37,7 +37,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
             return await GetAllAsync();
         }
 
-        public async Task<bool> AddAsync(LibraryInpuDTO dto)
+        public async Task<bool> AddAsync(LibraryDTO dto)
         {
             CustomException.ThrowIfNull(dto, "Biblioteca");
 
@@ -51,7 +51,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
                 HttpStatusCode.InternalServerError);
         }
 
-        public async Task<bool> Update(int id, LibraryInpuDTO dto)
+        public async Task<bool> Update(int id, LibraryDTO dto)
         {
             CustomException.ThrowIfNull(dto, "Biblioteca");
 

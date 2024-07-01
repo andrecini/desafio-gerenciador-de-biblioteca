@@ -3,6 +3,7 @@ using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Desafios.GerenciadorBiblioteca.Domain.Entities.Filters;
 using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
+using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
 using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces;
 using System.Net;
 

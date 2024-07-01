@@ -6,12 +6,12 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class LibraryController : ControllerBase
+    public class UserController : ControllerBase
     {
-        private readonly ILogger<LibraryController> _logger;
-        private readonly ILibraryService _service;
+        private readonly ILogger<UserController> _logger;
+        private readonly IUserService _service;
 
-        public LibraryController(ILogger<LibraryController> logger, ILibraryService service)
+        public UserController(ILogger<UserController> logger, IUserService service)
         {
             _service = service;
             _logger = logger;
@@ -42,7 +42,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddAsync(LibraryDTO request)
+        public async Task<IActionResult> AddAsync(UserDTO request)
         {
             await _service.AddAsync(request);
 
@@ -50,7 +50,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, LibraryDTO request)
+        public IActionResult Update(int id, UserDTO request)
         {
             _service.Update(id, request);
 

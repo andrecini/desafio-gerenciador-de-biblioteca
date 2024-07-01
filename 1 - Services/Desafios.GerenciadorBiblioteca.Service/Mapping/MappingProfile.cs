@@ -10,7 +10,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Mapping
     {
         public MappingProfile()
         {
-            CreateMap<LibraryInpuDTO, Library>()
+            CreateMap<LibraryDTO, Library>()
                 .ForMember(x => x.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(x => x.CNPJ, opt => opt.MapFrom(src => src.CNPJ))
                 .ForMember(x => x.Phone, opt => opt.MapFrom(src => src.Phone));
@@ -20,13 +20,13 @@ namespace Desafios.GerenciadorBiblioteca.Service.Mapping
                 .ForMember(x => x.Phone, opt => opt.MapFrom(src => src.Phone))
                 .ForMember(x => x.Email, opt => opt.MapFrom(src => src.Email));
 
-            CreateMap<BookInputDTO, Book>()
+            CreateMap<BookDTO, Book>()
                 .ForMember(x => x.Title, opt => opt.MapFrom(src => src.Title))
                 .ForMember(x => x.Author, opt => opt.MapFrom(src => src.Author))
                 .ForMember(x => x.ISBN, opt => opt.MapFrom(src => src.ISBN))
                 .ForMember(x => x.Year, opt => opt.MapFrom(src => src.Year));
 
-            CreateMap<InventoryInputDTO, Inventory>()
+            CreateMap<InventoryDTO, Inventory>()
                 .ForMember(x => x.LibraryId, opt => opt.MapFrom(src => src.BookId))
                 .ForMember(x => x.BookId, opt => opt.MapFrom(src => src.BookId))
                 .ForMember(x => x.Available, opt => opt.MapFrom(src => src.Available));

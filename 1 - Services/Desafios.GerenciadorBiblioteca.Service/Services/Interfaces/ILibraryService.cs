@@ -4,7 +4,7 @@ using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces.Base;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Services.Interfaces
 {
-    public interface ILibraryService : IService<LibraryInpuDTO, Library>
+    public interface ILibraryService : IService<LibraryDTO, Library>
     {
         Task<IEnumerable<Library>> FindAsync(string name);
     }

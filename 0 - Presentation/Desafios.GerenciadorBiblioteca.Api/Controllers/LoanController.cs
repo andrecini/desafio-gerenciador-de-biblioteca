@@ -1,3 +1,4 @@
+using Desafios.GerenciadorBiblioteca.Domain.Entities.Filters;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
 using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -6,12 +7,12 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class LibraryController : ControllerBase
+    public class LoanController : ControllerBase
     {
-        private readonly ILogger<LibraryController> _logger;
-        private readonly ILibraryService _service;
+        private readonly ILogger<LoanController> _logger;
+        private readonly ILoanService _service;
 
-        public LibraryController(ILogger<LibraryController> logger, ILibraryService service)
+        public LoanController(ILogger<LoanController> logger, ILoanService service)
         {
             _service = service;
             _logger = logger;
@@ -34,15 +35,15 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         }
 
         [HttpPost("filter")]
-        public async Task<IActionResult> FilterAsync([FromBody]string name)
+        public async Task<IActionResult> FilterAsync(LoanFilter filter)
         {
-            var data = await _service.FindAsync(name);
+            var data = await _service.FindAsync(filter);
 
             return data.Any() ? Ok(data) : NoContent();
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddAsync(LibraryDTO request)
+        public async Task<IActionResult> AddAsync(LoanDTO request)
         {
             await _service.AddAsync(request);
 
@@ -50,7 +51,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, LibraryDTO request)
+        public IActionResult Update(int id, LoanDTO request)
         {
             _service.Update(id, request);
 

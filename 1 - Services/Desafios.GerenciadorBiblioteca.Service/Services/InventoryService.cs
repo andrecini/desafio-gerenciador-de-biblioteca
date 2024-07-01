@@ -40,7 +40,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
             return data;
         }
 
-        public async Task<bool> AddAsync(InventoryInputDTO dto)
+        public async Task<bool> AddAsync(InventoryDTO dto)
         {
             CustomException.ThrowIfNull(dto, "Inventário");
 
@@ -54,7 +54,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
                 HttpStatusCode.InternalServerError);
         }
 
-        public async Task<bool> Update(int id, InventoryInputDTO dto)
+        public async Task<bool> Update(int id, InventoryDTO dto)
         {
             CustomException.ThrowIfNull(dto, "Inventário");
 
