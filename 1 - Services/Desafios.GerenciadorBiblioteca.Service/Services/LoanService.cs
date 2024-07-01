@@ -1,9 +1,11 @@
 ﻿using Desafios.GerenciadorBiblioteca.Domain.Application.Entities.Loans;
 using Desafios.GerenciadorBiblioteca.Domain.Application.Enums;
 using Desafios.GerenciadorBiblioteca.Domain.Application.Services;
+using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
 using Desafios.GerenciadorBiblioteca.Domain.Infra.Entities;
 using Desafios.GerenciadorBiblioteca.Domain.Infra.UnitOfWork;
 using Desafios.GerenciadorBiblioteca.Service.Services.Base;
+using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Services
 {
@@ -15,16 +17,16 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
         {
             var data = await _unitOfWork.Loans.GetAllAsync();
 
-            return data.Any() ? data : throw new Exception("Nenhum Emprestimo encontrado.");
+            return data;
         }
 
         public async Task<Loan> GetByIdAsync(int id)
         {
-            ArgumentOutOfRangeException.ThrowIfLessThan(0, id);
+            CustomException.ThrowIfLessThan(0, "Id");
 
             var data = await _unitOfWork.Loans.GetByIdAsync(id);
 
-            return ValidateReturnedDada(data, "Nenhum Emprestimo encontrado.");
+            return data;
         }
 
         public async Task<IEnumerable<Loan>> FindAsync(LoanFilter filter)
@@ -33,45 +35,49 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
 
             data = FilterLoans(data, filter);
 
-            return ValidateReturnedDada(data, "Nenhum Emprestimo encontrado.");
+            return data;
         }
 
         public async Task<bool> AddAsync(Loan entity)
         {
-            ArgumentNullException.ThrowIfNull(entity);
+            CustomException.ThrowIfLessThan(0, "Empréstimo");
 
             await _unitOfWork.Loans.AddAsync(entity);
             var result = await _unitOfWork.SaveAsync();
 
-            return ValidateResult(result, "Não foi possível adicionar o Emprestimo. Tente novamente!");
+            return result > 0 ? true : throw new CustomException(
+                "Não foi possível adicionar o Empréstimo. Tente novamente!",
+                HttpStatusCode.InternalServerError);
         }
 
         public async Task<bool> Update(Loan entity)
         {
-            ArgumentNullException.ThrowIfNull(entity);
+            CustomException.ThrowIfLessThan(0, "Empréstimo");
 
-            var libraryRegistered = await GetByIdAsync(entity.Id);
-
-            ArgumentNullException.ThrowIfNull(libraryRegistered);
+            var loanRegistered = await GetByIdAsync(entity.Id) ??
+                throw new CustomException("Nenhum Emrpéstimo foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
 
             _unitOfWork.Loans.Update(entity);
             var result = await _unitOfWork.SaveAsync();
 
-            return ValidateResult(result, "Não foi possível alterar o Emprestimo. Tente novamente!");
+            return result > 0 ? true : throw new CustomException(
+                "Não foi possível atualizar o Empréstimo. Tente novamente!",
+                HttpStatusCode.InternalServerError);
         }
 
         public async Task<bool> Remove(int id)
         {
-            ArgumentOutOfRangeException.ThrowIfLessThan(0, id);
+            CustomException.ThrowIfLessThan(0, "Id");
 
-            var libraryRegistered = await GetByIdAsync(id);
+            var loanRegistered = await GetByIdAsync(id) ??
+                throw new CustomException("Nenhum Empréstimo foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
 
-            ArgumentNullException.ThrowIfNull(libraryRegistered);
-
-            _unitOfWork.Loans.Remove(libraryRegistered);
+            _unitOfWork.Loans.Remove(loanRegistered);
             var result = await _unitOfWork.SaveAsync();
 
-            return ValidateResult(result, "Não foi possível deletar o Emprestimo. Tente novamente!");
+            return result > 0 ? true : throw new CustomException(
+                "Não foi possível deletar o Empréstimo. Tente novamente!",
+                HttpStatusCode.InternalServerError);
         }
 
         private IEnumerable<Loan> FilterLoans(IEnumerable<Loan> loans, LoanFilter filter)

@@ -1,7 +1,9 @@
 ﻿using Desafios.GerenciadorBiblioteca.Domain.Application.Services;
+using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
 using Desafios.GerenciadorBiblioteca.Domain.Infra.Entities;
 using Desafios.GerenciadorBiblioteca.Domain.Infra.UnitOfWork;
 using Desafios.GerenciadorBiblioteca.Service.Services.Base;
+using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Services
 {
@@ -13,64 +15,66 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
         {
             var data = await _unitOfWork.Users.GetAllAsync();
 
-            return data.Any() ? data : throw new Exception("Nenhum Usuário encontrado.");
+            return data;
         }
 
         public async Task<User> GetByIdAsync(int id)
         {
-            ArgumentOutOfRangeException.ThrowIfLessThan(0, id);
+            CustomException.ThrowIfLessThan(0, "Id");
 
             var data = await _unitOfWork.Users.GetByIdAsync(id);
 
-            return ValidateReturnedDada(data, "Nenhum Usuário encontrado.");
+            return data;
         }
 
         public async Task<IEnumerable<User>> FindAsync(string name)
         {
-            if (string.IsNullOrEmpty(name))
-                throw new ArgumentNullException(name);
+            if (!string.IsNullOrEmpty(name))
+                return await _unitOfWork.Users.FindAsync(x => x.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase));
 
-            var data = await _unitOfWork.Users.FindAsync(x => x.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase));
-
-            return ValidateReturnedDada(data, "Nenhuma Biblioteca encontrada.");
+            return await GetAllAsync();
         }
 
         public async Task<bool> AddAsync(User entity)
         {
-            ArgumentNullException.ThrowIfNull(entity);
+            CustomException.ThrowIfNull(entity, "Usuário");
 
             await _unitOfWork.Users.AddAsync(entity);
             var result = await _unitOfWork.SaveAsync();
 
-            return ValidateResult(result, "Não foi possível adicionar o Usuário. Tente novamente!");
+            return result > 0 ? true : throw new CustomException(
+                "Não foi possível adicionar o Usuário. Tente novamente!",
+                HttpStatusCode.InternalServerError);
         }
 
         public async Task<bool> Update(User entity)
         {
-            ArgumentNullException.ThrowIfNull(entity);
+            CustomException.ThrowIfNull(entity, "Usuário");
 
-            var libraryRegistered = await GetByIdAsync(entity.Id);
-
-            ArgumentNullException.ThrowIfNull(libraryRegistered);
+            var userRegistered = await GetByIdAsync(entity.Id) ??
+                throw new CustomException("Nenhum Usuário foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
 
             _unitOfWork.Users.Update(entity);
             var result = await _unitOfWork.SaveAsync();
 
-            return ValidateResult(result, "Não foi possível atualizar o Usuário. Tente novamente!");
+            return result > 0 ? true : throw new CustomException(
+                 "Não foi possível alterar o Usuário. Tente novamente!",
+                 HttpStatusCode.InternalServerError);
         }
 
         public async Task<bool> Remove(int id)
         {
-            ArgumentOutOfRangeException.ThrowIfLessThan(0, id);
+            CustomException.ThrowIfLessThan(0, "Id");
 
-            var libraryRegistered = await GetByIdAsync(id);
+            var userRegistered = await GetByIdAsync(id) ??
+                throw new CustomException("Nenhum Livro foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
 
-            ArgumentNullException.ThrowIfNull(libraryRegistered);
-
-            _unitOfWork.Users.Remove(libraryRegistered);
+            _unitOfWork.Users.Remove(userRegistered);
             var result = await _unitOfWork.SaveAsync();
 
-            return ValidateResult(result, "Não foi possível deletar o Usuário. Tente novamente!");
+            return result > 0 ? true : throw new CustomException(
+                "Não foi possível deletar o Usuário. Tente novamente!",
+                HttpStatusCode.InternalServerError);
         }
     }
 }

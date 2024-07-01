@@ -1,9 +1,10 @@
 ﻿using Desafios.GerenciadorBiblioteca.Domain.Application.Entities.Books;
-using Desafios.GerenciadorBiblioteca.Domain.Application.Entities.Loans;
 using Desafios.GerenciadorBiblioteca.Domain.Application.Services;
+using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
 using Desafios.GerenciadorBiblioteca.Domain.Infra.Entities;
 using Desafios.GerenciadorBiblioteca.Domain.Infra.UnitOfWork;
 using Desafios.GerenciadorBiblioteca.Service.Services.Base;
+using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Services
 {
@@ -15,63 +16,67 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
         {
             var data = await _unitOfWork.Books.GetAllAsync();
 
-            return data.Any() ? data : throw new Exception("Nenhum Livro encontrado.");
+            return data;
         }
 
         public async Task<Book> GetByIdAsync(int id)
         {
-            ArgumentOutOfRangeException.ThrowIfLessThan(0, id);
+            CustomException.ThrowIfLessThan(0, "Id");
 
             var data = await _unitOfWork.Books.GetByIdAsync(id);
 
-            return ValidateReturnedDada(data, "Nenhum Livro encontrado.");
+            return data;
         }
 
         public async Task<IEnumerable<Book>> FindAsync(BookFilter filter)
         {
             var data = await GetAllAsync();
 
-            FilterBooks(data, filter);
+            data = FilterBooks(data, filter);
 
-            return ValidateReturnedDada(data, "Nenhum Livro encontrado.");
+            return data;
         }
 
         public async Task<bool> AddAsync(Book entity)
         {
-            ArgumentNullException.ThrowIfNull(entity);
+            CustomException.ThrowIfNull(entity, "Livro");
 
             await _unitOfWork.Books.AddAsync(entity);
             var result = await _unitOfWork.SaveAsync();
 
-            return ValidateResult(result, "Não foi possível adicionar o Livro. Tente novamente!");
+            return result > 0 ? true : throw new CustomException(
+                "Não foi possível adicionar o Livro. Tente novamente!",
+                HttpStatusCode.InternalServerError);
         }
 
         public async Task<bool> Update(Book entity)
         {
-            ArgumentNullException.ThrowIfNull(entity);
+            CustomException.ThrowIfNull(entity, "Livro");
 
-            var libraryRegistered = await GetByIdAsync(entity.Id);
-
-            ArgumentNullException.ThrowIfNull(libraryRegistered);
+            var libraryRegistered = await GetByIdAsync(entity.Id) ??
+                throw new CustomException("Nenhum Livro foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
 
             _unitOfWork.Books.Update(entity);
             var result = await _unitOfWork.SaveAsync();
 
-            return ValidateResult(result, "Não foi possível alterar o Livro. Tente novamente!");
+            return result > 0 ? true : throw new CustomException(
+                "Não foi possível alterar o Livro. Tente novamente!",
+                HttpStatusCode.InternalServerError);
         }
 
         public async Task<bool> Remove(int id)
         {
-            ArgumentOutOfRangeException.ThrowIfLessThan(0, id);
+            CustomException.ThrowIfLessThan(0, "Id");
 
-            var libraryRegistered = await GetByIdAsync(id);
-
-            ArgumentNullException.ThrowIfNull(libraryRegistered);
+            var libraryRegistered = await GetByIdAsync(id) ??
+                throw new CustomException("Nenhum Livro foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
 
             _unitOfWork.Books.Remove(libraryRegistered);
             var result = await _unitOfWork.SaveAsync();
 
-            return ValidateResult(result, "Não foi possível deletar o Livro. Tente novamente!");
+            return result > 0 ? true : throw new CustomException(
+                "Não foi possível deletar o Livro. Tente novamente!",
+                HttpStatusCode.InternalServerError);
         }
 
         private IEnumerable<Book> FilterBooks(IEnumerable<Book> books, BookFilter filter)

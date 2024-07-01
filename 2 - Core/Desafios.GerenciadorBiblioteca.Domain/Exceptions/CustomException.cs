@@ -21,5 +21,14 @@ namespace Desafios.GerenciadorBiblioteca.Domain.Exceptions
                     HttpStatusCode.UnprocessableEntity
                 );
         }
+
+        public static void ThrowIfLessThan(int argument, string argumentName)
+        {
+            if (argument < 0)
+                throw new CustomException(
+                    $"O parâmetro {argumentName} deve ser maior ou igual a 0.",
+                    HttpStatusCode.UnprocessableEntity
+                );
+        }
     }
 }
