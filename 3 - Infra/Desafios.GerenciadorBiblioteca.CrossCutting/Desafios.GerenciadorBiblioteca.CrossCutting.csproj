@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\1 - Services\Desafios.GerenciadorBiblioteca.Service\Desafios.GerenciadorBiblioteca.Service.csproj" />
+    <ProjectReference Include="..\..\2 - Core\Desafios.GerenciadorBiblioteca.Domain\Desafios.GerenciadorBiblioteca.Domain.csproj" />
+    <ProjectReference Include="..\Desafios.GerenciadorBiblioteca.Data\Desafios.GerenciadorBiblioteca.Data.csproj" />
+  </ItemGroup>
+
+</Project>
