@@ -1,9 +1,9 @@
-﻿using Desafios.GerenciadorBiblioteca.Domain.Entities;
+﻿using Desafios.GerenciadorBiblioteca.Data.Context;
+using Desafios.GerenciadorBiblioteca.Data.Repositories.Base;
+using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Desafios.GerenciadorBiblioteca.Domain.Repositories;
-using Desafios.GerenciadorBiblioteca.Infra.Context;
-using Desafios.GerenciadorBiblioteca.Infra.Repositories.Base;
 
-namespace Desafios.GerenciadorBiblioteca.Infra.Repositories
+namespace Desafios.GerenciadorBiblioteca.Data.Repositories
 {
     public class BookRepository(LibraryDbContext context) : GenericRepository<Book, int>(context), IBookRepository
     {

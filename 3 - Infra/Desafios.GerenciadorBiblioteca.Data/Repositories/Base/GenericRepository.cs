@@ -1,11 +1,11 @@
-﻿using Desafios.GerenciadorBiblioteca.Domain.Entities.Base;
+﻿using Desafios.GerenciadorBiblioteca.Data.Context;
+using Desafios.GerenciadorBiblioteca.Domain.Entities.Base;
 using Desafios.GerenciadorBiblioteca.Domain.Repositories.Base;
-using Desafios.GerenciadorBiblioteca.Infra.Context;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 
-namespace Desafios.GerenciadorBiblioteca.Infra.Repositories.Base
+namespace Desafios.GerenciadorBiblioteca.Data.Repositories.Base
 {
     public abstract class GenericRepository<TEntity, T> : IGenericRepository<TEntity, T>
         where TEntity : class, IEntity<T>, new()

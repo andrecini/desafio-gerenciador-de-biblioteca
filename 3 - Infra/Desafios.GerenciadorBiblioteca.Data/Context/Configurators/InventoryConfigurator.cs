@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Desafios.GerenciadorBiblioteca.Infra.Context.Configurators
+namespace Desafios.GerenciadorBiblioteca.Data.Context.Configurators
 {
     public class InventoryConfigurator : IEntityTypeConfiguration<Inventory>
     {

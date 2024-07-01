@@ -1,9 +1,9 @@
-﻿using Desafios.GerenciadorBiblioteca.Domain.Repositories;
+﻿using Desafios.GerenciadorBiblioteca.Data.Context;
+using Desafios.GerenciadorBiblioteca.Data.Repositories;
+using Desafios.GerenciadorBiblioteca.Domain.Repositories;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
-using Desafios.GerenciadorBiblioteca.Infra.Context;
-using Desafios.GerenciadorBiblioteca.Infra.Repositories;
 
-namespace Desafios.GerenciadorBiblioteca.Infra.UnitOfWork
+namespace Desafios.GerenciadorBiblioteca.Data.UnitOfWork
 {
     public class UnitOfWork : IUnitOfWork
     {

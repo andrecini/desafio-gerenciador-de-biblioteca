@@ -1,4 +1,5 @@
-using Desafios.GerenciadorBiblioteca.Infra;
+using Desafios.GerenciadorBiblioteca.Api.Handlers;
+using Desafios.GerenciadorBiblioteca.Data;
 using Desafios.GerenciadorBiblioteca.Service;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,8 +11,13 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddInfraModule(builder.Configuration);
+builder.Services.AddDataModule(builder.Configuration);
 builder.Services.AddApplicationModule();
+
+// Handlers
+builder.Services.AddExceptionHandler<CustomExceptionHandler>();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 

@@ -5,9 +5,9 @@ namespace Desafios.GerenciadorBiblioteca.Domain.Exceptions
     public class CustomException : Exception
     {
         public HttpStatusCode StatusCode { get; set; }
-        public object ErrorDetails { get; set; }
+        public string ErrorDetails { get; set; }
 
-        public CustomException(object details, HttpStatusCode statusCode)
+        public CustomException(string details, HttpStatusCode statusCode)
         {
             StatusCode = statusCode;
             ErrorDetails = details;

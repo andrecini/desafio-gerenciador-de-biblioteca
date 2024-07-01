@@ -5,7 +5,7 @@ using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces.Base;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Services.Interfaces
 {
-    public interface IBookService : IService<BookInputDTO, Book>
+    public interface IBookService : IService<BookDTO, Book>
     {
         Task<IEnumerable<Book>> FindAsync(BookFilter filter);
     }

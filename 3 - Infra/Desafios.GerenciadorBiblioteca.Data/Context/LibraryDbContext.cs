@@ -2,7 +2,7 @@
 using Desafios.GerenciadorBiblioteca.Infra.Context.Configurators;
 using Microsoft.EntityFrameworkCore;
 
-namespace Desafios.GerenciadorBiblioteca.Infra.Context
+namespace Desafios.GerenciadorBiblioteca.Data.Context
 {
     public class LibraryDbContext(DbContextOptions<LibraryDbContext> options) : DbContext(options)
     {
