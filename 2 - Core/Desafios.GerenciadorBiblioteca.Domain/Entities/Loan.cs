@@ -1,4 +1,5 @@
 ﻿using Desafios.GerenciadorBiblioteca.Domain.Entities.Base;
+using System.Text.Json.Serialization;
 
 namespace Desafios.GerenciadorBiblioteca.Domain.Entities
 {
@@ -12,8 +13,11 @@ namespace Desafios.GerenciadorBiblioteca.Domain.Entities
         public DateTime LoanValidity { get; set; }
         public bool Returned { get; set; }
 
+        [JsonIgnore]
         public User? User { get; set; }
+        [JsonIgnore]
         public Book? Book { get; set; }
+        [JsonIgnore]
         public Library? Library { get; set; }
     }
 }

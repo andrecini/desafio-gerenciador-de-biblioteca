@@ -8,8 +8,20 @@ namespace Desafios.GerenciadorBiblioteca.Data.Context.Configurators
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
-            builder.HasKey(u => u.Id);
-            builder.Property(u => u.Id).ValueGeneratedOnAdd();
+            builder.HasKey(l => l.Id);
+            builder.Property(l => l.Id).ValueGeneratedOnAdd();
+
+            builder.Property(l => l.Name)
+                   .IsRequired()
+                   .HasMaxLength(100);
+
+            builder.Property(l => l.Email)
+                   .IsRequired()
+                   .HasMaxLength(100);
+
+            builder.Property(l => l.Phone)
+                   .IsRequired()
+                   .HasMaxLength(15);
         }
     }
 }

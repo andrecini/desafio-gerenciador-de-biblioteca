@@ -13,7 +13,7 @@ namespace Desafios.GerenciadorBiblioteca.Domain.Repositories.Base
 
         Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate);
 
-        Task AddAsync(TEntity entity);
+        Task<TEntity> AddAsync(TEntity entity);
 
         void Update(TEntity entity);
 

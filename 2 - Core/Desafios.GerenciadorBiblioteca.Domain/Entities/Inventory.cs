@@ -1,4 +1,5 @@
 ﻿using Desafios.GerenciadorBiblioteca.Domain.Entities.Base;
+using System.Text.Json.Serialization;
 
 namespace Desafios.GerenciadorBiblioteca.Domain.Entities
 {
@@ -9,7 +10,9 @@ namespace Desafios.GerenciadorBiblioteca.Domain.Entities
         public int BookId { get; set; }
         public bool Available { get; set; }
 
+        [JsonIgnore]
         public Library? Library { get; set; }
+        [JsonIgnore]
         public Book? Book { get; set; }
     }
 }

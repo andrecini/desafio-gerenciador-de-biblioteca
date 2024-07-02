@@ -1,6 +1,5 @@
-﻿using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
+﻿using Desafios.GerenciadorBiblioteca.Api.Responses;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Desafios.GerenciadorBiblioteca.Api.Handlers
 {
@@ -12,15 +11,10 @@ namespace Desafios.GerenciadorBiblioteca.Api.Handlers
         {
             _logger.LogError(exception, "Ocorreu uma Exceção: {Message}", exception.Message);
 
-            var problemDetails = new ProblemDetails
-            {
-                Status = httpContext.Response.StatusCode,
-                Title = "Internal Server Error",
-                Detail = exception.Message
-            };
+            var response = new CustomErrorResponse(exception.Message, "Exception");
 
-            httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken: cancellationToken);
+            httpContext.Response.StatusCode = 500;
+            await httpContext.Response.WriteAsJsonAsync(response, cancellationToken: cancellationToken);
 
             return true;
         }

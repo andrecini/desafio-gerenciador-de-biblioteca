@@ -29,7 +29,12 @@ namespace Desafios.GerenciadorBiblioteca.Data.Repositories.Base
         public async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate) =>
             await _dbSet.Where(predicate).ToListAsync();
 
-        public async Task AddAsync(TEntity entity) => await _dbSet.AddAsync(entity);
+        public async Task<TEntity> AddAsync(TEntity entity)
+        {
+            await _dbSet.AddAsync(entity);
+            return entity; 
+        }
+
 
         public void Update(TEntity entity) => _dbSet.Update(entity);
 

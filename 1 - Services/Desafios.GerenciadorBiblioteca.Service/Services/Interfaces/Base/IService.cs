@@ -6,8 +6,8 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services.Interfaces.Base
     {
         Task<IEnumerable<TEntity>> GetAllAsync();
         Task<TEntity> GetByIdAsync(int id);
-        Task<bool> AddAsync(T dto);
-        Task<bool> Update(int id, T dto);
+        Task<TEntity> AddAsync(T dto);
+        Task<TEntity> Update(int id, T dto);
         Task<bool> Remove(int id);
     }
 }

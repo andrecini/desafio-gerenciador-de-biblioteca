@@ -1,4 +1,5 @@
-﻿using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
+﻿using Desafios.GerenciadorBiblioteca.Api.Responses;
+using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,15 +16,10 @@ namespace Desafios.GerenciadorBiblioteca.Api.Handlers
 
             _logger.LogError("Aviso: {Message}", customException.ErrorDetails);
 
-            var problemDetails = new ProblemDetails
-            {
-                Status = (int)customException.StatusCode,
-                Title = "Falha ao Processar",
-                Detail = customException.ErrorDetails
-            };
+            var response = new CustomErrorResponse(customException.ErrorDetails, "CustomException");
 
-            httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken: cancellationToken);
+            httpContext.Response.StatusCode = (int)customException.StatusCode;
+            await httpContext.Response.WriteAsJsonAsync(response, cancellationToken: cancellationToken);
 
             return true;
         }

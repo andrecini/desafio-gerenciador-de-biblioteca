@@ -1,4 +1,5 @@
 ﻿using Desafios.GerenciadorBiblioteca.Domain.Entities.Base;
+using System.Text.Json.Serialization;
 
 namespace Desafios.GerenciadorBiblioteca.Domain.Entities
 {
@@ -9,7 +10,9 @@ namespace Desafios.GerenciadorBiblioteca.Domain.Entities
         public string? CNPJ { get; set; }
         public string? Phone { get; set; }
 
+        [JsonIgnore]
         public ICollection<Inventory>? Inventories { get; set; }
+        [JsonIgnore]
         public ICollection<Loan>? Loans { get; set; }
     }
 }

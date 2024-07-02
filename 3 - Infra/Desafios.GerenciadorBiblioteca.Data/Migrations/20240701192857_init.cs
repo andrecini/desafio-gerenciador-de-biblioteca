@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Desafios.GerenciadorBiblioteca.Infra.Migrations
+namespace Desafios.GerenciadorBiblioteca.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class v1 : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -35,7 +35,7 @@ namespace Desafios.GerenciadorBiblioteca.Infra.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CNPJ = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Prone = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {

@@ -10,6 +10,18 @@ namespace Desafios.GerenciadorBiblioteca.Data.Context.Configurators
         {
             builder.HasKey(l => l.Id);
             builder.Property(l => l.Id).ValueGeneratedOnAdd();
+
+            builder.Property(l => l.Name)
+                   .IsRequired()
+                   .HasMaxLength(100);
+
+            builder.Property(l => l.CNPJ)
+                   .IsRequired()
+                   .HasMaxLength(14);
+
+            builder.Property(l => l.Phone)
+                   .IsRequired()
+                   .HasMaxLength(11);
         }
     }
 }

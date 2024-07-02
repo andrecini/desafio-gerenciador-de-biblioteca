@@ -1,3 +1,5 @@
+using Desafios.GerenciadorBiblioteca.Api.Responses;
+using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
 using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -18,51 +20,59 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAsync()
+        public async Task<IActionResult> GetAll()
         {
             var data = await _service.GetAllAsync();
+            var response = new CustomResponse<IEnumerable<User>>(data, "Usuários Recupedados com Sucesso!");
 
             return data.Any() ? Ok(data) : NoContent();
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetByIdAsync(int id)
+        public async Task<IActionResult> GetById(int id)
         {
             var data = await _service.GetByIdAsync(id);
+            var response = new CustomResponse<User>(data, "Usuário Recupedado com Sucesso!");
 
             return data != null ? Ok(data) : NoContent();
         }
 
         [HttpPost("filter")]
-        public async Task<IActionResult> FilterAsync([FromBody]string name)
+        public async Task<IActionResult> Filter([FromBody]string name)
         {
             var data = await _service.FindAsync(name);
+            var response = new CustomResponse<IEnumerable<User>>(data, "Usuários Recupedados com Sucesso!");
 
             return data.Any() ? Ok(data) : NoContent();
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddAsync(UserDTO request)
+        public async Task<IActionResult> Add(UserDTO request)
         {
-            await _service.AddAsync(request);
+            var data = await _service.AddAsync(request);
+            var response = new CustomResponse<User>(data, "Usuário Adicionado com Sucesso!");
 
-            return Created();
+            var locationUri = Url.Link(nameof(GetById), new { id = data.Id });
+
+            return Created(locationUri, data);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, UserDTO request)
+        public async Task<IActionResult> Update(int id, UserDTO request)
         {
-            _service.Update(id, request);
+            var data = await _service.Update(id, request);
+            var response = new CustomResponse<User>(data, "Usuário Atualizado com Sucesso!");
 
             return Ok();
         }
         
         [HttpDelete]
-        public IActionResult Remove(int id)
+        public async Task<IActionResult> Remove(int id)
         {
-            _service.Remove(id);
+            var data = await _service.Remove(id);
+            var response = new CustomResponse<bool>(data, "Usuário Removido com Sucesso!");
 
-            return Ok();
+            return NoContent();
         }
     }
 }

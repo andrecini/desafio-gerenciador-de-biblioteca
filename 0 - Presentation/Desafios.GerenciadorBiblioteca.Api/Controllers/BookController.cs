@@ -1,3 +1,5 @@
+using Desafios.GerenciadorBiblioteca.Api.Responses;
+using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Desafios.GerenciadorBiblioteca.Domain.Entities.Filters;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
 using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces;
@@ -19,51 +21,59 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAsync()
+        public async Task<IActionResult> GetAll()
         {
             var data = await _service.GetAllAsync();
+            var response = new CustomResponse<IEnumerable<Book>>(data, "Livros Recupedados com Sucesso!");
 
-            return data.Any() ? Ok(data) : NoContent();
+            return data.Any() ? Ok(response) : NoContent();
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetByIdAsync(int id)
+        public async Task<IActionResult> GetById(int id)
         {
             var data = await _service.GetByIdAsync(id);
+            var response = new CustomResponse<Book>(data, "Livro Recupedado com Sucesso!");
 
-            return data != null ? Ok(data) : NoContent();
+            return data != null ? Ok(response) : NoContent();
         }
 
         [HttpPost("filter")]
-        public async Task<IActionResult> FilterAsync(BookFilter request)
+        public async Task<IActionResult> Filter(BookFilter request)
         {
             var data = await _service.FindAsync(request);
+            var response = new CustomResponse<IEnumerable<Book>>(data, "Livros Recupedados com Sucesso!");
 
-            return data.Any() ? Ok(data) : NoContent();
+            return data.Any() ? Ok(response) : NoContent();
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddAsync(BookDTO request)
+        public async Task<IActionResult> Add(BookDTO request)
         {
-            await _service.AddAsync(request);
+            var data = await _service.AddAsync(request);
+            var response = new CustomResponse<Book>(data, "Livro Adicionado com Sucesso!");
 
-            return Created();
+            var locationUri = Url.Link(nameof(GetById), new { id = data.Id });
+
+            return Created(locationUri, response);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, BookDTO request)
+        public async Task<IActionResult> Update(int id, BookDTO request)
         {
-            _service.Update(id, request);
+            var data = await _service.Update(id, request);
+            var response = new CustomResponse<Book>(data, "Livro Atualizado com Sucesso!");
 
-            return Ok();
+            return Ok(response);
         }
         
         [HttpDelete]
-        public IActionResult Remove(int id)
+        public async Task<IActionResult> Remove(int id)
         {
-            _service.Remove(id);
+            var data = await _service.Remove(id);
+            var response = new CustomResponse<bool>(data, "Livro Removido com Sucesso!");
 
-            return Ok();
+            return Ok(response);
         }
     }
 }

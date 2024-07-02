@@ -27,12 +27,12 @@ namespace Desafios.GerenciadorBiblioteca.Service.Mapping
                 .ForMember(x => x.Year, opt => opt.MapFrom(src => src.Year));
 
             CreateMap<InventoryDTO, Inventory>()
-                .ForMember(x => x.LibraryId, opt => opt.MapFrom(src => src.BookId))
+                .ForMember(x => x.LibraryId, opt => opt.MapFrom(src => src.LibraryId))
                 .ForMember(x => x.BookId, opt => opt.MapFrom(src => src.BookId))
                 .ForMember(x => x.Available, opt => opt.MapFrom(src => src.Available));
 
             CreateMap<LoanDTO, Loan>()
-                .ForMember(x => x.LibraryId, opt => opt.MapFrom(src => src.BookId))
+                .ForMember(x => x.LibraryId, opt => opt.MapFrom(src => src.LibraryId))
                 .ForMember(x => x.UserId, opt => opt.MapFrom(src => src.UserId))
                 .ForMember(x => x.BookId, opt => opt.MapFrom(src => src.BookId))
                 .ForMember(x => x.LoanDate, opt => opt.MapFrom(src => src.LoanDate))

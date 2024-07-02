@@ -5,12 +5,14 @@ using Desafios.GerenciadorBiblioteca.Domain.Enums;
 using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
+using Desafios.GerenciadorBiblioteca.Service.Services.Base;
 using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces;
+using Desafios.GerenciadorBiblioteca.Service.Validators;
 using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Services
 {
-    public class InventoryService(IUnitOfWork unitOfWork, IMapper mapper) : IInventoryService
+    public class InventoryService(IUnitOfWork unitOfWork, IMapper mapper) : BaseService, IInventoryService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IMapper _mapper = mapper;
@@ -40,33 +42,38 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
             return data;
         }
 
-        public async Task<bool> AddAsync(InventoryDTO dto)
+        public async Task<Inventory> AddAsync(InventoryDTO dto)
         {
             CustomException.ThrowIfNull(dto, "Inventário");
 
+            ValidateEntity<InventoryValidator, InventoryDTO>(dto);
+
             var entity = _mapper.Map<Inventory>(dto);
 
-            await _unitOfWork.Inventories.AddAsync(entity);
+            entity = await _unitOfWork.Inventories.AddAsync(entity);
             var result = await _unitOfWork.SaveAsync();
 
-            return result > 0 ? true : throw new CustomException(
+            return result > 0 ? entity : throw new CustomException(
                 "Não foi possível adicionar o Inventário. Tente novamente!",
                 HttpStatusCode.InternalServerError);
         }
 
-        public async Task<bool> Update(int id, InventoryDTO dto)
+        public async Task<Inventory> Update(int id, InventoryDTO dto)
         {
             CustomException.ThrowIfNull(dto, "Inventário");
+
+            ValidateEntity<InventoryValidator, InventoryDTO>(dto);
 
             var InventoryRegistered = await GetByIdAsync(id) ??
                 throw new CustomException("Nenhum Inventário foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
 
             var entity = _mapper.Map<Inventory>(dto);
+            entity.Id = id;
 
             _unitOfWork.Inventories.Update(entity);
             var result = await _unitOfWork.SaveAsync();
 
-            return result > 0 ? true : throw new CustomException(
+            return result > 0 ? entity : throw new CustomException(
                 "Não foi possível alterar o Inventário. Tente novamente!",
                 HttpStatusCode.InternalServerError);
         }

@@ -3,12 +3,14 @@ using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
+using Desafios.GerenciadorBiblioteca.Service.Services.Base;
 using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces;
+using Desafios.GerenciadorBiblioteca.Service.Validators;
 using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Services
 {
-    public class UserService(IUnitOfWork unitOfWork, IMapper mapper) : IUserService
+    public class UserService(IUnitOfWork unitOfWork, IMapper mapper) : BaseService, IUserService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IMapper _mapper = mapper;
@@ -37,33 +39,38 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
             return await GetAllAsync();
         }
 
-        public async Task<bool> AddAsync(UserDTO dto)
+        public async Task<User> AddAsync(UserDTO dto)
         {
             CustomException.ThrowIfNull(dto, "Usuário");
 
+            ValidateEntity<UserValidator, UserDTO>(dto);
+
             var entity = _mapper.Map<User>(dto);
 
-            await _unitOfWork.Users.AddAsync(entity);
+            entity = await _unitOfWork.Users.AddAsync(entity);
             var result = await _unitOfWork.SaveAsync();
 
-            return result > 0 ? true : throw new CustomException(
+            return result > 0 ? entity : throw new CustomException(
                 "Não foi possível adicionar o Usuário. Tente novamente!",
                 HttpStatusCode.InternalServerError);
         }
 
-        public async Task<bool> Update(int id, UserDTO dto)
+        public async Task<User> Update(int id, UserDTO dto)
         {
             CustomException.ThrowIfNull(dto, "Usuário");
+
+            ValidateEntity<UserValidator, UserDTO>(dto);
 
             var userRegistered = await GetByIdAsync(id) ??
                 throw new CustomException("Nenhum Usuário foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
 
             var entity = _mapper.Map<User>(dto);
+            entity.Id = id;
 
             _unitOfWork.Users.Update(entity);
             var result = await _unitOfWork.SaveAsync();
 
-            return result > 0 ? true : throw new CustomException(
+            return result > 0 ? entity : throw new CustomException(
                  "Não foi possível alterar o Usuário. Tente novamente!",
                  HttpStatusCode.InternalServerError);
         }
