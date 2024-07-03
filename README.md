@@ -1,3 +1,5 @@
+![image](https://github.com/andrecini/desafio-gerenciador-de-biblioteca/assets/79148213/16c27d61-7e75-445e-87a2-a5da8c221aed)
+
 # Mentoria .NET - Desafio: Gerenciador de Bibliotecas 📚
 
 ## 💡 Descrição
