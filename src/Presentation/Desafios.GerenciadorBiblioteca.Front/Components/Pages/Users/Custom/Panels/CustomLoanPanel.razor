@@ -16,11 +16,9 @@
 
 <MudContainer Class="d-flex flex-row align-end pa-0 mb-5 ma-0 gap-5" MaxWidth="MaxWidth.False">
     <MudForm Class="d-flex flex-row align-end pa-0 ma-0 gap-5 w-100">
-        <MudButton Variant="Variant.Outlined" Color="Color.Success" StartIcon="@Icons.Material.Filled.AddCircle" IconColor="Color.Success" @onclick="RegisterDialogHandle">Cadastrar</MudButton>
         <MudTextField @bind-Value="bookFilter" Immediate="true" Label="Livro" Class="ma-0" />
         <MudDatePicker @bind-Date="loanDateFilter" ShowToolbar="false" Label="Data empréstimo" Class="ma-0" />
         <MudDatePicker @bind-Date="loanDateValidityFilter" ShowToolbar="false" Label="Data Validade" Class="ma-0" />
-        <MudTextField @bind-Value="userFilter" Immediate="true" Label="Responsável" Class="ma-0" />
         <MudSelect @bind-Value="statusFilter" Label="Disponível" AnchorOrigin="Origin.BottomCenter">
             <MudSelectItem Value="0">Todos</MudSelectItem>
             <MudSelectItem Value="1">Devolvidos</MudSelectItem>
@@ -44,29 +42,20 @@ else
             <col />
             <col />
             <col />
-            <col />
-            <col width="280" />
         </ColGroup>
         <HeaderContent>
             <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<LoanViewModel, object>(x=>x.Id)">ID</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<LoanViewModel, object>(x=> x.BookName)" Class="w-100">Livro</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<LoanViewModel, object>(x=> x.LoanDate)">Data Empréstimo</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<LoanViewModel, object>(x=> x.LoanValidity)">Validade</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<LoanViewModel, object>(x=> x.Username)">Responsável</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<LoanViewModel, object>(x=> x.Status)">Status</MudTableSortLabel></MudTh>
-            <MudTh>Ações</MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<LoanViewModel, object>(x=> x.Status)">Disponível</MudTableSortLabel></MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="ID">@context.Id</MudTd>
-            <MudTd DataLabel="Livro">@context.BookName</MudTd>
-            <MudTd DataLabel="Empréstimo">@context.LoanDate.ToString("dd/MM/yyyy")</MudTd>
+            <MudTd DataLabel="Nome">@context.BookName</MudTd>
+            <MudTd DataLabel="Data Empréstimo">@context.LoanDate.ToString("dd/MM/yyyy")</MudTd>
             <MudTd DataLabel="Validade">@context.LoanValidity.ToString("dd/MM/yyyy")</MudTd>
-            <MudTd DataLabel="Responsáve">@context.Username</MudTd>
             <MudTd DataLabel="Status">@(context.Status ? "Devolvido" : "Pendente")</MudTd>
-            <MudTd DataLabel="Ações" Class="d-flex gap-2">
-                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Search">Detalhes</MudButton>
-                <MudButton @onclick="@((e) => DeleteDialogHandle(context.Id))" Variant="Variant.Outlined" Color="Color.Error" EndIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error">Excluir</MudButton>
-            </MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager PageSizeOptions="new int[]{10, 20}" />
@@ -87,7 +76,6 @@ else
     #region Filter Variables
     private LoanFilter filter = new();
     private string bookFilter;
-    private string userFilter;
     private DateTime? loanDateFilter;
     private DateTime? loanDateValidityFilter;
     private int statusFilter;
@@ -103,13 +91,13 @@ else
 
     private async Task InitializeInventories()
     {
-        inventories = await inventoryService.GetByLibraryAsync(Id);
+        inventories = await inventoryService.GetAllAsync();
     }
 
     private async Task InitializeLoans()
     {
         var inventoryIds = inventories.Select(inv => inv.Id).ToHashSet();
-        var allLoans = await loanService.GetAllAsync();
+        var allLoans = await loanService.GetByUserAsync(Id);
         loans = allLoans.Where(loan => inventoryIds.Contains(loan.InventoryId));
     }
 
@@ -126,7 +114,7 @@ else
                 var book = await bookService.GetByIdAsync(inventory.BookId);
                 var user = await userService.GetByIdAsync(loan.UserId);
 
-                loanViewModels.Add(new LoanViewModel(loan, book.Title, user.Name, loan.Returned));
+                loanViewModels.Add(new LoanViewModel(loan, book.Title, loan.Returned));
             }
         }
 
@@ -143,17 +131,13 @@ else
 
         var inventoriesIds = GetFilteredInventoriesIds(booksIds);
 
-        var usersIds = await GetFilteredUsersIdsAsync();
-
         filter.LoanValidity = loanDateValidityFilter ?? new DateTime();
         filter.LoanDate = loanDateFilter ?? new DateTime();
         filter.Status = (LoanStatus)statusFilter;
 
         loans = await loanService.GetByFilterAsync(filter);
 
-        loans = loans.Where(x =>
-            booksIds.Contains(x.InventoryId) &&
-            usersIds.Contains(x.UserId));
+        loans = loans.Where(x => booksIds.Contains(x.InventoryId) && x.UserId == Id);
 
         await InitializeLoansViewModel();
 
@@ -177,21 +161,10 @@ else
         return inventories.Select(x => x.Id).ToHashSet();
     }
 
-    private async Task<HashSet<int>> GetFilteredUsersIdsAsync()
-    {
-        var usersFiltered = await userService.GetByNameAsync(userFilter) ?? new List<User>();
-
-        if (!usersFiltered.Any())
-            return new();
-
-        return usersFiltered.Select(x => x.Id).ToHashSet();
-    }
-
     private async Task ResetFormFilters()
     {
         filter = new();
         bookFilter = null;
-        userFilter = null;
         loanDateFilter = null;
         loanDateValidityFilter = null;
         statusFilter = 0;
@@ -200,62 +173,14 @@ else
     }
     #endregion
 
-    #region Dialogs
-    private async Task DeleteDialogHandle(int id)
-    {
-        var parameters = new DialogParameters<CommonDeleteDialog>
-        {
-            { x => x.ContentText, "Tem certeza que deseja Excluir esse Empréstimo e todos os seus registros? Essa ação não poderá ser desfeita." },
-        };
-
-        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
-
-        var dialog = await dialogService.ShowAsync<CommonDeleteDialog>("Excluir", parameters, options);
-        var result = await dialog.Result;
-
-        if (!result.Canceled)
-        {
-            await loanService.RemoveAsync(id);
-            await InitializeInventories();
-            await InitializeLoans();
-            await InitializeLoansViewModel();
-        }
-
-        StateHasChanged();
-    }
-
-    private async Task RegisterDialogHandle()
-    {
-        var parameters = new DialogParameters<RegisterLoanDialog>
-        {
-            { x => x.LibraryId, Id },
-        };
-
-        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
-
-        var dialog = await dialogService.ShowAsync<RegisterLoanDialog>("Cadastrar", parameters, options);
-        var result = await dialog.Result;
-
-        if (!result.Canceled)
-        {
-            await InitializeInventories();
-            await InitializeLoans();
-            await InitializeLoansViewModel();
-        }
-
-        StateHasChanged();
-    }
-    #endregion
-
     public class LoanViewModel
     {
-        public LoanViewModel(Loan loan, string bookName, string userName, bool available)
+        public LoanViewModel(Loan loan, string bookName, bool available)
         {
             Id = loan.Id;
             BookName = bookName;
             LoanDate = loan.LoanDate;
             LoanValidity = loan.LoanValidity;
-            Username = userName;
             Status = available;
         }
 
@@ -263,7 +188,6 @@ else
         public string BookName { get; set; }
         public DateTime LoanDate { get; set; }
         public DateTime LoanValidity { get; set; }
-        public string Username { get; set; }
         public bool Status { get; set; }
     }
 

@@ -2,8 +2,8 @@
 @using Desafios.GerenciadorBiblioteca.Domain.Entities
 @using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests
 @using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces
-@using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Libraries.Custom.Panels
 @using System.ComponentModel.DataAnnotations
+@using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Users.Custom.Panels
 
 @inject IUserService userService;
 
@@ -28,10 +28,6 @@
 </MudContainer>
 
 <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" Class="h-100 mh-100 w-100 mw-100" PanelClass="pa-6 h-100 mh-100 overflow-y-auto">
-    <MudTabPanel Text="Livros" Class="h-100 w-100 overflow-y-auto">
-        <CustomBooksPanel Id="Id" />
-    </MudTabPanel>
-
     <MudTabPanel Text="Empréstimos" Class="h-100 w-100">
         <CustomLoanPanel Id="Id" />
     </MudTabPanel>
