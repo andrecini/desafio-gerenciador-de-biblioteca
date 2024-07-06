@@ -2,8 +2,9 @@
 @using Desafios.GerenciadorBiblioteca.Domain.Entities
 @using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests
 @using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces
+@using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Common
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Libraries.Custom.Dialog
-@using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Users.Dialog
+@using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Users.Custom.Dialog
 @rendermode InteractiveServer
 @inject IUserService userService
 @inject IDialogService DialogService
@@ -51,7 +52,7 @@ else
             <MudTd DataLabel="Email">@context.Email</MudTd>
             <MudTd DataLabel="Telefone">@context.Phone</MudTd>
             <MudTd DataLabel="Ações" Class="d-flex gap-2">
-                <MudButton Href="@($"/details/{context.Id}")" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Search">Detalhes</MudButton>
+                <MudButton Href="@($"users/details/{context.Id}")" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Search">Detalhes</MudButton>
                 <MudButton @onclick="@((e) => DeleteDialogHandle(context.Id))" Variant="Variant.Outlined" Color="Color.Error" EndIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error">Excluir</MudButton>
             </MudTd>
         </RowTemplate>
