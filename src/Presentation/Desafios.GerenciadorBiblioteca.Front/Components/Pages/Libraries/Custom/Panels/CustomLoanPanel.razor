@@ -83,13 +83,16 @@ else
     private IEnumerable<Loan> loans;
     private IEnumerable<Inventory> inventories;
 
+    #region Filter Variables
     private LoanFilter filter = new();
     private string bookFilter;
     private string userFilter;
     private DateTime? loanDateFilter;
     private DateTime? loanDateValidityFilter;
     private int statusFilter;
+    #endregion
 
+    #region Initializers
     protected override async Task OnInitializedAsync()
     {
         await InitializeInventories();
@@ -128,7 +131,9 @@ else
 
         loansViewModels = loanViewModels;
     }
+    #endregion
 
+    #region Filter
     private async Task FilterBooksViewModelAsync()
     {
         await InitializeInventories();
@@ -181,21 +186,35 @@ else
         return usersFiltered.Select(x => x.Id).ToHashSet();
     }
 
+    private async Task ResetFormFilters()
+    {
+        filter = new();
+        bookFilter = null;
+        userFilter = null;
+        loanDateFilter = null;
+        loanDateValidityFilter = null;
+        statusFilter = 0;
+
+        await FilterBooksViewModelAsync();
+    }
+    #endregion
+
+    #region Dialogs
     private async Task DeleteDialogHandle(int id)
     {
-        var parameters = new DialogParameters<DeleteLoanDialog>
+        var parameters = new DialogParameters<CommonDeleteDialog>
         {
             { x => x.ContentText, "Tem certeza que deseja Excluir esse Empréstimo e todos os seus registros? Essa ação não poderá ser desfeita." },
-            { x => x.Id, id },
         };
 
         var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
 
-        var dialog = await dialogService.ShowAsync<DeleteLoanDialog>("Excluir", parameters, options);
+        var dialog = await dialogService.ShowAsync<CommonDeleteDialog>("Excluir", parameters, options);
         var result = await dialog.Result;
 
         if (!result.Canceled)
         {
+            await loanService.RemoveAsync(id);
             await InitializeInventories();
             await InitializeLoans();
             await InitializeLoansViewModel();
@@ -225,18 +244,7 @@ else
 
         StateHasChanged();
     }
-
-    private async Task ResetFormFilters()
-    {
-        filter = new();
-        bookFilter = null;
-        userFilter = null;
-        loanDateFilter = null;
-        loanDateValidityFilter = null;
-        statusFilter = 0;
-
-        await FilterBooksViewModelAsync();
-    }
+    #endregion
 
     public class LoanViewModel
     {

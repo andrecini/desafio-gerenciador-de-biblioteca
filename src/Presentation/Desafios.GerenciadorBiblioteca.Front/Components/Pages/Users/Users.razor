@@ -1,16 +1,16 @@
-﻿@page "/"
+﻿@page "/users"
 @using Desafios.GerenciadorBiblioteca.Domain.Entities
 @using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests
 @using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Libraries.Custom.Dialog
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Users.Dialog
 @rendermode InteractiveServer
-@inject ILibraryService libraryService
+@inject IUserService userService
 @inject IDialogService DialogService
 
-<PageTitle>Bibliotecas</PageTitle>
+<PageTitle>Usuários</PageTitle>
 
-<MudText Typo="Typo.h5" GutterBottom="true">Bibliotecas</MudText>
+<MudText Typo="Typo.h5" GutterBottom="true">Usuários</MudText>
 
 <MudContainer Class="d-flex flex-row align-end pa-0 mb-5 ma-0" MaxWidth="MaxWidth.False">
     <MudButton @onclick="RegisterDialogHandle" Variant="Variant.Outlined" Color="Color.Success" StartIcon="@Icons.Material.Filled.AddCircle" IconColor="Color.Success">Cadastrar</MudButton>
@@ -18,19 +18,19 @@
     <MudSpacer />
 
     <MudForm Class="d-flex flex-row align-end gap-5">
-        <MudTextField @bind-Value="libraryNameFilter" Immediate="true" Label="Nome da Biblioteca" Class="ma-0" />
+        <MudTextField @bind-Value="userNameFilter" Immediate="true" Label="Nome do Usuário" Class="ma-0" />
         <MudButton Variant="Variant.Filled" Color="Color.Secondary" ButtonType="ButtonType.Reset" @onclick="ResetFormFilters">Limpar</MudButton>
         <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.FilterAlt" @onclick="FilterLibsHandle">Filtrar</MudButton>
     </MudForm>
 </MudContainer>
 
-@if (libraries == null)
+@if (users == null)
 {
     <MudProgressCircular Color="Color.Default" Indeterminate="true" />
 }
 else
 {
-    <MudTable Items="libraries" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true" Class="d-flex flex-column w-100">
+    <MudTable Items="users" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true" Class="d-flex flex-column w-100">
         <ColGroup>
             <col />
             <col />
@@ -39,16 +39,16 @@ else
             <col width="280" />
         </ColGroup>
         <HeaderContent>
-            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Library, object>(x=>x.Id)">ID</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Library, object>(x=> x.Name)" Class="w-100">Nome</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Library, object>(x=> x.CNPJ)">CNPJ</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Library, object>(x=> x.Phone)">Telefone</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<User, object>(x=>x.Id)">ID</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<User, object>(x=> x.Name)" Class="w-100">Nome</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<User, object>(x=> x.Email)">Email</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<User, object>(x=> x.Phone)">Telefone</MudTableSortLabel></MudTh>
             <MudTh>Ações</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="ID">@context.Id</MudTd>
             <MudTd DataLabel="Nome">@context.Name</MudTd>
-            <MudTd DataLabel="CNPJ">@context.CNPJ</MudTd>
+            <MudTd DataLabel="Email">@context.Email</MudTd>
             <MudTd DataLabel="Telefone">@context.Phone</MudTd>
             <MudTd DataLabel="Ações" Class="d-flex gap-2">
                 <MudButton Href="@($"/details/{context.Id}")" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Search">Detalhes</MudButton>
@@ -62,18 +62,18 @@ else
 }
 
 @code {
-    private IEnumerable<Library> libraries;
+    private IEnumerable<User> users;
 
-    private string libraryNameFilter = string.Empty;
+    private string userNameFilter = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        libraries = await libraryService.GetAllAsync();
+        users = await userService.GetAllAsync();
     }
 
     private async Task FilterLibsHandle()
     {
-        libraries = await libraryService.GetByNameAsync(libraryNameFilter);
+        users = await userService.GetByNameAsync(userNameFilter);
         StateHasChanged();
     }
 
@@ -82,7 +82,7 @@ else
     {
         var parameters = new DialogParameters<CommonDeleteDialog>
         {
-            { x => x.ContentText, "Tem certeza que deseja Excluir essa Biblioteca e todos os seus registros? Essa ação não poderá ser desfeita." },
+            { x => x.ContentText, "Tem certeza que deseja Excluir esse Usuário e todos os seus registros? Essa ação não poderá ser desfeita." },
         };
 
         var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
@@ -92,8 +92,8 @@ else
 
         if (!result.Canceled)
         {
-            await libraryService.RemoveAsync(id);
-            libraries = await libraryService.GetAllAsync();
+            await userService.RemoveAsync(id);
+            users = await userService.GetAllAsync();
         }
 
         StateHasChanged();
@@ -103,11 +103,11 @@ else
     {
         var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
 
-        var dialog = await DialogService.ShowAsync<RegisterLibraryDialog>("Cadastrar", options);
+        var dialog = await DialogService.ShowAsync<RegisterUserDialog>("Cadastrar", options);
         var result = await dialog.Result;
 
         if (!result.Canceled)
-            libraries = await libraryService.GetAllAsync();
+            users = await userService.GetAllAsync();
 
         StateHasChanged();
     }
@@ -115,7 +115,7 @@ else
 
     private async Task ResetFormFilters()
     {
-        libraryNameFilter = null;
+        userNameFilter = null;
 
         await FilterLibsHandle();
     }

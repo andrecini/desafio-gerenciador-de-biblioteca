@@ -32,17 +32,5 @@
     <_ContentIncludedByDefault Remove="Components\CustomDeleteConfirmDialog.razor" />
     <_ContentIncludedByDefault Remove="wwwroot\reset.css" />
   </ItemGroup>
-
-  
-  <ItemGroup>
-    <None Include="Components\Pages\Libraries\Custom\Dialog\DeleteLibraryDialog.razor" />
-  </ItemGroup>
-
-  
-  <ItemGroup>
-    <Content Update="Components\Pages\Libraries\Custom\Dialog\DeleteLoanDialog.razor">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-    </Content>
-  </ItemGroup>
   
 </Project>

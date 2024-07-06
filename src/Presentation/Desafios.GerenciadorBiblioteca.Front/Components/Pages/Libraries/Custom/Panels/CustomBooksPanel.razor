@@ -84,10 +84,13 @@ else
     private string yearFilter;
     private int availableFilter;
 
+    #region Form Variables
     private MudForm form;
     private bool success;
     private string[] errors = { };
+    #endregion
 
+    #region Initializers
     protected override async Task OnInitializedAsync()
     {
         await InitializeInventories();
@@ -117,7 +120,9 @@ else
             return new BooksViewModel(book, inventory.Id, available);
         }).ToList();
     }
+    #endregion
 
+    #region Filter
     private async Task FilterBooksViewModelAsync()
     {
         if (!form.IsValid)
@@ -164,21 +169,34 @@ else
         return null;
     }
 
+    private async Task ResetFormFilters()
+    {
+        filter = new();
+        yearFilter = null;
+        availableFilter = 0;
+        errors = [];
+
+        await FilterBooksViewModelAsync();
+    }
+    #endregion
+
+    #region Dialog Handles
     private async Task DeleteDialogHandle(int id)
     {
-        var parameters = new DialogParameters<DeleteBookDialog>
+        var parameters = new DialogParameters<CommonDeleteDialog>
         {
             { x => x.ContentText, "Tem certeza que deseja Excluir esse Livro e todos os seus registros? Essa ação não poderá ser desfeita." },
-            { x => x.Id, id },
         };
 
         var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
 
-        var dialog = await dialogService.ShowAsync<DeleteBookDialog>("Excluir", parameters, options);
+        var dialog = await dialogService.ShowAsync<CommonDeleteDialog>("Excluir", parameters, options);
         var result = await dialog.Result;
 
         if (!result.Canceled)
         {
+            await inventoryService.RemoveAsync(id);
+
             await InitializeInventories();
             await InitializeBooks();
             InitializeBooksViewModel();
@@ -208,16 +226,7 @@ else
 
         StateHasChanged();
     }
-
-    private async Task ResetFormFilters()
-    {
-        filter = new();
-        yearFilter = null;
-        availableFilter = 0;
-        errors = [];
-
-        await FilterBooksViewModelAsync();
-    }
+    #endregion
 
     public class BooksViewModel
     {

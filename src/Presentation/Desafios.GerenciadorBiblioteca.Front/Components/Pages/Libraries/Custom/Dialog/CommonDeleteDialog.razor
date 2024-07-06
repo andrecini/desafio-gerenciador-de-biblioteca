@@ -1,5 +1,5 @@
 ﻿@using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces
-@inject ILibraryService service
+@inject IInventoryService service
 
 <MudDialog>
     <DialogContent>
@@ -11,7 +11,6 @@
     </DialogActions>
 </MudDialog>
 
-
 @code {
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
@@ -19,12 +18,8 @@
     [Parameter]
     public string ContentText { get; set; }
 
-    [Parameter]
-    public int Id { get; set; }
-
     private async Task Submit()
     {
-        await service.RemoveAsync(Id);
         MudDialog.Close(DialogResult.Ok(true));
     }
 
