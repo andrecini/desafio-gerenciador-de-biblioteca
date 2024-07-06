@@ -4,6 +4,7 @@
 	but it is exclusively employed in the 'App.razor' component when authentication is enabled.
 */
 
+
 .btn-primary {
     text-transform: uppercase;
     --bs-btn-bg: var(--mud-palette-primary) !important;
@@ -18,3 +19,9 @@
     --bs-nav-link-color: var(--mud-palette-primary) !important;
     --bs-nav-link-hover-color: var(--mud-palette-primary-darken) !important;
 }
+
+.h-100 {
+    height: 100% !important;
+    max-height: 100% !important;
+}
+

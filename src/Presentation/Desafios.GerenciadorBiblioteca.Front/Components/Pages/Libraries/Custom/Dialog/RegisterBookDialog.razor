@@ -1,0 +1,91 @@
+﻿@using Desafios.GerenciadorBiblioteca.Domain.Entities
+@using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests
+@using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces
+
+@inject IInventoryService inventoryService
+@inject IBookService bookService
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+            <MudSelect T="int" Label="Selecione um dos Livro Cadastrados" AnchorOrigin="Origin.BottomCenter"
+                       HelperText="@helperText"
+                       Validation="@(new Func<int, string>(ValidateBook))" Required="true"
+                       RequiredError="O Livro é obrigatório" @bind-Value="bookId">
+                <MudSelectItem Value="0">Selecione um livro</MudSelectItem>
+                @foreach (var b in booksDictionary)
+                {
+                    <MudSelectItem Value="b.Key">@b.Value</MudSelectItem>
+                }
+
+            </MudSelect>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancelar</MudButton>
+        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="Submit">Cadastrar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public int LibraryId { get; set; }
+
+    private Dictionary<int, string> booksDictionary = new();
+    private int bookId;
+    private string helperText = string.Empty;
+
+    MudForm form;
+    bool success;
+    string[] errors = { };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await InitializeBooksDict();
+        helperText = "Se o livro não estiver listado, adicione-o à nossa base de dados na aba \"Livros\".";
+    }
+
+    private async Task Submit()
+    {
+        await form.Validate();
+
+        if (form.IsValid)
+        {
+            var dto = new InventoryDTO(LibraryId, bookId);
+
+            await inventoryService.AddAsync(dto);
+
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+
+    private string ValidateBook(int bookId)
+    {
+        if (bookId <= 0)
+            return "O Livro é obrigatório";
+
+        return null;
+    }
+
+
+    private async Task InitializeBooksDict()
+    {
+        var books = await bookService.GetAllAsync();
+
+        var inventories = await inventoryService.GetByLibraryAsync(LibraryId);
+        var inventoriesBooksIds = inventories.Select(x => x.BookId).ToHashSet();
+
+        var distinctBooks = books.Where(x => !inventoriesBooksIds.Contains(x.Id));
+
+        foreach (var b in distinctBooks)
+        {
+            booksDictionary.Add(b.Id, b.Title);
+        }
+    }
+}

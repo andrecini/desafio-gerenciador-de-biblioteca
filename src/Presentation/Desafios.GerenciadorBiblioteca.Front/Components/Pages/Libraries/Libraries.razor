@@ -1,0 +1,117 @@
+﻿@page "/"
+@using Desafios.GerenciadorBiblioteca.Domain.Entities
+@using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests
+@using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces
+@using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Libraries.Custom.Dialog
+@rendermode InteractiveServer
+@inject ILibraryService service
+@inject IDialogService DialogService
+
+<PageTitle>Bibliotecas</PageTitle>
+
+<MudText Typo="Typo.h5" GutterBottom="true">Bibliotecas</MudText>
+
+<MudContainer Class="d-flex flex-row align-end pa-0 mb-5 ma-0" MaxWidth="MaxWidth.False">
+    <MudButton @onclick="RegisterDialogHandle" Variant="Variant.Outlined" Color="Color.Success" StartIcon="@Icons.Material.Filled.AddCircle" IconColor="Color.Success">Cadastrar</MudButton>
+
+    <MudSpacer />
+
+    <MudForm Class="d-flex flex-row align-end gap-5">
+        <MudTextField @bind-Value="libraryNameFilter" Immediate="true" Label="Nome da Biblioteca" Class="ma-0" />
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" ButtonType="ButtonType.Reset" @onclick="ResetFormFilters">Limpar</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.FilterAlt" @onclick="FilterLibsHandle">Filtrar</MudButton>
+    </MudForm>
+</MudContainer>
+
+@if (libraries == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudTable Items="libraries" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true" Class="d-flex flex-column w-100">
+        <ColGroup>
+            <col />
+            <col />
+            <col />
+            <col />
+            <col width="280" />
+        </ColGroup>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Library, object>(x=>x.Id)">ID</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Library, object>(x=> x.Name)" Class="w-100">Nome</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Library, object>(x=> x.CNPJ)">CNPJ</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Library, object>(x=> x.Phone)">Telefone</MudTableSortLabel></MudTh>
+            <MudTh>Ações</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="ID">@context.Id</MudTd>
+            <MudTd DataLabel="Nome">@context.Name</MudTd>
+            <MudTd DataLabel="CNPJ">@context.CNPJ</MudTd>
+            <MudTd DataLabel="Telefone">@context.Phone</MudTd>
+            <MudTd DataLabel="Ações" Class="d-flex gap-2">
+                <MudButton Href="@($"/details/{context.Id}")" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Search">Detalhes</MudButton>
+                <MudButton @onclick="@((e) => DeleteDialogHandle(context.Id))" Variant="Variant.Outlined" Color="Color.Error" EndIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error">Excluir</MudButton>
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10, 20}" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    private IEnumerable<Library> libraries;
+
+    private string libraryNameFilter = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        libraries = await service.GetAllAsync();
+    }
+
+    private async Task DeleteDialogHandle(int id)
+    {
+        var parameters = new DialogParameters<DeleteLibraryDialog>
+        {
+            { x => x.ContentText, "Tem certeza que deseja Excluir essa Biblioteca e todos os seus registros? Essa ação não poderá ser desfeita." },
+            { x => x.Id, id },
+        };
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var dialog = await DialogService.ShowAsync<DeleteLibraryDialog>("Excluir", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+            libraries = await service.GetAllAsync();
+
+        StateHasChanged();
+    }
+
+    private async Task RegisterDialogHandle()
+    {
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var dialog = await DialogService.ShowAsync<RegisterLibraryDialog>("Cadastrar", options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+            libraries = await service.GetAllAsync();
+
+        StateHasChanged();
+    }
+
+    private async Task FilterLibsHandle()
+    {
+        libraries = await service.GetByNameAsync(libraryNameFilter);
+        StateHasChanged();
+    }
+
+    private async Task ResetFormFilters()
+    {
+        libraryNameFilter = null;
+
+        await FilterLibsHandle();
+    }
+}

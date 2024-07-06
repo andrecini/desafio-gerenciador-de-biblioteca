@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -6,9 +6,36 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Content Remove="Components\CustomDeleteConfirmDialog.razor" />
+  </ItemGroup>
+
   
   <ItemGroup>
-    <PackageReference Include="MudBlazor" Version="6.*" />
+    <PackageReference Include="MudBlazor" Version="7.0.0" />
+
+  </ItemGroup>
+
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Desafios.GerenciadorBiblioteca.Domain\Desafios.GerenciadorBiblioteca.Domain.csproj" />
+    <ProjectReference Include="..\..\Services\Desafios.GerenciadorBiblioteca.Service\Desafios.GerenciadorBiblioteca.Service.csproj" />
+  </ItemGroup>
+
+  
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Components\CustomDeleteConfirmDialog.razor" />
+  </ItemGroup>
+
+  
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Components\CustomDeleteConfirmDialog.razor" />
+    <_ContentIncludedByDefault Remove="wwwroot\reset.css" />
+  </ItemGroup>
+
+  
+  <ItemGroup>
+    <None Include="Components\Pages\Libraries\Custom\Dialog\DeleteLibraryDialog.razor" />
   </ItemGroup>
   
 </Project>

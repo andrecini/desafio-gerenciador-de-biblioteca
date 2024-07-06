@@ -1,0 +1,46 @@
+﻿@page "/books"
+@using Desafios.GerenciadorBiblioteca.Domain.Entities
+@using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces
+@rendermode InteractiveServer
+@inject IBookService service;
+
+<PageTitle>Livros</PageTitle>
+
+<MudText Typo="Typo.h3" GutterBottom="true">Livros</MudText>
+<MudText Class="mb-8">Listagem dos Livros.</MudText>
+
+@if (books == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudTable Items="books" Hover="true" SortLabel="Sort By" Elevation="0">
+        <HeaderContent>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Library, object>(x=>x.Id)">ID</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Book, object>(x=> x.Title)">Título</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Book, object>(x=> x.Author)">Autor</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Book, object>(x=> x.ISBN)">ISBN</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Book, object>(x=> x.Year)">Ano</MudTableSortLabel></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="ID">@context.Id</MudTd>
+            <MudTd DataLabel="Título">@context.Title</MudTd>
+            <MudTd DataLabel="Autor">@context.Author</MudTd>
+            <MudTd DataLabel="ISBN">@context.ISBN</MudTd>
+            <MudTd DataLabel="Ano">@context.Year</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10, 20}" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    private IEnumerable<Book> books;
+
+    protected override async Task OnInitializedAsync()
+    {
+        books = await service.GetAllAsync();
+    }
+}

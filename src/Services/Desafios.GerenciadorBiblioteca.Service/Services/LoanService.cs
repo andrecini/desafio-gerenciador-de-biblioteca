@@ -126,17 +126,17 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
 
         private IEnumerable<Loan> FilterLoans(IEnumerable<Loan> loans, LoanFilter filter)
         {
-            if (filter.InventoryId >= 0)
+            if (filter.InventoryId > 0)
                 loans = loans.Where(x => x.InventoryId == filter.InventoryId);
-            if (filter.UserId >= 0)
+            if (filter.UserId > 0)
                 loans = loans.Where(x => x.UserId == filter.UserId);
             if (filter.LoanDate != default)
-                loans = loans.Where(x => x.LoanDate == filter.LoanDate);
+                loans = loans.Where(x => x.LoanDate.ToShortDateString() == filter.LoanDate.ToShortDateString());
             if (filter.LoanValidity != default)
-                loans = loans.Where(x => x.LoanValidity == filter.LoanValidity);
+                loans = loans.Where(x => x.LoanValidity.ToShortDateString() == filter.LoanValidity.ToShortDateString());
             if (filter.Status == LoanStatus.Returned)
                 loans = loans.Where(x => x.Returned == true);
-            if (filter.Status == LoanStatus.Returned)
+            if (filter.Status == LoanStatus.Pending)
                 loans = loans.Where(x => x.Returned == false);
 
             return loans;

@@ -1,0 +1,244 @@
+﻿@using Desafios.GerenciadorBiblioteca.Domain.Entities
+@using Desafios.GerenciadorBiblioteca.Domain.Entities.Filters
+@using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces
+@using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Libraries.Custom.Dialog
+
+@inject ILibraryService libraryService
+@inject IBookService bookService
+@inject IInventoryService inventoryService
+@inject IDialogService dialogService
+
+<MudText Typo="Typo.h6">Livros</MudText>
+
+<MudContainer Class="d-flex flex-row align-end pa-0 mb-5 ma-0 gap-5" MaxWidth="MaxWidth.False">
+    <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-row align-end pa-0 ma-0 gap-5 w-100">
+        <MudButton Variant="Variant.Outlined" Color="Color.Success" StartIcon="@Icons.Material.Filled.AddCircle" IconColor="Color.Success" @onclick="RegisterDialogHandle">Cadastrar</MudButton>
+        <MudTextField @bind-Value="filter.Title" Immediate="true" Label="Título" Class="ma-0" />
+        <MudTextField @bind-Value="filter.Author" Immediate="true" Label="Autor" Class="ma-0" />
+        <MudTextField @bind-Value="filter.ISBN" Immediate="true" Label="ISBN" Class="ma-0" />
+        <MudTextField @bind-Value="yearFilter" Immediate="true" Label="Ano" Class="ma-0" InputType="InputType.Text" Validation="@(new Func<string, string>(ValidateDate))" />
+        <MudSelect @bind-Value="availableFilter" Label="Disponível" AnchorOrigin="Origin.BottomCenter">
+            <MudSelectItem Value="0">Todos</MudSelectItem>
+            <MudSelectItem Value="1">Disponíveis</MudSelectItem>
+            <MudSelectItem Value="2">Indisponíveis</MudSelectItem>
+        </MudSelect>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" ButtonType="ButtonType.Reset" @onclick="ResetFormFilters">Limpar</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.FilterAlt" @onclick="FilterBooksViewModelAsync">Filtrar</MudButton>
+    </MudForm>
+</MudContainer>
+
+@if (booksViewModels == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudTable Items="booksViewModels" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true" Class="d-flex flex-column w-100">
+        <ColGroup>
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col width="280" />
+        </ColGroup>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<BooksViewModel, object>(x=>x.Id)">ID</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<BooksViewModel, object>(x=> x.Title)" Class="w-100">Título</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<BooksViewModel, object>(x=> x.Author)">Autor</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<BooksViewModel, object>(x=> x.ISBN)">ISBN</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<BooksViewModel, object>(x=> x.Year)">Ano</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<BooksViewModel, object>(x=> x.Available)">Disponível</MudTableSortLabel></MudTh>
+            <MudTh>Ações</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="ID">@context.Id</MudTd>
+            <MudTd DataLabel="Título">@context.Title</MudTd>
+            <MudTd DataLabel="Autor">@context.Author</MudTd>
+            <MudTd DataLabel="ISBN">@context.ISBN</MudTd>
+            <MudTd DataLabel="Ano">@context.Year</MudTd>
+            <MudTd DataLabel="Disponível">@(context.Available ? "Disponível" : "Indisponível")</MudTd>
+            <MudTd DataLabel="Ações" Class="d-flex gap-2">
+                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Search">Detalhes</MudButton>
+                <MudButton @onclick="@((e) => DeleteDialogHandle(context.InventoryId))" Variant="Variant.Outlined" Color="Color.Error" EndIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error">Excluir</MudButton>
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10, 20}" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private List<BooksViewModel> booksViewModels = new();
+
+    private IEnumerable<Inventory> inventories;
+    private IEnumerable<Book> books;
+
+    private BookFilter filter = new();
+    private string yearFilter;
+    private int availableFilter;
+
+    private MudForm form;
+    private bool success;
+    private string[] errors = { };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await InitializeInventories();
+        await InitializeBooks();
+        InitializeBooksViewModel();
+    }
+
+    private async Task InitializeInventories()
+    {
+        inventories = await inventoryService.GetByLibraryAsync(Id);
+    }
+
+    private async Task InitializeBooks()
+    {
+        var bookIds = inventories.Select(inv => inv.BookId).ToHashSet();
+        var allBooks = await bookService.GetAllAsync();
+
+        books = allBooks.Where(book => bookIds.Contains(book.Id));
+    }
+
+    private void InitializeBooksViewModel()
+    {
+        booksViewModels = books.Select(book =>
+        {
+            var inventory = inventories.FirstOrDefault(inv => inv.BookId == book.Id);
+            bool available = inventory != null && inventory.Available;
+            return new BooksViewModel(book, inventory.Id, available);
+        }).ToList();
+    }
+
+    private async Task FilterBooksViewModelAsync()
+    {
+        if (!form.IsValid)
+            return;
+
+        await InitializeInventories();
+
+        if (availableFilter != 0)
+        {
+            var available = availableFilter == 1 ? true : false;
+            inventories = inventories.Where(x => x.Available == available);
+        }
+
+        var bookIds = inventories.Select(inv => inv.BookId).ToHashSet();
+
+        var allBooks = await bookService.GetByFilterAsync(filter);
+
+        books = allBooks.Where(book => bookIds.Contains(book.Id));
+
+        InitializeBooksViewModel();
+
+        StateHasChanged();
+    }
+
+    private string ValidateDate(string arg)
+    {
+        if (string.IsNullOrEmpty(arg))
+            filter.Year = 0;
+        else
+        {
+            if (!arg.All(char.IsDigit))
+                return "Digite apenas números";
+
+            var year = Convert.ToInt32(arg);
+
+            if (year <= 0)
+                return "O Ano deve ser maior do que 0";
+            if (year > DateTime.Now.Year)
+                return "O Ano deve ser menor do que o ano atual";
+
+            filter.Year = year;
+        }
+
+        return null;
+    }
+
+    private async Task DeleteDialogHandle(int id)
+    {
+        var parameters = new DialogParameters<DeleteBookDialog>
+        {
+            { x => x.ContentText, "Tem certeza que deseja Excluir esse Livro e todos os seus registros? Essa ação não poderá ser desfeita." },
+            { x => x.Id, id },
+        };
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var dialog = await dialogService.ShowAsync<DeleteBookDialog>("Excluir", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await InitializeInventories();
+            await InitializeBooks();
+            InitializeBooksViewModel();
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task RegisterDialogHandle()
+    {
+        var parameters = new DialogParameters<RegisterBookDialog>
+        {
+            { x => x.LibraryId, Id },
+        };
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var dialog = await dialogService.ShowAsync<RegisterBookDialog>("Cadastrar", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await InitializeInventories();
+            await InitializeBooks();
+            InitializeBooksViewModel();
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task ResetFormFilters()
+    {
+        filter = new();
+        yearFilter = null;
+        availableFilter = 0;
+        errors = [];
+
+        await FilterBooksViewModelAsync();
+    }
+
+    public class BooksViewModel
+    {
+        public BooksViewModel(Book book, int inventoryId, bool available)
+        {
+            Id = book.Id;
+            InventoryId = inventoryId;
+            Title = book.Title;
+            Author = book.Author;
+            ISBN = book.ISBN;
+            Year = book.Year;
+            Available = available;
+        }
+
+        public int Id { get; set; }
+        public int InventoryId { get; set; }
+        public string Title { get; set; }
+        public string Author { get; set; }
+        public string ISBN { get; set; }
+        public int? Year { get; set; }
+        public bool Available { get; set; }
+    }
+
+}

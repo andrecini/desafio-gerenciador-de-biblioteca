@@ -1,0 +1,77 @@
+﻿@using Desafios.GerenciadorBiblioteca.Domain.Entities
+@using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests
+@using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces
+@inject ILibraryService service
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+            <MudTextField T="string" Label="Nome" Required="true" RequiredError="O Nome da Biblioteca é obrigatório" @bind-Value="library.Name" />
+
+            <MudTextField T="string" Label="CNPJ" HelperText="Digite apenas Números"
+                          Validation="@(new Func<string, string>(ValidateCNPJ))" Required="true"
+                          RequiredError="O CNPJ é obrigatório" @bind-Value="library.CNPJ" />
+
+            <MudTextField T="string" Label="Telefone" HelperText="Digite apenas Números"
+                          InputType="InputType.Telephone"
+                          Validation="@(new Func<string, string>(ValidatePhone))" Required="true"
+                          RequiredError="O Telefone é obrigatório!" @bind-Value="library.Phone" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancelar</MudButton>
+        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="Submit">Cadastrar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    Library library = new Library();
+    MudForm form;
+    bool success;
+    string[] errors = { };
+
+    private async Task Submit()
+    {
+        if (form.IsValid)
+        {
+            var dto = new LibraryDTO(library.Name, library.CNPJ, library.Phone);
+
+            await service.AddAsync(dto);
+
+            MudDialog.Close(DialogResult.Ok(library));
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private string ValidateCNPJ(string cnpj)
+    {
+        if (string.IsNullOrEmpty(cnpj))
+            return "O CNPJ é obrigatório";
+
+        if (!cnpj.All(char.IsDigit))
+            return "O CNPJ deve conter apenas números";
+
+        if (cnpj.Length != 14)
+            return "O CNPJ deve ter 14 dígitos";
+
+        return null;
+    }
+
+    private string ValidatePhone(string phone)
+    {
+        if (string.IsNullOrEmpty(phone))
+            return "O Telefone é obrigatório";
+
+        if (!phone.All(char.IsDigit))
+            return "O Telefone deve conter apenas números";
+
+        if (phone.Length != 11)
+            return "O Telefone deve ter 11 dígitos";
+
+        return null;
+    }
+}

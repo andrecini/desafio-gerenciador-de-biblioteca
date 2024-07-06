@@ -32,9 +32,13 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
         }
 
         public async Task<IEnumerable<Library>> GetByNameAsync(string name)
-        {
+        {           
             var libraries = await _unitOfWork.Libraries.GetAllAsync();
-            return libraries.Where(x => x.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase));
+
+            if (!string.IsNullOrEmpty(name))
+                return libraries.Where(x => x.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase));
+
+            return libraries;
         }
 
         public async Task<Library> AddAsync(LibraryDTO dto)

@@ -1,0 +1,98 @@
+﻿@page "/details/{Id:int}"
+@using Desafios.GerenciadorBiblioteca.Domain.Entities
+@using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests
+@using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces
+@using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Libraries.Custom.Panels
+
+@inject ILibraryService libraryService;
+
+<PageTitle>Bibliotecas</PageTitle>
+
+<MudText Typo="Typo.h5" GutterBottom="true">Detalhes da Biblioteca</MudText>
+
+<MudContainer Class="d-flex flex-row align-center pa-0 mt-5 mb-5 ma-0 gap-5 w-100" MaxWidth="MaxWidth.False">
+    <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-row align-start pa-0 ma-0 gap-5 w-100">
+        <MudTextField @bind-Value="library.Name" Label="Nome" Required="true" RequiredError="O Nome da Biblioteca é obrigatório"/>
+
+        <MudTextField @bind-Value="library.CNPJ" Label="CNPJ" HelperText="Digite apenas Números"
+                      Validation="@(new Func<string, string>(ValidateCNPJ))" Required="true"
+                      RequiredError="O CNPJ é obrigatório" />
+
+        <MudTextField @bind-Value="library.Phone" Label="Telefone" HelperText="Digite apenas Números"
+                      InputType="InputType.Telephone"
+                      Validation="@(new Func<string, string>(ValidatePhone))" Required="true"
+                      RequiredError="O Telefone é obrigatório!" />
+    </MudForm>
+
+    <MudButton Variant="Variant.Filled" Color="Color.Tertiary" StartIcon="@Icons.Material.Filled.Save" @onclick="EditLibraryAsync">Salvar</MudButton>
+</MudContainer>
+
+<MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" Class="h-100 mh-100 w-100 mw-100" PanelClass="pa-6 h-100 mh-100 overflow-y-auto">
+    <MudTabPanel Text="Livros" Class="h-100 w-100 overflow-y-auto">
+        <CustomBooksPanel Id="Id" />
+    </MudTabPanel>
+
+    <MudTabPanel Text="Empréstimos" Class="h-100 w-100">
+        <CustomLoanPanel Id="Id" />
+    </MudTabPanel>
+</MudTabs>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Library library = new Library();
+    private MudForm form;
+    private bool success;
+    private string[] errors = { };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await InitializeLibrary();
+    }
+
+    private async Task InitializeLibrary()
+    {
+        library = await libraryService.GetByIdAsync(Id);
+    }
+
+    private async Task EditLibraryAsync()
+    {
+        if (form.IsValid)
+        {
+            var dto = new LibraryDTO(library.Name, library.CNPJ, library.Phone);
+
+            await libraryService.UpdateAsync(Id, dto);
+
+            StateHasChanged();
+        }
+    }
+
+    private string ValidateCNPJ(string cnpj)
+    {
+        if (string.IsNullOrEmpty(cnpj))
+            return "O CNPJ é obrigatório";
+
+        if (!cnpj.All(char.IsDigit))
+            return "O CNPJ deve conter apenas números";
+
+        if (cnpj.Length != 14)
+            return "O CNPJ deve ter 14 dígitos";
+
+        return null;
+    }
+
+    private string ValidatePhone(string phone)
+    {
+        if (string.IsNullOrEmpty(phone))
+            return "O Telefone é obrigatório";
+
+        if (!phone.All(char.IsDigit))
+            return "O Telefone deve conter apenas números";
+
+        if (phone.Length != 11)
+            return "O Telefone deve ter 11 dígitos";
+
+        return null;
+    }
+}
