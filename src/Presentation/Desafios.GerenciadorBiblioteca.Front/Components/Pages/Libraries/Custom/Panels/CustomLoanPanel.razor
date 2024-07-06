@@ -64,7 +64,7 @@ else
             <MudTd DataLabel="Disponível">@(context.Status ? "Devolvido" : "Pendente")</MudTd>
             <MudTd DataLabel="Ações" Class="d-flex gap-2">
                 <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Search">Detalhes</MudButton>
-                <MudButton Variant="Variant.Outlined" Color="Color.Error" EndIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error">Excluir</MudButton>
+                <MudButton @onclick="@((e) => DeleteDialogHandle(context.Id))" Variant="Variant.Outlined" Color="Color.Error" EndIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error">Excluir</MudButton>
             </MudTd>
         </RowTemplate>
         <PagerContent>
@@ -179,6 +179,29 @@ else
             return new();
 
         return usersFiltered.Select(x => x.Id).ToHashSet();
+    }
+
+    private async Task DeleteDialogHandle(int id)
+    {
+        var parameters = new DialogParameters<DeleteLoanDialog>
+        {
+            { x => x.ContentText, "Tem certeza que deseja Excluir esse Empréstimo e todos os seus registros? Essa ação não poderá ser desfeita." },
+            { x => x.Id, id },
+        };
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var dialog = await dialogService.ShowAsync<DeleteLoanDialog>("Excluir", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await InitializeInventories();
+            await InitializeLoans();
+            await InitializeLoansViewModel();
+        }
+
+        StateHasChanged();
     }
 
     private async Task RegisterDialogHandle()

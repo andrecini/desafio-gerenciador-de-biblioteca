@@ -62,7 +62,7 @@
     private int inventoryId;
     private int userId;
     private DateTime? loanDate = DateTime.Now;
-    private DateTime? loanValidity = DateTime.Now.AddDays(1);
+    private DateTime? loanValidity = DateTime.Now.AddDays(1).AddHours(1);
 
     private string helperTextBooks = string.Empty;
     private string helperTextUsers = string.Empty;
