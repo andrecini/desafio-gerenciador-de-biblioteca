@@ -1,0 +1,84 @@
+﻿@using Desafios.GerenciadorBiblioteca.Domain.Entities
+@using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests
+@using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces
+@using System.ComponentModel.DataAnnotations
+@inject IBookService service
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+            <MudTextField T="string" Label="Título" Required="true" RequiredError="O Título do Livro é obrigatório" @bind-Value="book.Title" />
+
+            <MudTextField T="string" Label="Autor" Required="true" RequiredError="O Autor do Livro é obrigatório" @bind-Value="book.Author" />
+
+            <MudTextField T="string" Label="ISBN" HelperText="Digite apenas Números"
+                          Validation="@(new Func<string, string>(ValidateISBN))" Required="true"
+                          RequiredError="O ISBN é obrigatório!" @bind-Value="book.ISBN" />
+
+            <MudTextField T="string" Label="Ano" HelperText="Digite apenas Números"
+                          Validation="@(new Func<string, string>(ValidateYear))" Required="true"
+                          RequiredError="O Ano é obrigatório!" @bind-Value="yearInput" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancelar</MudButton>
+        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="Submit">Cadastrar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    Book book = new();
+    private string yearInput;
+    MudForm form;
+    bool success;
+    string[] errors = { };
+
+    private async Task Submit()
+    {
+        if (form.IsValid)
+        {
+            book.Year = Convert.ToInt32(yearInput);
+
+            var dto = new BookDTO(book.Title, book.Author, book.ISBN, book.Year);
+
+            await service.AddAsync(dto);
+
+            MudDialog.Close(DialogResult.Ok(book));
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private string ValidateISBN(string isbn)
+    {
+        if (string.IsNullOrEmpty(isbn))
+            return "O ISBN é obrigatório";
+
+        if (!isbn.All(char.IsDigit))
+            return "O ISBN deve conter apenas números";
+
+        if (isbn.Length != 13)
+            return "O ISBN deve ter 13 dígitos";
+
+        return null;
+    }
+
+    private string ValidateYear(string year)
+    {
+        if (string.IsNullOrEmpty(year))
+            return "O Ano é obrigatório";
+
+        if (!year.All(char.IsDigit))
+            return "O Ano deve conter apenas números";
+
+        var yearNumber = Convert.ToInt32(year);
+
+        if (yearNumber > DateTime.Now.Year || yearNumber < 0)
+            return "O Ano deve ser menor do que o ano atual e maior do que 0";
+
+        return null;
+    }
+}

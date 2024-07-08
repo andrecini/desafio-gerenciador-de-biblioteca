@@ -64,7 +64,7 @@ else
             <MudTd DataLabel="Responsáve">@context.Username</MudTd>
             <MudTd DataLabel="Status">@(context.Status ? "Devolvido" : "Pendente")</MudTd>
             <MudTd DataLabel="Ações" Class="d-flex gap-2">
-                <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Search">Detalhes</MudButton>
+                <MudButton Href="@($"/loans/details/{context.Id}")" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Search">Detalhes</MudButton>
                 <MudButton @onclick="@((e) => DeleteDialogHandle(context.Id))" Variant="Variant.Outlined" Color="Color.Error" EndIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error">Excluir</MudButton>
             </MudTd>
         </RowTemplate>

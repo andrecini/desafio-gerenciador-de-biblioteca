@@ -1,6 +1,5 @@
 ﻿using Desafios.GerenciadorBiblioteca.Data.Context;
 using Desafios.GerenciadorBiblioteca.Data.Repositories;
-using Desafios.GerenciadorBiblioteca.Data;
 using Desafios.GerenciadorBiblioteca.Domain.Repositories;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
@@ -14,15 +13,15 @@ namespace Desafios.GerenciadorBiblioteca.Data
         public static IServiceCollection AddDataModule(this IServiceCollection services, IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("DefaultConnection");
-            services.AddDbContext<LibraryDbContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Singleton);
+            services.AddDbContext<LibraryDbContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Transient);
 
-            services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
+            services.AddTransient<IUnitOfWork, UnitOfWork.UnitOfWork>();
 
-            services.AddScoped<ILibraryRepository, LibraryRepository>();
-            services.AddScoped<IBookRepository, BookRepository>();
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IInventoryRepository, InventoryRepository>();
-            services.AddScoped<ILoanRepository, LoanRepository>();
+            services.AddTransient<ILibraryRepository, LibraryRepository>();
+            services.AddTransient<IBookRepository, BookRepository>();
+            services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<IInventoryRepository, InventoryRepository>();
+            services.AddTransient<ILoanRepository, LoanRepository>();
 
             return services;
         }

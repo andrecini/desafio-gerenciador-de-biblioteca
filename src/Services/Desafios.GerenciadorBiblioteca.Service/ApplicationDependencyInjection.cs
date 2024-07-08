@@ -11,11 +11,11 @@ namespace Desafios.GerenciadorBiblioteca.Service
         {
             services.AddAutoMapper(typeof(MappingProfile));
 
-            services.AddScoped<ILibraryService, LibrarySevice>();
-            services.AddScoped<IBookService, BookSevice>();
-            services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IInventoryService, InventoryService>();
-            services.AddScoped<ILoanService, LoanService>();
+            services.AddTransient<ILibraryService, LibrarySevice>();
+            services.AddTransient<IBookService, BookSevice>();
+            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IInventoryService, InventoryService>();
+            services.AddTransient<ILoanService, LoanService>();
 
             return services;
         }

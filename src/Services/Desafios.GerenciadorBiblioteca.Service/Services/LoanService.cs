@@ -95,14 +95,14 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
             CustomException.ThrowIfLessThan(1, "Empréstimo");
 
             var loanRegistered = await GetByIdAsync(id) ??
-                throw new CustomException("Nenhum Emrpéstimo foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
+                throw new CustomException("Nenhum Empréstimo foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
 
             loanRegistered.Returned = returned;
 
             _unitOfWork.Loans.Update(loanRegistered);
             var result = await _unitOfWork.SaveAsync();
 
-            await _inventoryService.UpdateStatusAsync(loanRegistered.InventoryId, true);
+            await _inventoryService.UpdateStatusAsync(loanRegistered.InventoryId, returned);
 
             return result > 0 ? loanRegistered : throw new CustomException(
                 "Não foi possível atualizar o Empréstimo. Tente novamente!",
