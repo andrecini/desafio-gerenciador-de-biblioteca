@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/libraries"
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Common
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Libraries.Custom.Dialogs
 @rendermode InteractiveServer
@@ -48,7 +48,7 @@ else
             <MudTd DataLabel="CNPJ">@context.CNPJ</MudTd>
             <MudTd DataLabel="Telefone">@context.Phone</MudTd>
             <MudTd DataLabel="Ações" Class="d-flex gap-2">
-                <MudButton Href="@($"/details/{context.Id}")" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Search">Detalhes</MudButton>
+                <MudButton Href="@($"/libraries/details/{context.Id}")" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Search">Detalhes</MudButton>
                 <MudButton @onclick="@((e) => DeleteDialogHandleAsync(context.Id))" Variant="Variant.Outlined" Color="Color.Error" EndIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error">Excluir</MudButton>
             </MudTd>
         </RowTemplate>

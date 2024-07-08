@@ -1,0 +1,254 @@
+﻿@page "/"
+@using System.Globalization
+@inject ILibraryService libraryService;
+@inject IUserService userService;
+@inject IBookService bookService;
+@inject ILoanService loanService;
+@inject IInventoryService inventoryService;
+
+
+<PageTitle>Dashboard</PageTitle>
+
+<MudText Typo="Typo.h5" GutterBottom="true">Dashboard</MudText>
+
+<MudContainer Class="d-flex flex-row pa-0 ma-0 gap-5" MaxWidth="MaxWidth.False">
+    <MudCard Elevation="4" Class="w-100">
+        <MudCardContent>
+            <MudText Typo="Typo.h6" GutterBottom="true">Total Bibliotecas</MudText>
+
+            <MudContainer Class="d-flex align-center flex-co pa-0 ma-0 gap-5" MaxWidth="MaxWidth.False">
+                <MudText Typo="Typo.h2" GutterBottom="true" Class="ma-0">@totalLibraries</MudText>
+                <MudSpacer />
+                <MudIcon Icon="@Icons.Material.Outlined.LocalLibrary" Style="font-size: 3.75rem;" />
+            </MudContainer>
+        </MudCardContent>
+    </MudCard>
+    <MudCard Elevation="4" Class="w-100">
+        <MudCardContent>
+            <MudText Typo="Typo.h6" GutterBottom="true">Total Livros</MudText>
+
+            <MudContainer Class="d-flex align-center flex-co pa-0 ma-0 gap-5" MaxWidth="MaxWidth.False">
+                <MudText Typo="Typo.h2" GutterBottom="true" Class="ma-0">@totalBooks</MudText>
+                <MudSpacer />
+                <MudIcon Icon="@Icons.Material.Outlined.MenuBook" Style="font-size: 3.75rem;" />
+            </MudContainer>
+        </MudCardContent>
+    </MudCard>
+    <MudCard Elevation="4" Class="w-100">
+        <MudCardContent>
+            <MudText Typo="Typo.h6" GutterBottom="true">Total Usuários</MudText>
+
+            <MudContainer Class="d-flex align-center flex-co pa-0 ma-0 gap-5" MaxWidth="MaxWidth.False">
+                <MudText Typo="Typo.h2" GutterBottom="true" Class="ma-0">@totalUsers</MudText>
+                <MudSpacer />
+                <MudIcon Icon="@Icons.Material.Outlined.Person" Style="font-size: 3.75rem;" />
+            </MudContainer>
+        </MudCardContent>
+    </MudCard>
+    <MudCard Elevation="4" Class="w-100">
+        <MudCardContent>
+            <MudText Typo="Typo.h6" GutterBottom="true">Empréstimos Ativos</MudText>
+
+            <MudContainer Class="d-flex align-center flex-co pa-0 ma-0 gap-5" MaxWidth="MaxWidth.False">
+                <MudText Typo="Typo.h2" GutterBottom="true" Class="ma-0">@totalLoansActives</MudText>
+                <MudSpacer />
+                <MudIcon Icon="@Icons.Material.Outlined.CheckCircle" Style="font-size: 3.75rem;" />
+            </MudContainer>
+        </MudCardContent>
+    </MudCard>
+    <MudCard Elevation="4" Class="w-100">
+        <MudCardContent>
+            <MudText Typo="Typo.h6" GutterBottom="true">Empréstimos Em Atraso</MudText>
+
+            <MudContainer Class="d-flex align-center flex-co pa-0 ma-0 gap-5" MaxWidth="MaxWidth.False">
+                <MudText Typo="Typo.h2" GutterBottom="true" Class="ma-0">@totalLoansOverdue</MudText>
+                <MudSpacer />
+                <MudIcon Icon="@Icons.Material.Outlined.WarningAmber" Style="font-size: 3.75rem;" />
+            </MudContainer>
+        </MudCardContent>
+    </MudCard>
+</MudContainer>
+
+<MudContainer Class="d-flex flex-row align-start justify-start pa-0 mt-5 gap-5 w-100 h-100 mh-100" MaxWidth="MaxWidth.False">
+
+    @if (series.Any())
+    {
+        <MudPaper Width="60%" Height="100%" MaxHeight="100%" Elevation="4">
+            <MudContainer Class="d-flex flex-row align-center justify-center pa-0 mt-5 gap-2 w-100" MaxWidth="MaxWidth.False">
+                <MudIcon Icon="@Icons.Material.Outlined.WorkspacePremium" />
+                <MudText Typo="Typo.h6" GutterBottom="true" Align="Align.Center" Class="ma-0">
+                    Os 10 Livros mais procurados
+                </MudText>
+            </MudContainer>
+            <MudChart ChartType="ChartType.Bar" ChartSeries="@series" XAxisLabels="@xAxisLabels" ChartOptions="@_options">
+                <CustomGraphics>
+                    <style>
+                        .mud-chart {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            height: 90% !important;
+                            width: 100% !important
+                        }
+
+                        .mud-chart-line {
+                            height: 100% !important;
+                            width: 90% !important
+                        }
+
+                        .mud-charts-xaxis {
+                            display: flex !important;
+                            align-items: center !important;
+                            justify-content: center !important;
+                            width: 100% !important;
+                        }
+
+                        text {
+                            font-size: 0.55rem !important;
+                            position: relative !important;
+                        }
+
+                    </style>
+                </CustomGraphics>
+            </MudChart>
+        </MudPaper>
+    }
+
+    <MudContainer Class="d-flex flex-column align-start justify-start pa-0 ma-0 gap-5 h-100 mh-100 w-40" MaxWidth="MaxWidth.False">
+        
+        <MudPaper Width="100%" Height="100%" MaxHeight="100%" Class="pa-5 gap-5" Elevation="4">
+            <MudText Typo="Typo.h6" GutterBottom="true">Empréstimos em Atraso</MudText>
+            <MudTable Items="viewModels" Hover="true" SortLabel="Sort By" Elevation="1" Class="d-flex flex-column w-100 mh-100">
+                <HeaderContent>
+                    <MudTh><MudTableSortLabel SortBy="new Func<LoanOverdueViewModel, object>(x=> x.BookName)" Class="w-100">Livro</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<LoanOverdueViewModel, object>(x=> x.UserName)">Responsável</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.Descending" SortBy="new Func<LoanOverdueViewModel, object>(x=> x.OverdueDays)">Dias em Atraso</MudTableSortLabel></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Livro">@context.BookName</MudTd>
+                    <MudTd DataLabel="Responsável">@context.UserName</MudTd>
+                    <MudTd DataLabel="Dias em Atraso">@context.OverdueDays</MudTd>
+                </RowTemplate>
+                <PagerContent>
+                    <MudTablePager PageSizeOptions="new int[]{10, 20}" />
+                </PagerContent>
+            </MudTable>
+        </MudPaper>
+    </MudContainer>
+
+</MudContainer>
+@code {
+    private IEnumerable<Library> libraries;
+    private IEnumerable<Book> books;
+    private IEnumerable<User> users;
+    private IEnumerable<Loan> loans;
+    private IEnumerable<Inventory> inventories;
+
+    private int totalLibraries;
+    private int totalBooks;
+    private int totalUsers;
+    private int totalLoansActives;
+    private int totalLoansOverdue;
+
+    private List<ChartSeries> series = new();
+    private string[] xAxisLabels = new string[12];
+    private readonly ChartOptions _options = new();
+
+    private List<LoanOverdueViewModel> viewModels = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await InitializeDataAsync();
+    }
+
+    private async Task InitializeDataAsync()
+    {
+        await InitializEnumerablesAsync();
+        InitializAmoutDatas();
+        InitializeChartData();
+        InitializeViewModelList();
+    }
+
+    private async Task InitializEnumerablesAsync()
+    {
+        libraries = await libraryService.GetAllAsync();
+        books = await bookService.GetAllAsync();
+        users = await userService.GetAllAsync();
+        loans = await loanService.GetAllAsync();
+        inventories = await inventoryService.GetAllAsync();
+    }
+
+    private void InitializAmoutDatas()
+    {
+        totalLibraries = libraries.Count();
+        totalBooks = books.Count();
+        totalUsers = users.Count();
+        var loansNotReturned = loans.Where(x => !x.Returned);
+
+        totalLoansActives = loansNotReturned.Where(x => x.LoanValidity >= DateTime.Now).Count();
+        totalLoansOverdue = loansNotReturned.Where(x => x.LoanValidity < DateTime.Now).Count();
+    }
+
+    private void InitializeChartData()
+    {
+        var bookLoanCounts = loans
+            .GroupBy(loan => inventories.FirstOrDefault(inv => inv.Id == loan.InventoryId)?.BookId)
+            .Select(group => new
+            {
+                BookId = group.Key,
+                LoanCount = group.Count()
+            })
+            .Where(x => x.BookId != null)
+            .OrderByDescending(x => x.LoanCount)
+            .Take(10)
+            .ToList();
+
+        for (int i = 0; i < bookLoanCounts.Count; i++)
+        {
+            var book = books.FirstOrDefault(b => b.Id == bookLoanCounts[i].BookId);
+            xAxisLabels[i] = TruncateString(book?.Title ?? "Desconhecido", 10);
+        }
+
+        series = new List<ChartSeries>
+        {
+            new ChartSeries
+            {
+                Name = "Empréstimos",
+                Data = bookLoanCounts.Select(x => (double)x.LoanCount).ToArray()
+            }
+        };
+
+        int maxTicks = bookLoanCounts.Max(x => x.LoanCount);
+        _options.YAxisTicks = 1;
+        _options.YAxisLines = true;
+        _options.MaxNumYAxisTicks = 10;
+        StateHasChanged();
+    }
+
+    private void InitializeViewModelList()
+    {
+        var overdueLoans = loans.Where(loan => loan.LoanValidity < DateTime.Now && !loan.Returned);
+
+        viewModels = overdueLoans.Select(loan =>
+        {
+            var inventory = inventories.FirstOrDefault(inv => inv.Id == loan.InventoryId);
+            var book = books.FirstOrDefault(b => b.Id == inventory?.BookId);
+            var user = users.FirstOrDefault(u => u.Id == loan.UserId);
+            var overdueDays = (DateTime.Now - loan.LoanValidity).Days;
+
+            return new LoanOverdueViewModel(
+                BookName: book?.Title ?? "Desconhecido",
+                OverdueDays: overdueDays,
+                UserName: user?.Name ?? "Desconhecido"
+            );
+        }).ToList();
+    }
+
+    private string TruncateString(string value, int maxLength)
+    {
+        if (string.IsNullOrEmpty(value)) return value;
+        return value.Length <= maxLength ? value : value.Substring(0, maxLength) + "...";
+    }
+
+    public record LoanOverdueViewModel(string BookName, int OverdueDays, string UserName);
+}

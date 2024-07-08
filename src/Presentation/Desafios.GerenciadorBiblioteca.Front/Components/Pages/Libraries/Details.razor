@@ -1,6 +1,6 @@
-﻿@page "/details/{Id:int}"
+﻿@page "/libraries/details/{Id:int}"
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Libraries.Custom.Panels
-
+@inject ISnackbar Snackbar
 @inject ILibraryService libraryService;
 
 <PageTitle>Bibliotecas</PageTitle>
@@ -59,7 +59,10 @@
         {
             var dto = new LibraryDTO(library.Name, library.CNPJ, library.Phone);
             await libraryService.UpdateAsync(Id, dto);
-            StateHasChanged();
+
+            Snackbar.Clear();
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopEnd;
+            Snackbar.Add("Dados alterados com sucesso!", Severity.Success);
         }
     }
 

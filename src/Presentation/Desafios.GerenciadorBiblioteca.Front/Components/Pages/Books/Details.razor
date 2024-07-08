@@ -1,7 +1,7 @@
 ﻿@page "/books/details/{Id:int}"
 @using System.ComponentModel.DataAnnotations
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Books.Custom.Panels
-
+@inject ISnackbar Snackbar
 @inject IBookService bookService;
 
 <PageTitle>Livros</PageTitle>
@@ -58,11 +58,12 @@
         if (form.IsValid)
         {
             book.Year = Convert.ToInt32(yearInput);
-
             var dto = new BookDTO(book.Title, book.Author, book.ISBN, book.Year);
-
             await bookService.UpdateAsync(Id, dto);
-            StateHasChanged();
+
+            Snackbar.Clear();
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopEnd;
+            Snackbar.Add("Dados alterados com sucesso!", Severity.Success);
         }
     }
 

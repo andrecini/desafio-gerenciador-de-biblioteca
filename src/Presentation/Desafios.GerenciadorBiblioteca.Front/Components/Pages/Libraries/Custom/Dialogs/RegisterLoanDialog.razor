@@ -21,7 +21,7 @@
                        HelperText="@("Se o Usuário não estiver listado, adicione-o à nossa base de dados na aba \"Usuários\".")"
                        Validation="@(new Func<int, string>(ValidateUser))" Required="true"
                        RequiredError="O Usuário é obrigatório" @bind-Value="userId">
-                <MudSelectItem Value="0">Selecione um livro</MudSelectItem>
+                <MudSelectItem Value="0">Selecione um Usuário</MudSelectItem>
                 @foreach (var u in usersDictionary)
                 {
                     <MudSelectItem Value="u.Key">@u.Value</MudSelectItem>

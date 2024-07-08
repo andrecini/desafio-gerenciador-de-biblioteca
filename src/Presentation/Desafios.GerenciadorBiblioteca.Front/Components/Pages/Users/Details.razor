@@ -1,7 +1,7 @@
 ﻿@page "/users/details/{Id:int}"
 @using System.ComponentModel.DataAnnotations
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Users.Custom.Panels
-
+@inject ISnackbar Snackbar
 @inject IUserService userService;
 
 <PageTitle>Usuáros</PageTitle>
@@ -37,7 +37,7 @@
     private User user = new();
     private MudForm form;
     private bool success;
-    private string[] errors = Array.Empty<string>();
+    private string[] errors = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -55,7 +55,10 @@
         {
             var dto = new UserDTO(user.Name, user.Email, user.Phone);
             await userService.UpdateAsync(Id, dto);
-            StateHasChanged();
+
+            Snackbar.Clear();
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopEnd;
+            Snackbar.Add("Dados alterados com sucesso!", Severity.Success);
         }
     }
 
