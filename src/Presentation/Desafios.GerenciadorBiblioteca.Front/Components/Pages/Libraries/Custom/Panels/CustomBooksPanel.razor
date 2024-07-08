@@ -13,7 +13,7 @@
 
 <MudContainer Class="d-flex flex-row align-end pa-0 mb-5 ma-0 gap-5" MaxWidth="MaxWidth.False">
     <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-row align-end pa-0 ma-0 gap-5 w-100">
-        <MudButton Variant="Variant.Outlined" Color="Color.Success" StartIcon="@Icons.Material.Filled.AddCircle" IconColor="Color.Success" @onclick="RegisterDialogHandle">Cadastrar</MudButton>
+        <MudButton Variant="Variant.Outlined" Color="Color.Success" StartIcon="@Icons.Material.Filled.AddCircle" IconColor="Color.Success" @onclick="RegisterDialogHandleAsync">Cadastrar</MudButton>
         <MudTextField @bind-Value="filter.Title" Immediate="true" Label="Título" Class="ma-0" />
         <MudTextField @bind-Value="filter.Author" Immediate="true" Label="Autor" Class="ma-0" />
         <MudTextField @bind-Value="filter.ISBN" Immediate="true" Label="ISBN" Class="ma-0" />
@@ -23,7 +23,7 @@
             <MudSelectItem Value="1">Disponíveis</MudSelectItem>
             <MudSelectItem Value="2">Indisponíveis</MudSelectItem>
         </MudSelect>
-        <MudButton Variant="Variant.Filled" Color="Color.Secondary" ButtonType="ButtonType.Reset" @onclick="ResetFormFilters">Limpar</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" ButtonType="ButtonType.Reset" @onclick="ResetFormFiltersAsync">Limpar</MudButton>
         <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.FilterAlt" @onclick="FilterBooksViewModelAsync">Filtrar</MudButton>
     </MudForm>
 </MudContainer>
@@ -62,7 +62,7 @@ else
             <MudTd DataLabel="Disponível">@(context.Available ? "Disponível" : "Indisponível")</MudTd>
             <MudTd DataLabel="Ações" Class="d-flex gap-2">
                 <MudButton Href="@($"/books/details/{context.Id}")" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Search">Detalhes</MudButton>
-                <MudButton @onclick="@((e) => DeleteDialogHandle(context.InventoryId))" Variant="Variant.Outlined" Color="Color.Error" EndIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error">Excluir</MudButton>
+                <MudButton @onclick="@((e) => DeleteDialogHandleAsync(context.InventoryId))" Variant="Variant.Outlined" Color="Color.Error" EndIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error">Excluir</MudButton>
             </MudTd>
         </RowTemplate>
         <PagerContent>
@@ -77,7 +77,6 @@ else
     public int Id { get; set; }
 
     private List<BooksViewModel> booksViewModels = new();
-
     private IEnumerable<Inventory> inventories;
     private IEnumerable<Book> books;
 
@@ -85,30 +84,31 @@ else
     private string yearFilter;
     private int availableFilter;
 
-    #region Form Variables
     private MudForm form;
     private bool success;
-    private string[] errors = { };
-    #endregion
-
-    #region Initializers
+    private string[] errors = [];
+    
     protected override async Task OnInitializedAsync()
     {
-        await InitializeInventories();
-        await InitializeBooks();
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        await InitializeInventoriesAsync();
+        await InitializeBooksAsync();
         InitializeBooksViewModel();
     }
 
-    private async Task InitializeInventories()
+    private async Task InitializeInventoriesAsync()
     {
         inventories = await inventoryService.GetByLibraryAsync(Id);
     }
 
-    private async Task InitializeBooks()
+    private async Task InitializeBooksAsync()
     {
         var bookIds = inventories.Select(inv => inv.BookId).ToHashSet();
         var allBooks = await bookService.GetAllAsync();
-
         books = allBooks.Where(book => bookIds.Contains(book.Id));
     }
 
@@ -121,37 +121,33 @@ else
             return new BooksViewModel(book, inventory.Id, available);
         }).ToList();
     }
-    #endregion
 
-    #region Filter
     private async Task FilterBooksViewModelAsync()
     {
         if (!form.IsValid)
             return;
 
-        await InitializeInventories();
+        await InitializeInventoriesAsync();
 
         if (availableFilter != 0)
         {
-            var available = availableFilter == 1 ? true : false;
+            var available = availableFilter == 1;
             inventories = inventories.Where(x => x.Available == available);
         }
 
         var bookIds = inventories.Select(inv => inv.BookId).ToHashSet();
-
         var allBooks = await bookService.GetByFilterAsync(filter);
-
         books = allBooks.Where(book => bookIds.Contains(book.Id));
-
         InitializeBooksViewModel();
-
         StateHasChanged();
     }
 
     private string ValidateDate(string arg)
     {
         if (string.IsNullOrEmpty(arg))
+        {
             filter.Year = 0;
+        }
         else
         {
             if (!arg.All(char.IsDigit))
@@ -170,64 +166,50 @@ else
         return null;
     }
 
-    private async Task ResetFormFilters()
+    private async Task ResetFormFiltersAsync()
     {
         filter = new();
         yearFilter = null;
         availableFilter = 0;
-        errors = [];
+        errors = Array.Empty<string>();
 
         await FilterBooksViewModelAsync();
     }
-    #endregion
 
-    #region Dialog Handles
-    private async Task DeleteDialogHandle(int id)
+    private async Task DeleteDialogHandleAsync(int id)
     {
         var parameters = new DialogParameters<CommonDeleteDialog>
         {
             { x => x.ContentText, "Tem certeza que deseja Excluir esse Livro e todos os seus registros? Essa ação não poderá ser desfeita." },
         };
 
-        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
-
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
         var dialog = await dialogService.ShowAsync<CommonDeleteDialog>("Excluir", parameters, options);
         var result = await dialog.Result;
 
         if (!result.Canceled)
         {
             await inventoryService.RemoveAsync(id);
-
-            await InitializeInventories();
-            await InitializeBooks();
-            InitializeBooksViewModel();
+            await LoadDataAsync();
         }
-
-        StateHasChanged();
     }
 
-    private async Task RegisterDialogHandle()
+    private async Task RegisterDialogHandleAsync()
     {
         var parameters = new DialogParameters<RegisterBookDialog>
         {
             { x => x.LibraryId, Id },
         };
 
-        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
-
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
         var dialog = await dialogService.ShowAsync<RegisterBookDialog>("Cadastrar", parameters, options);
         var result = await dialog.Result;
 
         if (!result.Canceled)
         {
-            await InitializeInventories();
-            await InitializeBooks();
-            InitializeBooksViewModel();
+            await LoadDataAsync();
         }
-
-        StateHasChanged();
     }
-    #endregion
 
     public class BooksViewModel
     {
@@ -250,5 +232,5 @@ else
         public int? Year { get; set; }
         public bool Available { get; set; }
     }
-
 }
+

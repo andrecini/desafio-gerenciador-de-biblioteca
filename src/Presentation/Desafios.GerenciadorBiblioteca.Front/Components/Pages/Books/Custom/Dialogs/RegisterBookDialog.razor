@@ -8,21 +8,14 @@
     <DialogContent>
         <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
             <MudTextField T="string" Label="Título" Required="true" RequiredError="O Título do Livro é obrigatório" @bind-Value="book.Title" />
-
             <MudTextField T="string" Label="Autor" Required="true" RequiredError="O Autor do Livro é obrigatório" @bind-Value="book.Author" />
-
-            <MudTextField T="string" Label="ISBN" HelperText="Digite apenas Números"
-                          Validation="@(new Func<string, string>(ValidateISBN))" Required="true"
-                          RequiredError="O ISBN é obrigatório!" @bind-Value="book.ISBN" />
-
-            <MudTextField T="string" Label="Ano" HelperText="Digite apenas Números"
-                          Validation="@(new Func<string, string>(ValidateYear))" Required="true"
-                          RequiredError="O Ano é obrigatório!" @bind-Value="yearInput" />
+            <MudTextField T="string" Label="ISBN" HelperText="Digite apenas Números" Validation="@(new Func<string, string>(ValidateISBN))" Required="true" RequiredError="O ISBN é obrigatório!" @bind-Value="book.ISBN" />
+            <MudTextField T="string" Label="Ano" HelperText="Digite apenas Números" Validation="@(new Func<string, string>(ValidateYear))" Required="true" RequiredError="O Ano é obrigatório!" @bind-Value="yearInput" />
         </MudForm>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancelar</MudButton>
-        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="Submit">Cadastrar</MudButton>
+        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="SubmitAsync">Cadastrar</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -30,13 +23,13 @@
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 
-    Book book = new();
+    private Book book = new();
     private string yearInput;
-    MudForm form;
-    bool success;
-    string[] errors = { };
+    private MudForm form;
+    private bool success;
+    private string[] errors = [];
 
-    private async Task Submit()
+    private async Task SubmitAsync()
     {
         if (form.IsValid)
         {

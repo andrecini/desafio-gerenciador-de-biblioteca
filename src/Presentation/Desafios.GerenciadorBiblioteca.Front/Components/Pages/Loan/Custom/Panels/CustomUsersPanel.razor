@@ -14,8 +14,8 @@
 <MudContainer Class="d-flex flex-row align-end pa-0 mb-5 ma-0" MaxWidth="MaxWidth.False">
     <MudForm Class="d-flex flex-row align-end gap-5">
         <MudTextField @bind-Value="userNameFilter" Immediate="true" Label="Nome do Usuário" Class="ma-0" />
-        <MudButton Variant="Variant.Filled" Color="Color.Secondary" ButtonType="ButtonType.Reset" @onclick="ResetFormFilters">Limpar</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.FilterAlt" @onclick="FilterLibsHandle">Filtrar</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" ButtonType="ButtonType.Reset" @onclick="ResetFormFiltersAsync">Limpar</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.FilterAlt" @onclick="FilterLibsHandleAsync">Filtrar</MudButton>
     </MudForm>
 </MudContainer>
 
@@ -26,12 +26,6 @@
 else
 {
     <MudTable Items="users" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true" Class="d-flex flex-column w-100">
-        <ColGroup>
-            <col />
-            <col />
-            <col />
-            <col />
-        </ColGroup>
         <HeaderContent>
             <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Library, object>(x=>x.Id)">ID</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<User, object>(x=> x.Name)" Class="w-100">Nome</MudTableSortLabel></MudTh>
@@ -55,11 +49,15 @@ else
     public int Id { get; set; }
 
     private IEnumerable<User> users;
-    private Loan loan = new Loan();
-
+    private Loan loan = new();
     private string userNameFilter = string.Empty;
 
     protected override async Task OnInitializedAsync()
+    {
+        await InitializeDataAsync();
+    }
+
+    private async Task InitializeDataAsync()
     {
         await InitializeLoanAsync();
         await InitializeUsersAsync();
@@ -73,24 +71,24 @@ else
     private async Task InitializeUsersAsync()
     {
         users = await userService.GetAllAsync();
-
-        users = users.Where(x => loan.Id == x.Id);
+        FilterUsersByLoanId();
     }
 
-    private async Task FilterLibsHandle()
+    private void FilterUsersByLoanId()
+    {
+        users = users.Where(x => loan.UserId == x.Id);
+    }
+
+    private async Task FilterLibsHandleAsync()
     {
         users = await userService.GetByNameAsync(userNameFilter);
-
-        users = users.Where(x => loan.Id == x.Id);
-
+        FilterUsersByLoanId();
         StateHasChanged();
     }
 
-    private async Task ResetFormFilters()
+    private async Task ResetFormFiltersAsync()
     {
-        userNameFilter = null;
-
-        await FilterLibsHandle();
+        userNameFilter = string.Empty;
+        await FilterLibsHandleAsync();
     }
 }
-

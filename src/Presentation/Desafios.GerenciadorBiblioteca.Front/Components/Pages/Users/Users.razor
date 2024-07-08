@@ -13,14 +13,14 @@
 <MudText Typo="Typo.h5" GutterBottom="true">Usuários</MudText>
 
 <MudContainer Class="d-flex flex-row align-end pa-0 mb-5 ma-0" MaxWidth="MaxWidth.False">
-    <MudButton @onclick="RegisterDialogHandle" Variant="Variant.Outlined" Color="Color.Success" StartIcon="@Icons.Material.Filled.AddCircle" IconColor="Color.Success">Cadastrar</MudButton>
+    <MudButton @onclick="RegisterDialogHandleAsync" Variant="Variant.Outlined" Color="Color.Success" StartIcon="@Icons.Material.Filled.AddCircle" IconColor="Color.Success">Cadastrar</MudButton>
 
     <MudSpacer />
 
     <MudForm Class="d-flex flex-row align-end gap-5">
         <MudTextField @bind-Value="userNameFilter" Immediate="true" Label="Nome do Usuário" Class="ma-0" />
-        <MudButton Variant="Variant.Filled" Color="Color.Secondary" ButtonType="ButtonType.Reset" @onclick="ResetFormFilters">Limpar</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.FilterAlt" @onclick="FilterLibsHandle">Filtrar</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" ButtonType="ButtonType.Reset" @onclick="ResetFormFiltersAsync">Limpar</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.FilterAlt" @onclick="FilterLibsHandleAsync">Filtrar</MudButton>
     </MudForm>
 </MudContainer>
 
@@ -52,7 +52,7 @@ else
             <MudTd DataLabel="Telefone">@context.Phone</MudTd>
             <MudTd DataLabel="Ações" Class="d-flex gap-2">
                 <MudButton Href="@($"users/details/{context.Id}")" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Search">Detalhes</MudButton>
-                <MudButton @onclick="@((e) => DeleteDialogHandle(context.Id))" Variant="Variant.Outlined" Color="Color.Error" EndIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error">Excluir</MudButton>
+                <MudButton @onclick="@((e) => DeleteDialogHandleAsync(context.Id))" Variant="Variant.Outlined" Color="Color.Error" EndIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error">Excluir</MudButton>
             </MudTd>
         </RowTemplate>
         <PagerContent>
@@ -68,24 +68,28 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadUsersAsync();
+    }
+
+    private async Task LoadUsersAsync()
+    {
         users = await userService.GetAllAsync();
     }
 
-    private async Task FilterLibsHandle()
+    private async Task FilterLibsHandleAsync()
     {
         users = await userService.GetByNameAsync(userNameFilter);
         StateHasChanged();
     }
 
-    #region Dialogs
-    private async Task DeleteDialogHandle(int id)
+    private async Task DeleteDialogHandleAsync(int id)
     {
         var parameters = new DialogParameters<CommonDeleteDialog>
         {
             { x => x.ContentText, "Tem certeza que deseja Excluir esse Usuário e todos os seus registros? Essa ação não poderá ser desfeita." },
         };
 
-        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
 
         var dialog = await DialogService.ShowAsync<CommonDeleteDialog>("Excluir", parameters, options);
         var result = await dialog.Result;
@@ -93,30 +97,26 @@ else
         if (!result.Canceled)
         {
             await userService.RemoveAsync(id);
-            users = await userService.GetAllAsync();
+            await LoadUsersAsync();
         }
-
-        StateHasChanged();
     }
 
-    private async Task RegisterDialogHandle()
+    private async Task RegisterDialogHandleAsync()
     {
-        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
 
         var dialog = await DialogService.ShowAsync<RegisterUserDialog>("Cadastrar", options);
         var result = await dialog.Result;
 
         if (!result.Canceled)
-            users = await userService.GetAllAsync();
-
-        StateHasChanged();
+        {
+            await LoadUsersAsync();
+        }
     }
-    #endregion
 
-    private async Task ResetFormFilters()
+    private async Task ResetFormFiltersAsync()
     {
-        userNameFilter = null;
-
-        await FilterLibsHandle();
+        userNameFilter = string.Empty;
+        await FilterLibsHandleAsync();
     }
 }

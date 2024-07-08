@@ -18,7 +18,7 @@
     [Parameter]
     public string ContentText { get; set; }
 
-    private async Task Submit()
+    private void Submit()
     {
         MudDialog.Close(DialogResult.Ok(true));
     }

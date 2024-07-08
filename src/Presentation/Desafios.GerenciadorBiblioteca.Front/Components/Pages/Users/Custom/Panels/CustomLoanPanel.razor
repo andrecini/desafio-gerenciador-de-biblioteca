@@ -24,7 +24,7 @@
             <MudSelectItem Value="1">Devolvidos</MudSelectItem>
             <MudSelectItem Value="2">Pendentes</MudSelectItem>
         </MudSelect>
-        <MudButton Variant="Variant.Filled" Color="Color.Secondary" ButtonType="ButtonType.Reset" @onclick="ResetFormFilters">Limpar</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" ButtonType="ButtonType.Reset" @onclick="ResetFormFiltersAsync">Limpar</MudButton>
         <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.FilterAlt" @onclick="FilterBooksViewModelAsync">Filtrar</MudButton>
     </MudForm>
 </MudContainer>
@@ -36,13 +36,6 @@
 else
 {
     <MudTable Items="loansViewModels" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true" Class="d-flex flex-column w-100">
-        <ColGroup>
-            <col />
-            <col />
-            <col />
-            <col />
-            <col />
-        </ColGroup>
         <HeaderContent>
             <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<LoanViewModel, object>(x=>x.Id)">ID</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<LoanViewModel, object>(x=> x.BookName)" Class="w-100">Livro</MudTableSortLabel></MudTh>
@@ -64,7 +57,6 @@ else
 }
 
 @code {
-
     [Parameter]
     public int Id { get; set; }
 
@@ -73,35 +65,37 @@ else
     private IEnumerable<Loan> loans;
     private IEnumerable<Inventory> inventories;
 
-    #region Filter Variables
     private LoanFilter filter = new();
     private string bookFilter;
     private DateTime? loanDateFilter;
     private DateTime? loanDateValidityFilter;
     private int statusFilter;
-    #endregion
 
-    #region Initializers
     protected override async Task OnInitializedAsync()
     {
-        await InitializeInventories();
-        await InitializeLoans();
-        await InitializeLoansViewModel();
+        await InitializeDataAsync();
     }
 
-    private async Task InitializeInventories()
+    private async Task InitializeDataAsync()
+    {
+        await InitializeInventoriesAsync();
+        await InitializeLoansAsync();
+        await InitializeLoansViewModelAsync();
+    }
+
+    private async Task InitializeInventoriesAsync()
     {
         inventories = await inventoryService.GetAllAsync();
     }
 
-    private async Task InitializeLoans()
+    private async Task InitializeLoansAsync()
     {
         var inventoryIds = inventories.Select(inv => inv.Id).ToHashSet();
         var allLoans = await loanService.GetByUserAsync(Id);
         loans = allLoans.Where(loan => inventoryIds.Contains(loan.InventoryId));
     }
 
-    private async Task InitializeLoansViewModel()
+    private async Task InitializeLoansViewModelAsync()
     {
         var loanViewModels = new List<LoanViewModel>();
 
@@ -112,23 +106,18 @@ else
             if (inventory != null)
             {
                 var book = await bookService.GetByIdAsync(inventory.BookId);
-                var user = await userService.GetByIdAsync(loan.UserId);
-
                 loanViewModels.Add(new LoanViewModel(loan, book.Title, loan.Returned));
             }
         }
 
         loansViewModels = loanViewModels;
     }
-    #endregion
 
-    #region Filter
     private async Task FilterBooksViewModelAsync()
     {
-        await InitializeInventories();
+        await InitializeInventoriesAsync();
 
         var booksIds = await GetFilteredBooksIdsAsync();
-
         var inventoriesIds = GetFilteredInventoriesIds(booksIds);
 
         filter.LoanValidity = loanDateValidityFilter ?? new DateTime();
@@ -136,32 +125,25 @@ else
         filter.Status = (LoanStatus)statusFilter;
 
         loans = await loanService.GetByFilterAsync(filter);
+        loans = loans.Where(x => inventoriesIds.Contains(x.InventoryId) && x.UserId == Id);
 
-        loans = loans.Where(x => booksIds.Contains(x.InventoryId) && x.UserId == Id);
-
-        await InitializeLoansViewModel();
-
+        await InitializeLoansViewModelAsync();
         StateHasChanged();
     }
 
     private async Task<HashSet<int>> GetFilteredBooksIdsAsync()
     {
         var filteredBooks = await bookService.GetByFilterAsync(new() { Title = bookFilter }) ?? new List<Book>();
-
-        if (filteredBooks.Any())
-            return filteredBooks.Select(x => x.Id).ToHashSet();
-
-        return new();
+        return filteredBooks.Select(x => x.Id).ToHashSet();
     }
 
     private HashSet<int> GetFilteredInventoriesIds(HashSet<int> booksIds)
     {
-        inventories = inventories.Where(x => booksIds.Contains(x.BookId)) ?? new List<Inventory>();
-
+        inventories = inventories.Where(x => booksIds.Contains(x.BookId));
         return inventories.Select(x => x.Id).ToHashSet();
     }
 
-    private async Task ResetFormFilters()
+    private async Task ResetFormFiltersAsync()
     {
         filter = new();
         bookFilter = null;
@@ -171,7 +153,6 @@ else
 
         await FilterBooksViewModelAsync();
     }
-    #endregion
 
     public class LoanViewModel
     {
@@ -190,5 +171,4 @@ else
         public DateTime LoanValidity { get; set; }
         public bool Status { get; set; }
     }
-
 }

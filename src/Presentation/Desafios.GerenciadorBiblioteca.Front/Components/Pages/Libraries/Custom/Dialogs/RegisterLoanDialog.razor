@@ -10,8 +10,8 @@
 <MudDialog>
     <DialogContent>
         <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
-            <MudSelect T="int" Label="Selecione um dos Livro Cadastrados" AnchorOrigin="Origin.BottomCenter"
-                       HelperText="@helperTextBooks" Class="mb-2"
+            <MudSelect T="int" Label="Selecione um dos Livro Cadastrados" AnchorOrigin="Origin.BottomCenter" Class="mb-2"
+                       HelperText="@("Se o livro não estiver listado, adicione-o à nossa base de dados na aba \"Livros\".")"
                        Validation="@(new Func<int, string>(ValidateBook))" Required="true"
                        RequiredError="O Livro é obrigatório" @bind-Value="inventoryId">
                 <MudSelectItem Value="0">Selecione um livro</MudSelectItem>
@@ -21,8 +21,8 @@
                 }
             </MudSelect>
 
-            <MudSelect T="int" Label="Selecione um dos Usuários Cadastrados" AnchorOrigin="Origin.BottomCenter"
-                       HelperText="@helperTextUsers" Class="mb-2"
+            <MudSelect T="int" Label="Selecione um dos Usuários Cadastrados" AnchorOrigin="Origin.BottomCenter" Class="mb-2"
+                       HelperText="@("Se o Usuário não estiver listado, adicione-o à nossa base de dados na aba \"Usuários\".")"
                        Validation="@(new Func<int, string>(ValidateUser))" Required="true"
                        RequiredError="O Usuário é obrigatório" @bind-Value="userId">
                 <MudSelectItem Value="0">Selecione um livro</MudSelectItem>
@@ -45,7 +45,7 @@
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancelar</MudButton>
-        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="Submit">Cadastrar</MudButton>
+        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="SubmitAsync">Cadastrar</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -64,32 +64,24 @@
     private DateTime? loanDate = DateTime.Now;
     private DateTime? loanValidity = DateTime.Now.AddDays(1).AddHours(1);
 
-    private string helperTextBooks = string.Empty;
-    private string helperTextUsers = string.Empty;
-
-    MudForm form;
-    bool success;
-    string[] errors = { };
+    private MudForm form;
+    private bool success;
+    private string[] errors = [];
 
     protected override async Task OnInitializedAsync()
     {
-        await InitializeBooksDict();
-        await InitializeUsersDict();
-
-        helperTextBooks = "Se o livro não estiver listado, adicione-o à nossa base de dados na aba \"Livros\".";
-        helperTextUsers = "Se o Usuário não estiver listado, adicione-o à nossa base de dados na aba \"Usuários\".";
+        await InitializeBooksDictAsync();
+        await InitializeUsersDictAsync();
     }
 
-    private async Task Submit()
+    private async Task SubmitAsync()
     {
         await form.Validate();
 
         if (form.IsValid)
         {
             var dto = new LoanDTO(inventoryId, userId, loanDate.Value, loanValidity.Value);
-
             await loanService.AddAsync(dto);
-
             MudDialog.Close(DialogResult.Ok(true));
         }
     }
@@ -98,18 +90,12 @@
 
     private string ValidateBook(int bookId)
     {
-        if (bookId <= 0)
-            return "O Livro é obrigatório";
-
-        return null;
+        return bookId <= 0 ? "O Livro é obrigatório" : null;
     }
 
     private string ValidateUser(int userId)
     {
-        if (userId <= 0)
-            return "O Usuário é obrigatório";
-
-        return null;
+        return userId <= 0 ? "O Usuário é obrigatório" : null;
     }
 
     private string ValidateLoanDate(DateTime? loanDate)
@@ -137,33 +123,31 @@
         return null;
     }
 
-    private async Task InitializeBooksDict()
+    private async Task InitializeBooksDictAsync()
     {
         var books = await bookService.GetAllAsync();
-
         var inventories = await inventoryService.GetByLibraryAsync(LibraryId);
-        var inventoriesAvailables = inventories.Where(x => x.Available);
-        var inventoriesBooksIds = inventoriesAvailables.Select(x => x.BookId).ToHashSet();
+        var availableInventories = inventories.Where(x => x.Available);
+        var availableBookIds = availableInventories.Select(x => x.BookId).ToHashSet();
 
-        var filteredBooks = books.Where(x => inventoriesBooksIds.Contains(x.Id));
+        var filteredBooks = books.Where(x => availableBookIds.Contains(x.Id));
 
-        foreach (var inventory in inventoriesAvailables)
+        foreach (var inventory in availableInventories)
         {
             var book = filteredBooks.FirstOrDefault(b => b.Id == inventory.BookId);
             if (book != null)
             {
-                inventoriesDictionary.Add(inventory.Id, book.Title);
+                inventoriesDictionary[inventory.Id] = book.Title;
             }
         }
     }
 
-    private async Task InitializeUsersDict()
+    private async Task InitializeUsersDictAsync()
     {
         var users = await userService.GetAllAsync();
-
-        foreach (var u in users)
+        foreach (var user in users)
         {
-            usersDictionary.Add(u.Id, u.Name);
+            usersDictionary[user.Id] = user.Name;
         }
     }
 }

@@ -68,7 +68,7 @@
     [Parameter]
     public int Id { get; set; }
 
-    public Loan loan = new Loan();
+    public Loan loan = new();
 
     private Dictionary<int, string> inventoriesDictionary = new();
     private Dictionary<int, string> usersDictionary = new();
@@ -79,16 +79,19 @@
     private string helperTextBooks = string.Empty;
     private string helperTextUsers = string.Empty;
 
-    MudForm form;
-    bool success;
-    string[] errors = { };
+    private MudForm form;
+    private bool success;
+    private string[] errors = [];
 
     protected override async Task OnInitializedAsync()
     {
         await InitializeLoanAsync();
         await InitializeDictionariesAsync();
-        StateHasChanged();
+        SetHelperTexts();
+    }
 
+    private void SetHelperTexts()
+    {
         helperTextBooks = "Se o livro não estiver listado, adicione-o à nossa base de dados na aba \"Livros\".";
         helperTextUsers = "Se o Usuário não estiver listado, adicione-o à nossa base de dados na aba \"Usuários\".";
     }
@@ -100,7 +103,6 @@
         if (form.IsValid)
         {
             var dto = new LoanDTO(loan.InventoryId, loan.UserId, loanDate.Value, loanValidity.Value);
-
             await loanService.UpdateAsync(Id, dto);
             await loanService.UpdateStatusAsync(Id, loan.Returned);
         }
@@ -108,18 +110,12 @@
 
     private string ValidateBook(int bookId)
     {
-        if (bookId <= 0)
-            return "O Livro é obrigatório";
-
-        return null;
+        return bookId <= 0 ? "O Livro é obrigatório" : null;
     }
 
     private string ValidateUser(int userId)
     {
-        if (userId <= 0)
-            return "O Usuário é obrigatório";
-
-        return null;
+        return userId <= 0 ? "O Usuário é obrigatório" : null;
     }
 
     private string ValidateLoanDate(DateTime? loanDate)
@@ -127,10 +123,7 @@
         if (loanDate == null)
             return "A Data de Empréstimo é obrigatória";
 
-        if (loanDate > DateTime.Now)
-            return "Data de Empréstimo inválida. Selecione uma data menor ou igual à data atual.";
-
-        return null;
+        return loanDate > DateTime.Now ? "Data de Empréstimo inválida. Selecione uma data menor ou igual à data atual." : null;
     }
 
     private string ValidateLoanValidity(DateTime? loanValidity)
@@ -138,13 +131,7 @@
         if (loanValidity == null)
             return "A Data de Validade é obrigatória";
 
-        if (loanDate == null)
-            return null;
-
-        if (loanValidity < loanDate.Value.AddDays(1))
-            return "Data de Validade inválida. Intervalo entre a Data de Empréstimo e a Data de Validade deve ser de no mínimo 1 dia.";
-
-        return null;
+        return loanValidity < loanDate?.AddDays(1) ? "Data de Validade inválida. Intervalo entre a Data de Empréstimo e a Data de Validade deve ser de no mínimo 1 dia." : null;
     }
 
     private async Task InitializeLoanAsync()
@@ -163,7 +150,7 @@
         var books = await bookService.GetAllAsync();
         var inventories = await inventoryService.GetAllAsync();
         var inventoriesAvailables = inventories.Where(x => x.Available).ToHashSet();
-        var inventoryActual = await inventoryService.GetByIdAsync(loan.Id);
+        var inventoryActual = await inventoryService.GetByIdAsync(loan.InventoryId);
 
         if (!inventoriesAvailables.Contains(inventoryActual))
             inventoriesAvailables.Add(inventoryActual);
@@ -184,10 +171,9 @@
     private async Task InitializeUsersDictAsync()
     {
         var users = await userService.GetAllAsync();
-
-        foreach (var u in users)
+        foreach (var user in users)
         {
-            usersDictionary[u.Id] = u.Name;
+            usersDictionary[user.Id] = user.Name;
         }
     }
 }

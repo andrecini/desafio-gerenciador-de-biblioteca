@@ -43,14 +43,14 @@
     private string yearInput;
     private MudForm form;
     private bool success;
-    private string[] errors = { };
+    private string[] errors = [];
 
     protected override async Task OnInitializedAsync()
     {
-        await InitializeLibrary();
+        await InitializeLibraryAsync();
     }
 
-    private async Task InitializeLibrary()
+    private async Task InitializeLibraryAsync()
     {
         book = await bookService.GetByIdAsync(Id);
         yearInput = book.Year.ToString();
@@ -65,7 +65,6 @@
             var dto = new BookDTO(book.Title, book.Author, book.ISBN, book.Year);
 
             await bookService.UpdateAsync(Id, dto);
-
             StateHasChanged();
         }
     }

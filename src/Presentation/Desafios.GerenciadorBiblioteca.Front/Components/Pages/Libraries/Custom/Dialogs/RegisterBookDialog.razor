@@ -17,13 +17,12 @@
                 {
                     <MudSelectItem Value="b.Key">@b.Value</MudSelectItem>
                 }
-
             </MudSelect>
         </MudForm>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancelar</MudButton>
-        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="Submit">Cadastrar</MudButton>
+        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="SubmitAsync">Cadastrar</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -38,54 +37,46 @@
     private int bookId;
     private string helperText = string.Empty;
 
-    MudForm form;
-    bool success;
-    string[] errors = { };
+    private MudForm form;
+    private bool success;
+    private string[] errors = [];
 
     protected override async Task OnInitializedAsync()
     {
-        await InitializeBooksDict();
+        await InitializeBooksDictAsync();
         helperText = "Se o livro não estiver listado, adicione-o à nossa base de dados na aba \"Livros\".";
     }
 
-    private async Task Submit()
+    private async Task SubmitAsync()
     {
         await form.Validate();
 
         if (form.IsValid)
         {
             var dto = new InventoryDTO(LibraryId, bookId);
-
             await inventoryService.AddAsync(dto);
-
             MudDialog.Close(DialogResult.Ok(true));
         }
     }
 
     private void Cancel() => MudDialog.Cancel();
 
-
     private string ValidateBook(int bookId)
     {
-        if (bookId <= 0)
-            return "O Livro é obrigatório";
-
-        return null;
+        return bookId <= 0 ? "O Livro é obrigatório" : null;
     }
 
-
-    private async Task InitializeBooksDict()
+    private async Task InitializeBooksDictAsync()
     {
         var books = await bookService.GetAllAsync();
-
         var inventories = await inventoryService.GetByLibraryAsync(LibraryId);
         var inventoriesBooksIds = inventories.Select(x => x.BookId).ToHashSet();
 
         var distinctBooks = books.Where(x => !inventoriesBooksIds.Contains(x.Id));
 
-        foreach (var b in distinctBooks)
+        foreach (var book in distinctBooks)
         {
-            booksDictionary.Add(b.Id, b.Title);
+            booksDictionary.Add(book.Id, book.Title);
         }
     }
 }

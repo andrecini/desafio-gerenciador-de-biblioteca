@@ -20,7 +20,7 @@
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancelar</MudButton>
-        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="Submit">Cadastrar</MudButton>
+        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="SubmitAsync">Cadastrar</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -28,19 +28,17 @@
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 
-    User user = new();
-    MudForm form;
-    bool success;
-    string[] errors = { };
+    private User user = new();
+    private MudForm form;
+    private bool success;
+    private string[] errors = [];
 
-    private async Task Submit()
+    private async Task SubmitAsync()
     {
         if (form.IsValid)
         {
             var dto = new UserDTO(user.Name, user.Email, user.Phone);
-
             await service.AddAsync(dto);
-
             MudDialog.Close(DialogResult.Ok(user));
         }
     }
@@ -61,3 +59,4 @@
         return null;
     }
 }
+
