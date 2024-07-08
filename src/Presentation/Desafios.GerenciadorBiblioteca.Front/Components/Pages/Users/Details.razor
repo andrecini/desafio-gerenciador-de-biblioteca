@@ -1,7 +1,4 @@
 ﻿@page "/users/details/{Id:int}"
-@using Desafios.GerenciadorBiblioteca.Domain.Entities
-@using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests
-@using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces
 @using System.ComponentModel.DataAnnotations
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Users.Custom.Panels
 
@@ -24,7 +21,7 @@
                       RequiredError="O Telefone é obrigatório!" />
     </MudForm>
 
-    <MudButton Variant="Variant.Filled" Color="Color.Tertiary" StartIcon="@Icons.Material.Filled.Save" @onclick="EditLibraryAsync">Salvar</MudButton>
+    <MudButton Variant="Variant.Filled" Color="Color.Tertiary" StartIcon="@Icons.Material.Filled.Save" @onclick="EditUserAsync">Salvar</MudButton>
 </MudContainer>
 
 <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" Class="h-100 mh-100 w-100 mw-100" PanelClass="pa-6 h-100 mh-100 overflow-y-auto">
