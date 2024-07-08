@@ -1,19 +1,28 @@
 ﻿@inherits LayoutComponentBase
 
-<MudThemingProvider />
+<MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="_theme" />
+<MudDialogProvider @rendermode="InteractiveServer" FullWidth="true" />
+<MudPopoverProvider @rendermode="InteractiveServer" />
+<MudSnackbarProvider/>
+
 <MudLayout>
-    <MudAppBar Elevation="1">
-        <MudText Typo="Typo.h5" Class="ml-3">Application</MudText>
+    <MudAppBar Color="Color.Primary" Fixed="false">
+        <MudIconButton Icon="@Icons.Material.Filled.Book" Color="Color.Inherit" />
+        <MudText Typo="Typo.h6" Class="ml-3">Desafio 1 - Gerenciador de Bibliotecas</MudText>
+        <MudSpacer />
+        <MudSwitch @bind-Value="_isDarkMode"/>
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
         <NavMenu />
     </MudDrawer>
-    <MudMainContent Class="mt-16 pa-4">
+    <MudMainContent Class="px-4 py-8">
         @Body
     </MudMainContent>
 </MudLayout>
 
 @code {
+    private MudTheme _theme = new();
+    private bool _isDarkMode = true;
     private bool _drawerOpen = true;
 
     private void DrawerToggle()

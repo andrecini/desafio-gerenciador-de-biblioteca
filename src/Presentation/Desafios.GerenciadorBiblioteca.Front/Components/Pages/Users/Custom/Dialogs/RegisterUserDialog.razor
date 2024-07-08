@@ -1,0 +1,59 @@
+﻿@using System.ComponentModel.DataAnnotations
+@inject IUserService service
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+            <MudTextField T="string" Label="Nome" Required="true" RequiredError="O Nome do Livro é obrigatório" @bind-Value="user.Name" />
+
+            <MudTextField T="string" Label="Email" Required="true" RequiredError="O Email é obrigatório" @bind-Value="user.Email"
+                          Validation="@(new EmailAddressAttribute() {ErrorMessage = "Email Inválido"})" />
+
+            <MudTextField T="string" Label="Telefone" HelperText="Digite apenas Números"
+                          InputType="InputType.Telephone"
+                          Validation="@(new Func<string, string>(ValidatePhone))" Required="true"
+                          RequiredError="O Telefone é obrigatório!" @bind-Value="user.Phone" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancelar</MudButton>
+        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="SubmitAsync">Cadastrar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    private User user = new();
+    private MudForm form;
+    private bool success;
+    private string[] errors = [];
+
+    private async Task SubmitAsync()
+    {
+        if (form.IsValid)
+        {
+            var dto = new UserDTO(user.Name, user.Email, user.Phone);
+            await service.AddAsync(dto);
+            MudDialog.Close(DialogResult.Ok(user));
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private string ValidatePhone(string phone)
+    {
+        if (string.IsNullOrEmpty(phone))
+            return "O Telefone é obrigatório";
+
+        if (!phone.All(char.IsDigit))
+            return "O Telefone deve conter apenas números";
+
+        if (phone.Length != 11)
+            return "O Telefone deve ter 11 dígitos";
+
+        return null;
+    }
+}
+

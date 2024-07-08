@@ -1,0 +1,119 @@
+﻿@page "/users"
+@using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Common
+@using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Users.Custom.Dialogs
+@rendermode InteractiveServer
+@inject IUserService userService
+@inject IDialogService DialogService
+
+<PageTitle>Usuários</PageTitle>
+
+<MudText Typo="Typo.h5" GutterBottom="true">Usuários</MudText>
+
+<MudContainer Class="d-flex flex-row align-end pa-0 mb-5 ma-0" MaxWidth="MaxWidth.False">
+    <MudButton @onclick="RegisterDialogHandleAsync" Variant="Variant.Outlined" Color="Color.Success" StartIcon="@Icons.Material.Filled.AddCircle" IconColor="Color.Success">Cadastrar</MudButton>
+
+    <MudSpacer />
+
+    <MudForm Class="d-flex flex-row align-end gap-5">
+        <MudTextField @bind-Value="userNameFilter" Immediate="true" Label="Nome do Usuário" Class="ma-0" />
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" ButtonType="ButtonType.Reset" @onclick="ResetFormFiltersAsync">Limpar</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.FilterAlt" @onclick="FilterLibsHandleAsync">Filtrar</MudButton>
+    </MudForm>
+</MudContainer>
+
+@if (users == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudTable Items="users" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true" Class="d-flex flex-column w-100">
+        <ColGroup>
+            <col />
+            <col />
+            <col />
+            <col />
+            <col width="280" />
+        </ColGroup>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<User, object>(x=>x.Id)">ID</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<User, object>(x=> x.Name)" Class="w-100">Nome</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<User, object>(x=> x.Email)">Email</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<User, object>(x=> x.Phone)">Telefone</MudTableSortLabel></MudTh>
+            <MudTh>Ações</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="ID">@context.Id</MudTd>
+            <MudTd DataLabel="Nome">@context.Name</MudTd>
+            <MudTd DataLabel="Email">@context.Email</MudTd>
+            <MudTd DataLabel="Telefone">@context.Phone</MudTd>
+            <MudTd DataLabel="Ações" Class="d-flex gap-2">
+                <MudButton Href="@($"users/details/{context.Id}")" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Search">Detalhes</MudButton>
+                <MudButton @onclick="@((e) => DeleteDialogHandleAsync(context.Id))" Variant="Variant.Outlined" Color="Color.Error" EndIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error">Excluir</MudButton>
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10, 20}" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    private IEnumerable<User> users;
+
+    private string userNameFilter = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsersAsync();
+    }
+
+    private async Task LoadUsersAsync()
+    {
+        users = await userService.GetAllAsync();
+    }
+
+    private async Task FilterLibsHandleAsync()
+    {
+        users = await userService.GetByNameAsync(userNameFilter);
+        StateHasChanged();
+    }
+
+    private async Task DeleteDialogHandleAsync(int id)
+    {
+        var parameters = new DialogParameters<CommonDeleteDialog>
+        {
+            { x => x.ContentText, "Tem certeza que deseja Excluir esse Usuário e todos os seus registros? Essa ação não poderá ser desfeita." },
+        };
+
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var dialog = await DialogService.ShowAsync<CommonDeleteDialog>("Excluir", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await userService.RemoveAsync(id);
+            await LoadUsersAsync();
+        }
+    }
+
+    private async Task RegisterDialogHandleAsync()
+    {
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var dialog = await DialogService.ShowAsync<RegisterUserDialog>("Cadastrar", options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await LoadUsersAsync();
+        }
+    }
+
+    private async Task ResetFormFiltersAsync()
+    {
+        userNameFilter = string.Empty;
+        await FilterLibsHandleAsync();
+    }
+}

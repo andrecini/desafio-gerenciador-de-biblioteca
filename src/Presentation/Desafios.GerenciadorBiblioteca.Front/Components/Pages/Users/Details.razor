@@ -1,0 +1,78 @@
+﻿@page "/users/details/{Id:int}"
+@using System.ComponentModel.DataAnnotations
+@using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Users.Custom.Panels
+@inject ISnackbar Snackbar
+@inject IUserService userService;
+
+<PageTitle>Usuáros</PageTitle>
+
+<MudText Typo="Typo.h5" GutterBottom="true">Detalhes do Usuário</MudText>
+
+<MudContainer Class="d-flex flex-row align-center pa-0 mt-5 mb-5 ma-0 gap-5 w-100" MaxWidth="MaxWidth.False">
+    <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-row align-start pa-0 ma-0 gap-5 w-100">
+        <MudTextField @bind-Value="user.Name" Label="Nome" Required="true" RequiredError="O Nome da Biblioteca é obrigatório" />
+
+        <MudTextField @bind-Value="user.Email" Label="CNPJ" HelperText="Digite apenas Números" Required="true" RequiredError="O Email é obrigatório"
+                      Validation="@(new EmailAddressAttribute() {ErrorMessage = "O Email é Inválido"})" />
+
+        <MudTextField @bind-Value="user.Phone" Label="Telefone" HelperText="Digite apenas Números"
+                      InputType="InputType.Telephone"
+                      Validation="@(new Func<string, string>(ValidatePhone))" Required="true"
+                      RequiredError="O Telefone é obrigatório!" />
+    </MudForm>
+
+    <MudButton Variant="Variant.Filled" Color="Color.Tertiary" StartIcon="@Icons.Material.Filled.Save" @onclick="EditUserAsync">Salvar</MudButton>
+</MudContainer>
+
+<MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" Class="h-100 mh-100 w-100 mw-100" PanelClass="pa-6 h-100 mh-100 overflow-y-auto">
+    <MudTabPanel Text="Empréstimos" Class="h-100 w-100">
+        <CustomLoanPanel Id="Id" />
+    </MudTabPanel>
+</MudTabs>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private User user = new();
+    private MudForm form;
+    private bool success;
+    private string[] errors = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await InitializeUserAsync();
+    }
+
+    private async Task InitializeUserAsync()
+    {
+        user = await userService.GetByIdAsync(Id);
+    }
+
+    private async Task EditUserAsync()
+    {
+        if (form.IsValid)
+        {
+            var dto = new UserDTO(user.Name, user.Email, user.Phone);
+            await userService.UpdateAsync(Id, dto);
+
+            Snackbar.Clear();
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopEnd;
+            Snackbar.Add("Dados alterados com sucesso!", Severity.Success);
+        }
+    }
+
+    private string ValidatePhone(string phone)
+    {
+        if (string.IsNullOrEmpty(phone))
+            return "O Telefone é obrigatório";
+
+        if (!phone.All(char.IsDigit))
+            return "O Telefone deve conter apenas números";
+
+        if (phone.Length != 11)
+            return "O Telefone deve ter 11 dígitos";
+
+        return null;
+    }
+}

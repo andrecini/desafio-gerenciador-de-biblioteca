@@ -95,14 +95,14 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
             CustomException.ThrowIfLessThan(1, "Empréstimo");
 
             var loanRegistered = await GetByIdAsync(id) ??
-                throw new CustomException("Nenhum Emrpéstimo foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
+                throw new CustomException("Nenhum Empréstimo foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
 
             loanRegistered.Returned = returned;
 
             _unitOfWork.Loans.Update(loanRegistered);
             var result = await _unitOfWork.SaveAsync();
 
-            await _inventoryService.UpdateStatusAsync(loanRegistered.InventoryId, true);
+            await _inventoryService.UpdateStatusAsync(loanRegistered.InventoryId, returned);
 
             return result > 0 ? loanRegistered : throw new CustomException(
                 "Não foi possível atualizar o Empréstimo. Tente novamente!",
@@ -126,17 +126,17 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
 
         private IEnumerable<Loan> FilterLoans(IEnumerable<Loan> loans, LoanFilter filter)
         {
-            if (filter.InventoryId >= 0)
+            if (filter.InventoryId > 0)
                 loans = loans.Where(x => x.InventoryId == filter.InventoryId);
-            if (filter.UserId >= 0)
+            if (filter.UserId > 0)
                 loans = loans.Where(x => x.UserId == filter.UserId);
             if (filter.LoanDate != default)
-                loans = loans.Where(x => x.LoanDate == filter.LoanDate);
+                loans = loans.Where(x => x.LoanDate.ToShortDateString() == filter.LoanDate.ToShortDateString());
             if (filter.LoanValidity != default)
-                loans = loans.Where(x => x.LoanValidity == filter.LoanValidity);
+                loans = loans.Where(x => x.LoanValidity.ToShortDateString() == filter.LoanValidity.ToShortDateString());
             if (filter.Status == LoanStatus.Returned)
                 loans = loans.Where(x => x.Returned == true);
-            if (filter.Status == LoanStatus.Returned)
+            if (filter.Status == LoanStatus.Pending)
                 loans = loans.Where(x => x.Returned == false);
 
             return loans;

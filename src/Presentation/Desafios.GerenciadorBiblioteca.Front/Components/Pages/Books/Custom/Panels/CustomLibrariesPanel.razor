@@ -1,0 +1,96 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Users.Custom.Panels
+
+@inject IBookService bookService;
+@inject ILibraryService libraryService
+@inject IInventoryService inventoryService
+@inject IDialogService DialogService
+
+<PageTitle>Livros</PageTitle>
+
+<MudText Typo="Typo.h5" GutterBottom="true">Bibliotecas</MudText>
+
+<MudContainer Class="d-flex flex-row align-end pa-0 mb-5 ma-0" MaxWidth="MaxWidth.False">
+    <MudForm Class="d-flex flex-row align-end gap-5">
+        <MudTextField @bind-Value="libraryNameFilter" Immediate="true" Label="Nome da Biblioteca" Class="ma-0" />
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" ButtonType="ButtonType.Reset" @onclick="ResetFormFiltersAsync">Limpar</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.FilterAlt" @onclick="FilterLibsHandleAsync">Filtrar</MudButton>
+    </MudForm>
+</MudContainer>
+
+@if (libraries == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudTable Items="libraries" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true" Class="d-flex flex-column w-100">
+        <HeaderContent>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Library, object>(x=>x.Id)">ID</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Library, object>(x=> x.Name)" Class="w-100">Nome</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Library, object>(x=> x.CNPJ)">CNPJ</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Library, object>(x=> x.Phone)">Telefone</MudTableSortLabel></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="ID">@context.Id</MudTd>
+            <MudTd DataLabel="Nome">@context.Name</MudTd>
+            <MudTd DataLabel="CNPJ">@context.CNPJ</MudTd>
+            <MudTd DataLabel="Telefone">@context.Phone</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10, 20}" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private IEnumerable<Library> libraries;
+    private IEnumerable<Inventory> inventories;
+
+    private string libraryNameFilter = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await InitializeDataAsync();
+    }
+
+    private async Task InitializeDataAsync()
+    {
+        await InitializeInventoriesAsync();
+        await InitializeLibrariesAsync();
+    }
+
+    private async Task InitializeInventoriesAsync()
+    {
+        inventories = await inventoryService.GetAllAsync();
+        inventories = inventories.Where(x => x.BookId == Id);
+    }
+
+    private async Task InitializeLibrariesAsync()
+    {
+        libraries = await libraryService.GetAllAsync();
+        FilterLibraries();
+    }
+
+    private void FilterLibraries()
+    {
+        var libraryIds = inventories.Select(x => x.LibraryId);
+        libraries = libraries.Where(x => libraryIds.Contains(x.Id));
+    }
+
+    private async Task FilterLibsHandleAsync()
+    {
+        libraries = await libraryService.GetByNameAsync(libraryNameFilter);
+        FilterLibraries();
+        StateHasChanged();
+    }
+
+    private async Task ResetFormFiltersAsync()
+    {
+        libraryNameFilter = string.Empty;
+        await FilterLibsHandleAsync();
+    }
+}

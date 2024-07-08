@@ -1,5 +1,9 @@
 using Desafios.GerenciadorBiblioteca.Website.Components;
 using MudBlazor.Services;
+using Desafios.GerenciadorBiblioteca.Service;
+using Desafios.GerenciadorBiblioteca.Data;
+using MudBlazor;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,7 +11,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddApplicationModule();
+builder.Services.AddDataModule(builder.Configuration);
+
 builder.Services.AddMudServices();
+builder.Services.AddServerSideBlazor().AddCircuitOptions(options => { options.DetailedErrors = true; });
 
 var app = builder.Build();
 

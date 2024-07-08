@@ -34,7 +34,11 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
         public async Task<IEnumerable<User>> GetByNameAsync(string name)
         {
             var users = await _unitOfWork.Users.GetAllAsync();
-            return users.Where(x => x.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase));
+
+            if (!string.IsNullOrEmpty(name))
+                return users.Where(x => x.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase));
+        
+            return users;
         }
 
         public async Task<User> AddAsync(UserDTO dto)

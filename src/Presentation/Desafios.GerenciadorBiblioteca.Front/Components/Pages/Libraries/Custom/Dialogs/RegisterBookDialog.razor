@@ -1,0 +1,78 @@
+﻿@inject IInventoryService inventoryService
+@inject IBookService bookService
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+            <MudSelect T="int" Label="Selecione um dos Livro Cadastrados" AnchorOrigin="Origin.BottomCenter"
+                       HelperText="@helperText"
+                       Validation="@(new Func<int, string>(ValidateBook))" Required="true"
+                       RequiredError="O Livro é obrigatório" @bind-Value="bookId">
+                <MudSelectItem Value="0">Selecione um livro</MudSelectItem>
+                @foreach (var b in booksDictionary)
+                {
+                    <MudSelectItem Value="b.Key">@b.Value</MudSelectItem>
+                }
+            </MudSelect>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancelar</MudButton>
+        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="SubmitAsync">Cadastrar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public int LibraryId { get; set; }
+
+    private Dictionary<int, string> booksDictionary = new();
+    private int bookId;
+    private string helperText = string.Empty;
+
+    private MudForm form;
+    private bool success;
+    private string[] errors = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await InitializeBooksDictAsync();
+        helperText = "Se o livro não estiver listado, adicione-o à nossa base de dados na aba \"Livros\".";
+    }
+
+    private async Task SubmitAsync()
+    {
+        await form.Validate();
+
+        if (form.IsValid)
+        {
+            var dto = new InventoryDTO(LibraryId, bookId);
+            await inventoryService.AddAsync(dto);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private string ValidateBook(int bookId)
+    {
+        return bookId <= 0 ? "O Livro é obrigatório" : null;
+    }
+
+    private async Task InitializeBooksDictAsync()
+    {
+        var books = await bookService.GetAllAsync();
+        var inventories = await inventoryService.GetByLibraryAsync(LibraryId);
+        var inventoriesBooksIds = inventories.Select(x => x.BookId).ToHashSet();
+
+        var distinctBooks = books.Where(x => !inventoriesBooksIds.Contains(x.Id));
+
+        foreach (var book in distinctBooks)
+        {
+            booksDictionary.Add(book.Id, book.Title);
+        }
+    }
+}

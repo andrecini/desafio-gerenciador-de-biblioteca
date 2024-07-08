@@ -1,0 +1,149 @@
+﻿@inject ILoanService loanService
+@inject IInventoryService inventoryService
+@inject IBookService bookService
+@inject IUserService userService
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+            <MudSelect T="int" Label="Selecione um dos Livro Cadastrados" AnchorOrigin="Origin.BottomCenter" Class="mb-2"
+                       HelperText="@("Se o livro não estiver listado, adicione-o à nossa base de dados na aba \"Livros\".")"
+                       Validation="@(new Func<int, string>(ValidateBook))" Required="true"
+                       RequiredError="O Livro é obrigatório" @bind-Value="inventoryId">
+                <MudSelectItem Value="0">Selecione um livro</MudSelectItem>
+                @foreach (var b in inventoriesDictionary)
+                {
+                    <MudSelectItem Value="b.Key">@b.Value</MudSelectItem>
+                }
+            </MudSelect>
+
+            <MudSelect T="int" Label="Selecione um dos Usuários Cadastrados" AnchorOrigin="Origin.BottomCenter" Class="mb-2"
+                       HelperText="@("Se o Usuário não estiver listado, adicione-o à nossa base de dados na aba \"Usuários\".")"
+                       Validation="@(new Func<int, string>(ValidateUser))" Required="true"
+                       RequiredError="O Usuário é obrigatório" @bind-Value="userId">
+                <MudSelectItem Value="0">Selecione um Usuário</MudSelectItem>
+                @foreach (var u in usersDictionary)
+                {
+                    <MudSelectItem Value="u.Key">@u.Value</MudSelectItem>
+                }
+            </MudSelect>
+
+            <MudDatePicker ShowToolbar="false" Label="Data empréstimo" Class="mb-2"
+                           HelperText="A Data de Empréstimo deve ser menor ou igual a Data Atual"
+                           Validation="@(new Func<DateTime?, string>(ValidateLoanDate))" Required="true"
+                           @bind-Date="loanDate" />
+
+            <MudDatePicker ShowToolbar="false" Label="Data Validade" Class="mb-2"
+                           HelperText="A Data de Validade dever ser pelo menos 1 dia maior do que a Data de Rmpréstimo"
+                           Validation="@(new Func<DateTime?, string>(ValidateLoanValidity))" Required="true"
+                           @bind-Date="loanValidity" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancelar</MudButton>
+        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="SubmitAsync">Cadastrar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public int LibraryId { get; set; }
+
+    private Dictionary<int, string> inventoriesDictionary = new();
+    private Dictionary<int, string> usersDictionary = new();
+
+    private int inventoryId;
+    private int userId;
+    private DateTime? loanDate = DateTime.Now;
+    private DateTime? loanValidity = DateTime.Now.AddDays(1).AddHours(1);
+
+    private MudForm form;
+    private bool success;
+    private string[] errors = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await InitializeBooksDictAsync();
+        await InitializeUsersDictAsync();
+    }
+
+    private async Task SubmitAsync()
+    {
+        await form.Validate();
+
+        if (form.IsValid)
+        {
+            var dto = new LoanDTO(inventoryId, userId, loanDate.Value, loanValidity.Value);
+            await loanService.AddAsync(dto);
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private string ValidateBook(int bookId)
+    {
+        return bookId <= 0 ? "O Livro é obrigatório" : null;
+    }
+
+    private string ValidateUser(int userId)
+    {
+        return userId <= 0 ? "O Usuário é obrigatório" : null;
+    }
+
+    private string ValidateLoanDate(DateTime? loanDate)
+    {
+        if (loanDate == null)
+            return "A Data de Empréstimo é obrigatória";
+
+        if (loanDate > DateTime.Now)
+            return "Data de Empréstimo inválida. Selecione uma data menor ou igual à data atual.";
+
+        return null;
+    }
+
+    private string ValidateLoanValidity(DateTime? loanValidity)
+    {
+        if (loanValidity == null)
+            return "A Data de Validade é obrigatória";
+
+        if (loanDate == null)
+            return null;
+
+        if (loanValidity < loanDate.Value.AddDays(1))
+            return "Data de Validade inválida. Intervalo entre a Data de Empréstimo e a Data de Validade deve ser de no mínimo 1 dia.";
+
+        return null;
+    }
+
+    private async Task InitializeBooksDictAsync()
+    {
+        var books = await bookService.GetAllAsync();
+        var inventories = await inventoryService.GetByLibraryAsync(LibraryId);
+        var availableInventories = inventories.Where(x => x.Available);
+        var availableBookIds = availableInventories.Select(x => x.BookId).ToHashSet();
+
+        var filteredBooks = books.Where(x => availableBookIds.Contains(x.Id));
+
+        foreach (var inventory in availableInventories)
+        {
+            var book = filteredBooks.FirstOrDefault(b => b.Id == inventory.BookId);
+            if (book != null)
+            {
+                inventoriesDictionary[inventory.Id] = book.Title;
+            }
+        }
+    }
+
+    private async Task InitializeUsersDictAsync()
+    {
+        var users = await userService.GetAllAsync();
+        foreach (var user in users)
+        {
+            usersDictionary[user.Id] = user.Name;
+        }
+    }
+}

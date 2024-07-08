@@ -1,0 +1,165 @@
+﻿@page "/books"
+@using Desafios.GerenciadorBiblioteca.Domain.Entities.Filters
+@using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Books.Custom.Dialogs
+@using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Common
+@rendermode InteractiveServer
+@inject IBookService bookService
+@inject IDialogService dialogService
+
+<PageTitle>Usuários</PageTitle>
+
+<MudText Typo="Typo.h5" GutterBottom="true">Usuários</MudText>
+
+
+
+<MudText Typo="Typo.h6">Livros</MudText>
+
+<MudContainer Class="d-flex flex-row align-end pa-0 mb-5 ma-0 gap-5" MaxWidth="MaxWidth.False">
+    <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-row align-end pa-0 ma-0 gap-5 w-100">
+        <MudButton Variant="Variant.Outlined" Color="Color.Success" StartIcon="@Icons.Material.Filled.AddCircle" IconColor="Color.Success" @onclick="RegisterDialogHandleAsync">Cadastrar</MudButton>
+        <MudTextField @bind-Value="filter.Title" Immediate="true" Label="Título" Class="ma-0" />
+        <MudTextField @bind-Value="filter.Author" Immediate="true" Label="Autor" Class="ma-0" />
+        <MudTextField @bind-Value="filter.ISBN" Immediate="true" Label="ISBN" Class="ma-0" />
+        <MudTextField @bind-Value="yearFilter" Immediate="true" Label="Ano" Class="ma-0" InputType="InputType.Text" Validation="@(new Func<string, string>(ValidateDate))" />
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" ButtonType="ButtonType.Reset" @onclick="ResetFormFiltersAsync">Limpar</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.FilterAlt" @onclick="FilterBooksViewModelAsync">Filtrar</MudButton>
+    </MudForm>
+</MudContainer>
+
+@if (books == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudTable Items="books" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true" Class="d-flex flex-column w-100">
+        <ColGroup>
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col width="280" />
+        </ColGroup>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Book, object>(x=>x.Id)">ID</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Book, object>(x=> x.Title)" Class="w-100">Título</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Book, object>(x=> x.Author)">Autor</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Book, object>(x=> x.ISBN)">ISBN</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Book, object>(x=> x.Year)">Ano</MudTableSortLabel></MudTh>
+            <MudTh>Ações</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="ID">@context.Id</MudTd>
+            <MudTd DataLabel="Título">@context.Title</MudTd>
+            <MudTd DataLabel="Autor">@context.Author</MudTd>
+            <MudTd DataLabel="ISBN">@context.ISBN</MudTd>
+            <MudTd DataLabel="Ano">@context.Year</MudTd>
+            <MudTd DataLabel="Ações" Class="d-flex gap-2">
+                <MudButton Href="@($"/books/details/{context.Id}")" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Search">Detalhes</MudButton>
+                <MudButton @onclick="@((e) => DeleteDialogHandleAsync(context.Id))" Variant="Variant.Outlined" Color="Color.Error" EndIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error">Excluir</MudButton>
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager PageSizeOptions="new int[]{10, 20}" />
+        </PagerContent>
+    </MudTable>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private IEnumerable<Book> books;
+    private BookFilter filter = new();
+    private string yearFilter;
+
+    private MudForm form;
+    private bool success;
+    private string[] errors = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await InitializeBooksAsync();
+    }
+
+    private async Task InitializeBooksAsync()
+    {
+        books = await bookService.GetAllAsync();
+    }
+
+    private async Task FilterBooksViewModelAsync()
+    {
+        if (!form.IsValid)
+            return;
+
+        books = await bookService.GetByFilterAsync(filter);
+        StateHasChanged();
+    }
+
+    private string ValidateDate(string arg)
+    {
+        if (string.IsNullOrEmpty(arg))
+        {
+            filter.Year = 0;
+        }
+        else
+        {
+            if (!arg.All(char.IsDigit))
+                return "Digite apenas números";
+
+            var year = Convert.ToInt32(arg);
+
+            if (year <= 0)
+                return "O Ano deve ser maior do que 0";
+            if (year > DateTime.Now.Year)
+                return "O Ano deve ser menor do que o ano atual";
+
+            filter.Year = year;
+        }
+
+        return null;
+    }
+
+    private async Task ResetFormFiltersAsync()
+    {
+        filter = new();
+        yearFilter = null;
+        errors = Array.Empty<string>();
+
+        await FilterBooksViewModelAsync();
+    }
+
+    private async Task DeleteDialogHandleAsync(int id)
+    {
+        var parameters = new DialogParameters<CommonDeleteDialog>
+        {
+            { x => x.ContentText, "Tem certeza que deseja Excluir esse Livro e todos os seus registros? Essa ação não poderá ser desfeita." },
+        };
+
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var dialog = await dialogService.ShowAsync<CommonDeleteDialog>("Excluir", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await bookService.RemoveAsync(id);
+            await InitializeBooksAsync();
+        }
+    }
+
+    private async Task RegisterDialogHandleAsync()
+    {
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var dialog = await dialogService.ShowAsync<RegisterBookDialog>("Cadastrar", options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await InitializeBooksAsync();
+        }
+    }
+}
+
