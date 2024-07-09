@@ -55,6 +55,8 @@
 
     private async Task EditLibraryAsync()
     {
+        await form.Validate();
+
         if (form.IsValid)
         {
             var dto = new LibraryDTO(library.Name, library.CNPJ, library.Phone);
