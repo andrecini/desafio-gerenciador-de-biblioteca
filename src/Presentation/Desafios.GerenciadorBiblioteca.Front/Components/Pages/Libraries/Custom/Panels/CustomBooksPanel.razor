@@ -43,7 +43,7 @@ else
             <col width="280" />
         </ColGroup>
         <HeaderContent>
-            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<BookDetailsDTO, object>(x=>x.BookDetails.Id)">ID</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<BookDetailsDTO, object>(x => x.BookDetails.Id)">ID</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<BookDetailsDTO, object>(x=> x.BookDetails.Title)" Class="w-100">Título</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<BookDetailsDTO, object>(x=> x.BookDetails.Author)">Autor</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<BookDetailsDTO, object>(x=> x.BookDetails.ISBN)">ISBN</MudTableSortLabel></MudTh>
@@ -52,7 +52,7 @@ else
             <MudTh>Ações</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="ID">@context.BookDetails..Id</MudTd>
+            <MudTd DataLabel="ID">@context.BookDetails.Id</MudTd>
             <MudTd DataLabel="Título">@context.BookDetails.Title</MudTd>
             <MudTd DataLabel="Autor">@context.BookDetails.Author</MudTd>
             <MudTd DataLabel="ISBN">@context.BookDetails.ISBN</MudTd>
@@ -87,11 +87,6 @@ else
     private string[] errors = [];
 
     protected override async Task OnInitializedAsync()
-    {
-        await LoadDataAsync();
-    }
-
-    private async Task LoadDataAsync()
     {
         await InitializeBooksDetailsAsync();
     }
@@ -154,7 +149,7 @@ else
         if (!result.Canceled)
         {
             await inventoryService.RemoveAsync(id);
-            await LoadDataAsync();
+            await InitializeBooksDetailsAsync();
         }
     }
 
@@ -171,7 +166,7 @@ else
 
         if (!result.Canceled)
         {
-            await LoadDataAsync();
+            await InitializeBooksDetailsAsync();
         }
     }
 }

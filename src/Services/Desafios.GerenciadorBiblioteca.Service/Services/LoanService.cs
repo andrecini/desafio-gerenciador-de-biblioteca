@@ -5,6 +5,7 @@ using Desafios.GerenciadorBiblioteca.Domain.Enums;
 using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
+using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
 using Desafios.GerenciadorBiblioteca.Service.Services.Base;
 using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces;
 using Desafios.GerenciadorBiblioteca.Service.Validators;
@@ -12,10 +13,17 @@ using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Services
 {
-    public class LoanService(IUnitOfWork unitOfWork, IInventoryService inventoryService, IMapper mapper) : BaseService, ILoanService
+    public class LoanService(
+        IUnitOfWork unitOfWork,
+        IInventoryService inventoryService,
+        IBookService bookService,
+        IUserService userService,
+        IMapper mapper) : BaseService, ILoanService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IInventoryService _inventoryService = inventoryService;
+        private readonly IBookService _bookService = bookService;
+        private readonly IUserService _userService = userService;
         private readonly IMapper _mapper = mapper;
 
         public async Task<IEnumerable<Loan>> GetAllAsync()
@@ -122,6 +130,73 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
             return result > 0 ? true : throw new CustomException(
                 "Não foi possível deletar o Empréstimo. Tente novamente!",
                 HttpStatusCode.InternalServerError);
+        }
+
+        public async Task<List<LoanDetailsDTO>> GetLoanDetailsByLibraryAsync(int libraryId)
+        {
+            var inventories = await inventoryService.GetByLibraryAsync(libraryId);
+            var allLoans = await GetAllAsync();
+            var books = await bookService.GetAllAsync();
+            var users = await userService.GetAllAsync();
+
+            var inventoryIds = inventories.Select(inv => inv.Id).ToHashSet();
+            var loans = allLoans.Where(loan => inventoryIds.Contains(loan.InventoryId)).ToList();
+
+            var bookDict = books.ToDictionary(book => book.Id, book => book.Title);
+            var userDict = users.ToDictionary(user => user.Id, user => user.Name);
+
+            var loansDtos = new List<LoanDetailsDTO>();
+
+            foreach (var loan in loans)
+            {
+                var inventory = inventories.FirstOrDefault(x => x.Id == loan.InventoryId);
+
+                if (inventory != null &&
+                    bookDict.TryGetValue(inventory.BookId, out var bookTitle) &&
+                    userDict.TryGetValue(loan.UserId, out var userName))
+                {
+                    loansDtos.Add(new LoanDetailsDTO(loan, bookTitle, userName));
+                }
+            }
+
+            return loansDtos;
+        }
+
+        public async Task<List<LoanDetailsDTO>> GetFilteredLoanDetailsAsync(LoanDetailsFilter filter)
+        {
+            var filteredBooks = await bookService.GetByFilterAsync(new() { Title = filter.BookName });
+            var filteredBooksIds = filteredBooks.Select(x => x.Id).ToHashSet();
+
+            var inventories = await _inventoryService.GetByLibraryAsync(filter.LibraryId);
+            var filteredInventories = inventories.Where(x => filteredBooksIds.Contains(x.BookId));
+            var fiteredInventoriesIds =  inventories.Select(x => x.Id).ToHashSet();
+
+            var usersFiltered = await userService.GetByNameAsync(filter.UserName);
+            var usersFilteredIds = usersFiltered.Select(x => x.Id).ToHashSet();
+
+            var bookDict = filteredBooks.ToDictionary(book => book.Id, book => book.Title);
+            var userDict = usersFiltered.ToDictionary(user => user.Id, user => user.Name);
+
+            var loansfiltered = await GetByFilterAsync(filter.LoanFilter);
+            loansfiltered = loansfiltered.Where(x =>
+            fiteredInventoriesIds.Contains(x.InventoryId) &&
+            usersFilteredIds.Contains(x.UserId));
+
+            var loansDtos = new List<LoanDetailsDTO>();
+
+            foreach (var loan in loansfiltered)
+            {
+                var inventory = inventories.FirstOrDefault(x => x.Id == loan.InventoryId);
+
+                if (inventory != null &&
+                    bookDict.TryGetValue(inventory.BookId, out var bookTitle) &&
+                    userDict.TryGetValue(loan.UserId, out var userName))
+                {
+                    loansDtos.Add(new LoanDetailsDTO(loan, bookTitle, userName));
+                }
+            }
+
+            return loansDtos;
         }
 
         private IEnumerable<Loan> FilterLoans(IEnumerable<Loan> loans, LoanFilter filter)
