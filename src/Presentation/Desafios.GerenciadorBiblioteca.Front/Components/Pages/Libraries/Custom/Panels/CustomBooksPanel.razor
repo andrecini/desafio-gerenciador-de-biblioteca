@@ -1,4 +1,5 @@
 ﻿@using Desafios.GerenciadorBiblioteca.Domain.Entities.Filters
+@using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Common
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Libraries.Custom.Dialogs
 @inject ILibraryService libraryService
@@ -21,17 +22,17 @@
             <MudSelectItem Value="2">Indisponíveis</MudSelectItem>
         </MudSelect>
         <MudButton Variant="Variant.Filled" Color="Color.Secondary" ButtonType="ButtonType.Reset" @onclick="ResetFormFiltersAsync">Limpar</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.FilterAlt" @onclick="FilterBooksViewModelAsync">Filtrar</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.FilterAlt" @onclick="FilterBooksDetailsAsync">Filtrar</MudButton>
     </MudForm>
 </MudContainer>
 
-@if (booksViewModels == null)
+@if (details == null)
 {
     <MudProgressCircular Color="Color.Default" Indeterminate="true" />
 }
 else
 {
-    <MudTable Items="booksViewModels" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true" Class="d-flex flex-column w-100">
+    <MudTable Items="details" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true" Class="d-flex flex-column w-100">
         <ColGroup>
             <col />
             <col />
@@ -42,23 +43,23 @@ else
             <col width="280" />
         </ColGroup>
         <HeaderContent>
-            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<BooksViewModel, object>(x=>x.Id)">ID</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<BooksViewModel, object>(x=> x.Title)" Class="w-100">Título</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<BooksViewModel, object>(x=> x.Author)">Autor</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<BooksViewModel, object>(x=> x.ISBN)">ISBN</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<BooksViewModel, object>(x=> x.Year)">Ano</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<BooksViewModel, object>(x=> x.Available)">Disponível</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<BookDetailsDTO, object>(x=>x.BookDetails.Id)">ID</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<BookDetailsDTO, object>(x=> x.BookDetails.Title)" Class="w-100">Título</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<BookDetailsDTO, object>(x=> x.BookDetails.Author)">Autor</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<BookDetailsDTO, object>(x=> x.BookDetails.ISBN)">ISBN</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<BookDetailsDTO, object>(x=> x.BookDetails.Year)">Ano</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<BookDetailsDTO, object>(x=> x.Available)">Disponível</MudTableSortLabel></MudTh>
             <MudTh>Ações</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="ID">@context.Id</MudTd>
-            <MudTd DataLabel="Título">@context.Title</MudTd>
-            <MudTd DataLabel="Autor">@context.Author</MudTd>
-            <MudTd DataLabel="ISBN">@context.ISBN</MudTd>
-            <MudTd DataLabel="Ano">@context.Year</MudTd>
+            <MudTd DataLabel="ID">@context.BookDetails..Id</MudTd>
+            <MudTd DataLabel="Título">@context.BookDetails.Title</MudTd>
+            <MudTd DataLabel="Autor">@context.BookDetails.Author</MudTd>
+            <MudTd DataLabel="ISBN">@context.BookDetails.ISBN</MudTd>
+            <MudTd DataLabel="Ano">@context.BookDetails.Year</MudTd>
             <MudTd DataLabel="Disponível">@(context.Available ? "Disponível" : "Indisponível")</MudTd>
             <MudTd DataLabel="Ações" Class="d-flex gap-2">
-                <MudButton Href="@($"/books/details/{context.Id}")" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Search">Detalhes</MudButton>
+                <MudButton Href="@($"/books/details/{context.BookDetails.Id}")" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Search">Detalhes</MudButton>
                 <MudButton @onclick="@((e) => DeleteDialogHandleAsync(context.InventoryId))" Variant="Variant.Outlined" Color="Color.Error" EndIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error">Excluir</MudButton>
             </MudTd>
         </RowTemplate>
@@ -73,7 +74,7 @@ else
     [Parameter]
     public int Id { get; set; }
 
-    private List<BooksViewModel> booksViewModels = new();
+    private IEnumerable<BookDetailsDTO> details;
     private IEnumerable<Inventory> inventories;
     private IEnumerable<Book> books;
 
@@ -84,7 +85,7 @@ else
     private MudForm form;
     private bool success;
     private string[] errors = [];
-    
+
     protected override async Task OnInitializedAsync()
     {
         await LoadDataAsync();
@@ -92,51 +93,17 @@ else
 
     private async Task LoadDataAsync()
     {
-        await InitializeInventoriesAsync();
-        await InitializeBooksAsync();
-        InitializeBooksViewModel();
+        await InitializeBooksDetailsAsync();
     }
 
-    private async Task InitializeInventoriesAsync()
+    private async Task InitializeBooksDetailsAsync()
     {
-        inventories = await inventoryService.GetByLibraryAsync(Id);
+        details = await bookService.GetBooksDetailsByLibraryAsync(Id);
     }
 
-    private async Task InitializeBooksAsync()
+    private async Task FilterBooksDetailsAsync()
     {
-        var bookIds = inventories.Select(inv => inv.BookId).ToHashSet();
-        var allBooks = await bookService.GetAllAsync();
-        books = allBooks.Where(book => bookIds.Contains(book.Id));
-    }
-
-    private void InitializeBooksViewModel()
-    {
-        booksViewModels = books.Select(book =>
-        {
-            var inventory = inventories.FirstOrDefault(inv => inv.BookId == book.Id);
-            bool available = inventory != null && inventory.Available;
-            return new BooksViewModel(book, inventory.Id, available);
-        }).ToList();
-    }
-
-    private async Task FilterBooksViewModelAsync()
-    {
-        if (!form.IsValid)
-            return;
-
-        await InitializeInventoriesAsync();
-
-        if (availableFilter != 0)
-        {
-            var available = availableFilter == 1;
-            inventories = inventories.Where(x => x.Available == available);
-        }
-
-        var bookIds = inventories.Select(inv => inv.BookId).ToHashSet();
-        var allBooks = await bookService.GetByFilterAsync(filter);
-        books = allBooks.Where(book => bookIds.Contains(book.Id));
-        InitializeBooksViewModel();
-        StateHasChanged();
+        details = await bookService.GetBooksDetailsFilteredAsync(Id, filter, availableFilter);
     }
 
     private string ValidateDate(string arg)
@@ -170,7 +137,7 @@ else
         availableFilter = 0;
         errors = Array.Empty<string>();
 
-        await FilterBooksViewModelAsync();
+        await FilterBooksDetailsAsync();
     }
 
     private async Task DeleteDialogHandleAsync(int id)
@@ -206,28 +173,6 @@ else
         {
             await LoadDataAsync();
         }
-    }
-
-    public class BooksViewModel
-    {
-        public BooksViewModel(Book book, int inventoryId, bool available)
-        {
-            Id = book.Id;
-            InventoryId = inventoryId;
-            Title = book.Title;
-            Author = book.Author;
-            ISBN = book.ISBN;
-            Year = book.Year;
-            Available = available;
-        }
-
-        public int Id { get; set; }
-        public int InventoryId { get; set; }
-        public string Title { get; set; }
-        public string Author { get; set; }
-        public string ISBN { get; set; }
-        public int? Year { get; set; }
-        public bool Available { get; set; }
     }
 }
 

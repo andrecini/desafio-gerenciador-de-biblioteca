@@ -4,6 +4,7 @@ using Desafios.GerenciadorBiblioteca.Domain.Entities.Filters;
 using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
+using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
 using Desafios.GerenciadorBiblioteca.Service.Services.Base;
 using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces;
 using Desafios.GerenciadorBiblioteca.Service.Validators;
@@ -11,10 +12,14 @@ using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Services
 {
-    public class BookSevice(IUnitOfWork unitOfWork, IMapper mapper) : BaseService, IBookService
+    public class BookService(
+        IUnitOfWork unitOfWork,
+        IMapper mapper,
+        IInventoryService inventoryService) : BaseService, IBookService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IMapper _mapper = mapper;
+        private readonly IInventoryService _inventoryService;
 
         public async Task<IEnumerable<Book>> GetAllAsync()
         {
@@ -94,6 +99,48 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
                 HttpStatusCode.InternalServerError);
         }
 
+        public async Task<IEnumerable<BookDetailsDTO>> GetBooksDetailsByLibraryAsync(int libraryId)
+        {
+            var inventories = await inventoryService.GetByLibraryAsync(libraryId);
+
+            var bookIds = inventories.Select(inv => inv.BookId).ToHashSet();
+            var allBooks = await GetAllAsync();
+            var books = allBooks.Where(book => bookIds.Contains(book.Id)).ToList();
+
+            var booksViewModels = books.Select(book =>
+            {
+                var inventory = inventories.FirstOrDefault(inv => inv.BookId == book.Id);
+                bool available = inventory != null && inventory.Available;
+                return new BookDetailsDTO(book, inventory.Id, available);
+            });
+
+            return booksViewModels;
+        }
+
+        public async Task<IEnumerable<BookDetailsDTO>> GetBooksDetailsFilteredAsync(int libraryId, BookFilter filter, int available)
+        {
+            var inventories = await inventoryService.GetByLibraryAsync(libraryId);
+
+            if (available != 0)
+            {
+                bool isAvailable = available == 1;
+                inventories = inventories.Where(x => x.Available == isAvailable).ToList();
+            }
+
+            var bookIds = inventories.Select(inv => inv.BookId).ToHashSet();
+            var allBooks = await GetByFilterAsync(filter);
+            var filteredBooks = allBooks.Where(book => bookIds.Contains(book.Id)).ToList();
+
+            var booksViewModels = filteredBooks.Select(book =>
+            {
+                var inventory = inventories.FirstOrDefault(inv => inv.BookId == book.Id);
+                bool available = inventory != null && inventory.Available;
+                return new BookDetailsDTO(book, inventory.Id, available);
+            });
+
+            return booksViewModels;
+        }
+    
         private IEnumerable<Book> FilterBooks(IEnumerable<Book> books, BookFilter filter)
         {
             if (!string.IsNullOrEmpty(filter.Title))
