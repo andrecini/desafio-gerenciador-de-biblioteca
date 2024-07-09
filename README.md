@@ -24,9 +24,8 @@ O projeto está organizado em camadas seguindo os princípios de Clean Architect
 </details>
 
 <details>
-  <summary>Blazor Server ⌛</summary>
-  (Carregando...)
-  Futuro desenvolvimento utilizando Blazor Server para criar interfaces de usuário interativas e dinâmicas, aproveitando a execução no lado do servidor.
+  <summary>Blazor Server</summary>
+  Desenvolvimento do FrontEnd com Blazor Server para criar interfaces de usuário interativas e dinâmicas, aproveitando a execução no lado do servidor.
 </details>
 
 <details>
