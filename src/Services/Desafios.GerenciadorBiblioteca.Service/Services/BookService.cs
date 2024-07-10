@@ -30,7 +30,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
 
         public async Task<Book> GetByIdAsync(int id)
         {
-            CustomException.ThrowIfLessThan(0, "Id");
+            CustomException.ThrowIfLessThan(id, "Id");
 
             var data = await _unitOfWork.Books.GetByIdAsync(id);
 
