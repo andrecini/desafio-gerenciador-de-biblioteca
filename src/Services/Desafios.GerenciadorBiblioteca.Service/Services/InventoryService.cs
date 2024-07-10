@@ -26,7 +26,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
 
         public async Task<Inventory> GetByIdAsync(int id)
         {
-            CustomException.ThrowIfLessThan(0, "Id");
+            CustomException.ThrowIfLessThanOne(id, "Id");
 
             var data = await _unitOfWork.Inventories.GetByIdAsync(id);
 
@@ -89,7 +89,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
 
         public async Task<Inventory> UpdateStatusAsync(int id, bool available)
         {
-            CustomException.ThrowIfLessThan(1, "Id");
+            CustomException.ThrowIfLessThanOne(id, "Id");
 
             var InventoryRegistered = await GetByIdAsync(id) ??
                 throw new CustomException("Nenhum Inventário foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
@@ -106,7 +106,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
 
         public async Task<bool> RemoveAsync(int id)
         {
-            CustomException.ThrowIfLessThan(1, "Id");
+            CustomException.ThrowIfLessThanOne(1, "Id");
 
             var InventoryRegistered = await GetByIdAsync(id) ??
                 throw new CustomException("Nenhum Inventário foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
@@ -121,9 +121,9 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
 
         private IEnumerable<Inventory> FilterInventories(IEnumerable<Inventory> inventories, InventoryFilter filter)
         {
-            if (filter.LibraryId >= 0)
+            if (filter.LibraryId > 0)
                 inventories = inventories.Where(x => x.LibraryId == filter.LibraryId);
-            if (filter.BookId >= 0)
+            if (filter.BookId > 0)
                 inventories = inventories.Where(x => x.BookId == filter.BookId);
             if (filter.Status == InventoryStatus.Available)
                 inventories = inventories.Where(x => x.Available == true);

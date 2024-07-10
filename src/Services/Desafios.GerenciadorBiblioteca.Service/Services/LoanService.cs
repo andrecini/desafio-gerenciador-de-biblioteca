@@ -35,7 +35,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
 
         public async Task<Loan> GetByIdAsync(int id)
         {
-            CustomException.ThrowIfLessThan(0, "Id");
+            CustomException.ThrowIfLessThanOne(id, "Empréstimo");
 
             var data = await _unitOfWork.Loans.GetByIdAsync(id);
 
@@ -60,8 +60,6 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
 
         public async Task<Loan> AddAsync(LoanDTO dto)
         {
-            CustomException.ThrowIfLessThan(0, "Empréstimo");
-
             ValidateEntity<LoanValidator, LoanDTO>(dto);
 
             var entity = _mapper.Map<Loan>(dto);
@@ -78,7 +76,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
 
         public async Task<Loan> UpdateAsync(int id, LoanDTO dto)
         {
-            CustomException.ThrowIfLessThan(0, "Empréstimo");
+            CustomException.ThrowIfLessThanOne(id, "Empréstimo");
 
             ValidateEntity<LoanValidator, LoanDTO>(dto);
 
@@ -100,7 +98,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
 
         public async Task<Loan> UpdateStatusAsync(int id, bool returned)
         {
-            CustomException.ThrowIfLessThan(1, "Empréstimo");
+            CustomException.ThrowIfLessThanOne(id, "Empréstimo");
 
             var loanRegistered = await GetByIdAsync(id) ??
                 throw new CustomException("Nenhum Empréstimo foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
@@ -119,7 +117,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
 
         public async Task<bool> RemoveAsync(int id)
         {
-            CustomException.ThrowIfLessThan(0, "Id");
+            CustomException.ThrowIfLessThanOne(id, "Empréstimo");
 
             var loanRegistered = await GetByIdAsync(id) ??
                 throw new CustomException("Nenhum Empréstimo foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
@@ -134,6 +132,8 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
 
         public async Task<List<LoanDetailsDTO>> GetLoanDetailsByLibraryAsync(int libraryId)
         {
+            CustomException.ThrowIfLessThanOne(libraryId, "Empréstimo");
+
             var inventories = await inventoryService.GetByLibraryAsync(libraryId);
             var allLoans = await GetAllAsync();
             var books = await bookService.GetAllAsync();

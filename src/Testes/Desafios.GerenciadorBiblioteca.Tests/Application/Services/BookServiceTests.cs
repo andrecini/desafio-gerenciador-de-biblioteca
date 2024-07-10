@@ -362,7 +362,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _bookService.RemoveAsync(invalidId));
-            Assert.Equal("O parâmetro Id deve ser maior ou igual a 0.", exception.ErrorDetails);
+            Assert.Equal("O parâmetro Id deve ser maior ou igual a 1.", exception.ErrorDetails);
         }
 
         [Fact]

@@ -22,11 +22,11 @@ namespace Desafios.GerenciadorBiblioteca.Domain.Exceptions
                 );
         }
 
-        public static void ThrowIfLessThan(int argument, string argumentName)
+        public static void ThrowIfLessThanOne(int argument, string argumentName)
         {
-            if (argument < 0)
+            if (argument < 1)
                 throw new CustomException(
-                    $"O parâmetro {argumentName} deve ser maior ou igual a 0.",
+                    $"O parâmetro {argumentName} deve ser maior ou igual a 1.",
                     HttpStatusCode.UnprocessableEntity
                 );
         }

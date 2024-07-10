@@ -24,7 +24,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
 
         public async Task<User> GetByIdAsync(int id)
         {
-            CustomException.ThrowIfLessThan(0, "Id");
+            CustomException.ThrowIfLessThanOne(id, "Id");
 
             var data = await _unitOfWork.Users.GetByIdAsync(id);
 
@@ -80,10 +80,10 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
 
         public async Task<bool> RemoveAsync(int id)
         {
-            CustomException.ThrowIfLessThan(0, "Id");
+            CustomException.ThrowIfLessThanOne(id, "Id");
 
             var userRegistered = await GetByIdAsync(id) ??
-                throw new CustomException("Nenhum Livro foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
+                throw new CustomException("Nenhum Usuário foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
 
             _unitOfWork.Users.Remove(userRegistered);
             var result = await _unitOfWork.SaveAsync();
