@@ -51,6 +51,8 @@
 
     private async Task EditUserAsync()
     {
+        await form.Validate();
+
         if (form.IsValid)
         {
             var dto = new UserDTO(user.Name, user.Email, user.Phone);

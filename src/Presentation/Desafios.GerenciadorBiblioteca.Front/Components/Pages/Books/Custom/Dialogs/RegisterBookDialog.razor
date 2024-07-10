@@ -28,6 +28,8 @@
 
     private async Task SubmitAsync()
     {
+        await form.Validate();
+
         if (form.IsValid)
         {
             book.Year = Convert.ToInt32(yearInput);

@@ -141,6 +141,7 @@
     private async Task InitializeUsersDictAsync()
     {
         var users = await userService.GetAllAsync();
+
         foreach (var user in users)
         {
             usersDictionary[user.Id] = user.Name;

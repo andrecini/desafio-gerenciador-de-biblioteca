@@ -117,8 +117,10 @@
     <MudContainer Class="d-flex flex-column align-start justify-start pa-0 ma-0 gap-5 h-100 mh-100 w-40" MaxWidth="MaxWidth.False">
         
         <MudPaper Width="100%" Height="100%" MaxHeight="100%" Class="pa-5 gap-5" Elevation="4">
-            <MudText Typo="Typo.h6" GutterBottom="true">Empréstimos em Atraso</MudText>
-            <MudTable Items="viewModels" Hover="true" SortLabel="Sort By" Elevation="1" Class="d-flex flex-column w-100 mh-100">
+            <MudTable Items="viewModels" Hover="true" SortLabel="Sort By" Elevation="1" Class="d-flex flex-column w-100 h-100 mh-100">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6" GutterBottom="true">Empréstimos em Atraso</MudText>
+                </ToolBarContent>
                 <HeaderContent>
                     <MudTh><MudTableSortLabel SortBy="new Func<LoanOverdueViewModel, object>(x=> x.BookName)" Class="w-100">Livro</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortBy="new Func<LoanOverdueViewModel, object>(x=> x.UserName)">Responsável</MudTableSortLabel></MudTh>
@@ -129,9 +131,6 @@
                     <MudTd DataLabel="Responsável">@context.UserName</MudTd>
                     <MudTd DataLabel="Dias em Atraso">@context.OverdueDays</MudTd>
                 </RowTemplate>
-                <PagerContent>
-                    <MudTablePager PageSizeOptions="new int[]{10, 20}" />
-                </PagerContent>
             </MudTable>
         </MudPaper>
     </MudContainer>
@@ -227,14 +226,14 @@
 
     private void InitializeViewModelList()
     {
-        var overdueLoans = loans.Where(loan => loan.LoanValidity < DateTime.Now && !loan.Returned);
+        var overdueLoans = loans.Where(loan => loan.LoanValidity.DayOfYear < DateTime.Now.DayOfYear && !loan.Returned);
 
         viewModels = overdueLoans.Select(loan =>
         {
             var inventory = inventories.FirstOrDefault(inv => inv.Id == loan.InventoryId);
             var book = books.FirstOrDefault(b => b.Id == inventory?.BookId);
             var user = users.FirstOrDefault(u => u.Id == loan.UserId);
-            var overdueDays = (DateTime.Now - loan.LoanValidity).Days;
+            var overdueDays = DateTime.Now.DayOfYear - loan.LoanValidity.DayOfYear;
 
             return new LoanOverdueViewModel(
                 BookName: book?.Title ?? "Desconhecido",

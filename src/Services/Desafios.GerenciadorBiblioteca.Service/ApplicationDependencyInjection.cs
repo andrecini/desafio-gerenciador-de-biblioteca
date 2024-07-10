@@ -11,8 +11,8 @@ namespace Desafios.GerenciadorBiblioteca.Service
         {
             services.AddAutoMapper(typeof(MappingProfile));
 
-            services.AddTransient<ILibraryService, LibrarySevice>();
-            services.AddTransient<IBookService, BookSevice>();
+            services.AddTransient<ILibraryService, LibraryService>();
+            services.AddTransient<IBookService, BookService>();
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IInventoryService, InventoryService>();
             services.AddTransient<ILoanService, LoanService>();

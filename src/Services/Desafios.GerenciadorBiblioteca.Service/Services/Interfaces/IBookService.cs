@@ -1,6 +1,7 @@
 ﻿using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Desafios.GerenciadorBiblioteca.Domain.Entities.Filters;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
+using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
 using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces.Base;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Services.Interfaces
@@ -8,5 +9,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services.Interfaces
     public interface IBookService : IService<BookDTO, Book>
     {
         Task<IEnumerable<Book>> GetByFilterAsync(BookFilter filter);
+        Task<IEnumerable<BookDetailsDTO>> GetBooksDetailsByLibraryAsync(int libraryId);
+        Task<IEnumerable<BookDetailsDTO>> GetBooksDetailsFilteredAsync(int libraryId, BookFilter filter, int available);
     }
 }
