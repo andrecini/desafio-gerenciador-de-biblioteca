@@ -1,3 +1,4 @@
+using Desafios.GerenciadorBiblioteca.Api.Configurators;
 using Desafios.GerenciadorBiblioteca.Api.Handlers;
 using Desafios.GerenciadorBiblioteca.Data;
 using Desafios.GerenciadorBiblioteca.Service;
@@ -7,15 +8,20 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Layer's Modules
 builder.Services.AddDataModule(builder.Configuration);
 builder.Services.AddApplicationModule();
+
+// Swashbuckle - API Documentation
+builder.Services.ConfigureSwagger(builder.Environment.EnvironmentName);
+
+// Add Authentication and Authorization
+builder.Services.ConfigureAuth(builder.Configuration);
 
 //Serialization
 builder.Services.ConfigureHttpJsonOptions(options =>
@@ -37,10 +43,16 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.RoutePrefix = "swagger";
+    });
 }
 
 app.UseExceptionHandler();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseHttpsRedirection();
 
