@@ -43,12 +43,12 @@ else
             <col width="280" />
         </ColGroup>
         <HeaderContent>
-            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<BookDetailsDTO, object>(x => x.BookDetails.Id)">ID</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<BookDetailsDTO, object>(x=> x.BookDetails.Title)" Class="w-100">Título</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<BookDetailsDTO, object>(x=> x.BookDetails.Author)">Autor</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<BookDetailsDTO, object>(x=> x.BookDetails.ISBN)">ISBN</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<BookDetailsDTO, object>(x=> x.BookDetails.Year)">Ano</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<BookDetailsDTO, object>(x=> x.Available)">Disponível</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<BookDetailsViewModel, object>(x => x.BookDetails.Id)">ID</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<BookDetailsViewModel, object>(x=> x.BookDetails.Title)" Class="w-100">Título</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<BookDetailsViewModel, object>(x=> x.BookDetails.Author)">Autor</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<BookDetailsViewModel, object>(x=> x.BookDetails.ISBN)">ISBN</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<BookDetailsViewModel, object>(x=> x.BookDetails.Year)">Ano</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<BookDetailsViewModel, object>(x=> x.Available)">Disponível</MudTableSortLabel></MudTh>
             <MudTh>Ações</MudTh>
         </HeaderContent>
         <RowTemplate>
@@ -74,7 +74,7 @@ else
     [Parameter]
     public int Id { get; set; }
 
-    private IEnumerable<BookDetailsDTO> details;
+    private IEnumerable<BookDetailsViewModel> details;
     private IEnumerable<Inventory> inventories;
     private IEnumerable<Book> books;
 

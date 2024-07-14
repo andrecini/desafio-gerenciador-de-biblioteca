@@ -43,12 +43,12 @@ else
             <col width="280" />
         </ColGroup>
         <HeaderContent>
-            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<LoanDetailsDTO, object>(x =>  x.LoanDetails.Id)">ID</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<LoanDetailsDTO, object>(x => x.BookName)" Class="w-100">Livro</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<LoanDetailsDTO, object>(x => x.LoanDetails.LoanDate)">Data Empréstimo</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<LoanDetailsDTO, object>(x => x.LoanDetails.LoanValidity)">Validade</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<LoanDetailsDTO, object>(x => x.Username)">Responsável</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<LoanDetailsDTO, object>(x => x.LoanDetails.Returned)">Status</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<LoanDetailsViewModel, object>(x =>  x.LoanDetails.Id)">ID</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<LoanDetailsViewModel, object>(x => x.BookName)" Class="w-100">Livro</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<LoanDetailsViewModel, object>(x => x.LoanDetails.LoanDate)">Data Empréstimo</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<LoanDetailsViewModel, object>(x => x.LoanDetails.LoanValidity)">Validade</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<LoanDetailsViewModel, object>(x => x.Username)">Responsável</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<LoanDetailsViewModel, object>(x => x.LoanDetails.Returned)">Status</MudTableSortLabel></MudTh>
             <MudTh>Ações</MudTh>
         </HeaderContent>
         <RowTemplate>
@@ -74,7 +74,7 @@ else
     [Parameter]
     public int Id { get; set; }
 
-    private List<LoanDetailsDTO> loansDetails = new();
+    private List<LoanDetailsViewModel> loansDetails = new();
 
     private LoanFilter filter = new();
     private string bookFilter;

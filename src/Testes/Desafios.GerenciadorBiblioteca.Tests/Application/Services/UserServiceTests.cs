@@ -3,6 +3,7 @@ using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
+using Desafios.GerenciadorBiblioteca.Service.Security.Interfaces;
 using Desafios.GerenciadorBiblioteca.Service.Services;
 using Moq;
 using System.Net;
@@ -13,13 +14,15 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
     {
         private readonly Mock<IUnitOfWork> _mockUnitOfWork;
         private readonly Mock<IMapper> _mockMapper;
+        private readonly Mock<ICipherService> _cipherMock;
         private readonly UserService _userService;
 
         public UserServiceTests()
         {
             _mockUnitOfWork = new Mock<IUnitOfWork>();
             _mockMapper = new Mock<IMapper>();
-            _userService = new UserService(_mockUnitOfWork.Object, _mockMapper.Object);
+            _cipherMock = new Mock<ICipherService>();
+            _userService = new UserService(_mockUnitOfWork.Object, _mockMapper.Object, _cipherMock.Object);
         }
 
         [Fact]
@@ -31,6 +34,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
                 new User { Id = 1, Name = "User 1", Email = "user1@example.com", Phone = "111111111" },
                 new User { Id = 2, Name = "User 2", Email = "user2@example.com", Phone = "222222222" }
             };
+
             _mockUnitOfWork.Setup(uow => uow.Users.GetAllAsync())
                            .ReturnsAsync(users);
 
@@ -40,7 +44,6 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
             // Assert
             Assert.NotNull(result);
             Assert.Equal(users.Count, result.Count());
-            Assert.Equal(users, result);
         }
 
         [Fact]
@@ -79,7 +82,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
             var users = new List<User>
             {
                 new User { Id = 1, Name = "User 1", Email = "user1@example.com", Phone = "111111111" },
-                new User { Id = 2, Name = "Another User", Email = "user2@example.com", Phone = "222222222" }
+                new User { Id = 2, Name = "User 2", Email = "user2@example.com", Phone = "222222222" }
             };
             _mockUnitOfWork.Setup(uow => uow.Users.GetAllAsync())
                            .ReturnsAsync(users);
@@ -101,7 +104,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
             var users = new List<User>
             {
                 new User { Id = 1, Name = "User 1", Email = "user1@example.com", Phone = "111111111" },
-                new User { Id = 2, Name = "Another User", Email = "user2@example.com", Phone = "222222222" }
+                new User { Id = 2, Name = "User 2", Email = "user2@example.com", Phone = "222222222" }
             };
             _mockUnitOfWork.Setup(uow => uow.Users.GetAllAsync())
                            .ReturnsAsync(users);
@@ -122,8 +125,9 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
             var users = new List<User>
             {
                 new User { Id = 1, Name = "User 1", Email = "user1@example.com", Phone = "111111111" },
-                new User { Id = 2, Name = "Another User", Email = "user2@example.com", Phone = "222222222" }
+                new User { Id = 2, Name = "User 2", Email = "user2@example.com", Phone = "222222222" }
             };
+
             _mockUnitOfWork.Setup(uow => uow.Users.GetAllAsync())
                            .ReturnsAsync(users);
 
@@ -133,14 +137,13 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
             // Assert
             Assert.NotNull(result);
             Assert.Equal(users.Count, result.Count());
-            Assert.Equal(users, result);
         }
 
         [Fact]
         public async Task AddAsync_WhenDtoIsValid_ShouldReturnAddedUser()
         {
             // Arrange
-            var dto = new UserDTO("User 1", "user1@example.com", "111111111");
+            var dto = new UserRegisterInputModel("User 1", "user1@example.com", "111111111", "teste#123");
             var user = new User { Id = 1, Name = "User 1", Email = "user1@example.com", Phone = "111111111" };
             _mockMapper.Setup(m => m.Map<User>(dto)).Returns(user);
             _mockUnitOfWork.Setup(uow => uow.Users.AddAsync(It.IsAny<User>())).ReturnsAsync(user);
@@ -160,7 +163,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         public async Task AddAsync_WhenDtoIsNull_ShouldThrowCustomException()
         {
             // Arrange
-            UserDTO dto = null;
+            UserRegisterInputModel dto = null;
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _userService.AddAsync(dto));
@@ -171,8 +174,8 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         public async Task AddAsync_WhenSaveFails_ShouldThrowCustomException()
         {
             // Arrange
-            var dto = new UserDTO("User 1", "user1@example.com", "111111111");
-            var user = new User { Id = 1, Name = "User 1", Email = "user1@example.com", Phone = "111111111" };
+            var dto = new UserRegisterInputModel("User 1", "user1@example.com", "111111111", "teste#123");
+            var user = new User { Id = 1, Name = "User 1", Email = "teste@email.com", Phone = "11988887777" };
             _mockMapper.Setup(m => m.Map<User>(dto)).Returns(user);
             _mockUnitOfWork.Setup(uow => uow.Users.AddAsync(It.IsAny<User>())).ReturnsAsync(user);
             _mockUnitOfWork.Setup(uow => uow.SaveAsync()).ReturnsAsync(0);
@@ -188,8 +191,8 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         {
             // Arrange
             int userId = 1;
-            var dto = new UserDTO("Updated User", "updated@example.com", "222222222");
-            var existingUser = new User { Id = userId, Name = "Old User", Email = "old@example.com", Phone = "111111111" };
+            var dto = new UserUpdateInputModel("Updated User", "updated@example.com", "222222222");
+            var existingUser = new User { Id = userId, Name = "Old User", Email = "old@example.com", Phone = "11988887777" };
 
             _mockUnitOfWork.Setup(uow => uow.Users.GetByIdAsync(userId)).ReturnsAsync(existingUser);
             _mockUnitOfWork.Setup(uow => uow.SaveAsync()).ReturnsAsync(1);
@@ -209,7 +212,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         {
             // Arrange
             int userId = 1;
-            UserDTO dto = null;
+            UserUpdateInputModel dto = null;
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _userService.UpdateAsync(userId, dto));
@@ -221,7 +224,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         {
             // Arrange
             int userId = 1;
-            var dto = new UserDTO("Updated User", "updated@example.com", "222222222");
+            var dto = new UserUpdateInputModel("Updated User", "updated@example.com", "222222222");
 
             _mockUnitOfWork.Setup(uow => uow.Users.GetByIdAsync(userId)).ReturnsAsync((User)null);
 
@@ -236,7 +239,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         {
             // Arrange
             int userId = 1;
-            var dto = new UserDTO("Updated User", "updated@example.com", "222222222");
+            var dto = new UserUpdateInputModel("Updated User", "updated@example.com", "222222222");
             var existingUser = new User { Id = userId, Name = "Old User", Email = "old@example.com", Phone = "111111111" };
 
             _mockUnitOfWork.Setup(uow => uow.Users.GetByIdAsync(userId)).ReturnsAsync(existingUser);

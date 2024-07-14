@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using System.Globalization
+@using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses
 @inject ILibraryService libraryService;
 @inject IUserService userService;
 @inject IBookService bookService;
@@ -139,7 +140,7 @@
 @code {
     private IEnumerable<Library> libraries;
     private IEnumerable<Book> books;
-    private IEnumerable<User> users;
+    private IEnumerable<UserViewModel> users;
     private IEnumerable<Loan> loans;
     private IEnumerable<Inventory> inventories;
 

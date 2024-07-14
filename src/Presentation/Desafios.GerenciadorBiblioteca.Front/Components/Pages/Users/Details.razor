@@ -1,5 +1,6 @@
 ﻿@page "/users/details/{Id:int}"
 @using System.ComponentModel.DataAnnotations
+@using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Users.Custom.Panels
 @inject ISnackbar Snackbar
 @inject IUserService userService;
@@ -10,12 +11,12 @@
 
 <MudContainer Class="d-flex flex-row align-center pa-0 mt-5 mb-5 ma-0 gap-5 w-100" MaxWidth="MaxWidth.False">
     <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-row align-start pa-0 ma-0 gap-5 w-100">
-        <MudTextField @bind-Value="user.Name" Label="Nome" Required="true" RequiredError="O Nome da Biblioteca é obrigatório" />
+        <MudTextField @bind-Value="name" Label="Nome" Required="true" RequiredError="O Nome da Biblioteca é obrigatório" />
 
-        <MudTextField @bind-Value="user.Email" Label="CNPJ" HelperText="Digite apenas Números" Required="true" RequiredError="O Email é obrigatório"
+        <MudTextField @bind-Value="email" Label="CNPJ" HelperText="Digite apenas Números" Required="true" RequiredError="O Email é obrigatório"
                       Validation="@(new EmailAddressAttribute() {ErrorMessage = "O Email é Inválido"})" />
 
-        <MudTextField @bind-Value="user.Phone" Label="Telefone" HelperText="Digite apenas Números"
+        <MudTextField @bind-Value="phone" Label="Telefone" HelperText="Digite apenas Números"
                       InputType="InputType.Telephone"
                       Validation="@(new Func<string, string>(ValidatePhone))" Required="true"
                       RequiredError="O Telefone é obrigatório!" />
@@ -34,7 +35,12 @@
     [Parameter]
     public int Id { get; set; }
 
-    private User user = new();
+    private string name;
+    private string email;
+    private string phone;
+
+    private UserViewModel user;
+
     private MudForm form;
     private bool success;
     private string[] errors = [];
@@ -47,6 +53,9 @@
     private async Task InitializeUserAsync()
     {
         user = await userService.GetByIdAsync(Id);
+        name = user.Name;
+        email = user.Email;
+        phone = user.Phone;
     }
 
     private async Task EditUserAsync()
@@ -55,7 +64,7 @@
 
         if (form.IsValid)
         {
-            var dto = new UserDTO(user.Name, user.Email, user.Phone);
+            var dto = new UserUpdateInputModel(name, email, phone);
             await userService.UpdateAsync(Id, dto);
 
             Snackbar.Clear();

@@ -57,7 +57,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(LoanDTO request)
+        public async Task<IActionResult> Add(LoanInputModel request)
         {
             var data = await _service.AddAsync(request);
             var response = new CustomResponse<Loan>(data, "Empréstimo Adicionado com Sucesso!");
@@ -68,7 +68,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, LoanDTO request)
+        public async Task<IActionResult> Update(int id, LoanInputModel request)
         {
             var data = await _service.UpdateAsync(id, request);
             var response = new CustomResponse<Loan>(data, "Empréstimo Atualizado com Sucesso!");

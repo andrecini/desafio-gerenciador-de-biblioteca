@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Validators
 {
-    public class LoanValidator : AbstractValidator<LoanDTO>
+    public class LoanValidator : AbstractValidator<LoanInputModel>
     {
         public LoanValidator()
         {

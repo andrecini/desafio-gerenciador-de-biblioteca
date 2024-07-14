@@ -1,8 +1,12 @@
 ﻿using AutoMapper;
 using Desafios.GerenciadorBiblioteca.Domain.Entities;
+using Desafios.GerenciadorBiblioteca.Domain.Entities.Base;
+using Desafios.GerenciadorBiblioteca.Domain.Enums;
 using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
+using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
+using Desafios.GerenciadorBiblioteca.Service.Security.Interfaces;
 using Desafios.GerenciadorBiblioteca.Service.Services.Base;
 using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces;
 using Desafios.GerenciadorBiblioteca.Service.Validators;
@@ -10,61 +14,77 @@ using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Services
 {
-    public class UserService(IUnitOfWork unitOfWork, IMapper mapper) : BaseService, IUserService
+    public class UserService(IUnitOfWork unitOfWork, IMapper mapper, ICipherService cipher) : BaseService, IUserService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IMapper _mapper = mapper;
+        private readonly ICipherService _cipher = cipher;
 
-        public async Task<IEnumerable<User>> GetAllAsync()
+        public async Task<IEnumerable<UserViewModel>> GetAllAsync()
         {
             var data = await _unitOfWork.Users.GetAllAsync();
 
-            return data;
+            var viewModel = _mapper.Map<IEnumerable<UserViewModel>>(data);
+
+            return viewModel;
         }
 
-        public async Task<User> GetByIdAsync(int id)
+        public async Task<UserViewModel> GetByIdAsync(int id)
         {
             CustomException.ThrowIfLessThanOne(id, "Id");
 
             var data = await _unitOfWork.Users.GetByIdAsync(id);
 
-            return data;
+            var viewModel = _mapper.Map<UserViewModel>(data);
+
+            return viewModel;
         }
 
-        public async Task<IEnumerable<User>> GetByNameAsync(string name)
+        public async Task<IEnumerable<UserViewModel>> GetByNameAsync(string name)
         {
             var users = await _unitOfWork.Users.GetAllAsync();
 
             if (!string.IsNullOrEmpty(name))
-                return users.Where(x => x.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase));
-        
-            return users;
+                users = users.Where(x => x.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase));
+
+            var viewModel = _mapper.Map<IEnumerable<UserViewModel>>(users);
+
+            return viewModel;
         }
 
-        public async Task<User> AddAsync(UserDTO dto)
+        public async Task<UserViewModel> AddAsync(UserRegisterInputModel dto)
         {
             CustomException.ThrowIfNull(dto, "Usuário");
 
-            ValidateEntity<UserValidator, UserDTO>(dto);
+            ValidateEntity<UserRegisterValidator, UserRegisterInputModel>(dto);
+
+            _cipher.ValidatePasswordPolicy(dto.Password);
 
             var entity = _mapper.Map<User>(dto);
+
+            entity.Password = _cipher.Encrypt(dto.Password);
+            entity.Role = Roles.Common;
 
             entity = await _unitOfWork.Users.AddAsync(entity);
             var result = await _unitOfWork.SaveAsync();
 
-            return result > 0 ? entity : throw new CustomException(
+            var viewModel = _mapper.Map<UserViewModel>(entity);
+
+            return result > 0 ? viewModel : throw new CustomException(
                 "Não foi possível adicionar o Usuário. Tente novamente!",
                 HttpStatusCode.InternalServerError);
         }
 
-        public async Task<User> UpdateAsync(int id, UserDTO dto)
+        public async Task<UserViewModel> UpdateAsync(int id, UserUpdateInputModel dto)
         {
             CustomException.ThrowIfNull(dto, "Usuário");
 
-            ValidateEntity<UserValidator, UserDTO>(dto);
+            ValidateEntity<UserUpdateValidator, UserUpdateInputModel>(dto);
 
-            var userRegistered = await GetByIdAsync(id) ??
+            var user = await GetByIdAsync(id) ??
                 throw new CustomException("Nenhum Usuário foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
+
+            var userRegistered = await _unitOfWork.Users.GetByIdAsync(id);
 
             userRegistered.Name = dto.Name;
             userRegistered.Email = dto.Email;
@@ -73,8 +93,34 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
             _unitOfWork.Users.Update(userRegistered);
             var result = await _unitOfWork.SaveAsync();
 
-            return result > 0 ? userRegistered : throw new CustomException(
+            var viewModel = _mapper.Map<UserViewModel>(userRegistered);
+
+            return result > 0 ? viewModel : throw new CustomException(
                  "Não foi possível alterar o Usuário. Tente novamente!",
+                 HttpStatusCode.InternalServerError);
+        }
+
+        public async Task<UserViewModel> UpdatePasswordAsync(int id, string newPassword)
+        {
+            if (string.IsNullOrEmpty(newPassword))
+                throw new CustomException("A Nova Senha é obrigatória!", HttpStatusCode.UnprocessableEntity);
+
+            var user = await GetByIdAsync(id) ??
+                throw new CustomException("Nenhum Usuário foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
+
+            var userRegistered = await _unitOfWork.Users.GetByIdAsync(id);
+
+            _cipher.ValidatePasswordPolicy(newPassword);
+
+            userRegistered.Password = _cipher.Encrypt(newPassword);
+
+            _unitOfWork.Users.Update(userRegistered);
+            var result = await _unitOfWork.SaveAsync();
+
+            var viewModel = _mapper.Map<UserViewModel>(userRegistered);
+
+            return result > 0 ? viewModel : throw new CustomException(
+                 "Não foi possível alterar a senha do Usuário. Tente novamente!",
                  HttpStatusCode.InternalServerError);
         }
 
@@ -82,7 +128,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
         {
             CustomException.ThrowIfLessThanOne(id, "Id");
 
-            var userRegistered = await GetByIdAsync(id) ??
+            var userRegistered = await _unitOfWork.Users.GetByIdAsync(id) ??
                 throw new CustomException("Nenhum Usuário foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
 
             _unitOfWork.Users.Remove(userRegistered);

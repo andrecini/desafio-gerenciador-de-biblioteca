@@ -9,6 +9,7 @@ using Desafios.GerenciadorBiblioteca.Service.Services;
 using Moq;
 using System.Net;
 using Desafios.GerenciadorBiblioteca.Domain.Enums;
+using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
 
 namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 {
@@ -124,7 +125,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         public async Task AddAsync_WhenDtoIsValid_ShouldReturnAddedLoan()
         {
             // Arrange
-            var dto = new LoanDTO(1, 1, DateTime.Now, DateTime.Now.AddDays(7));
+            var dto = new LoanInputModel(1, 1, DateTime.Now, DateTime.Now.AddDays(7));
             var loan = new Loan { Id = 1, UserId = 1, InventoryId = 1, LoanDate = dto.LoanDate, LoanValidity = dto.LoanValidity, Returned = false };
             _mockMapper.Setup(m => m.Map<Loan>(dto)).Returns(loan);
             _mockUnitOfWork.Setup(uow => uow.Loans.AddAsync(It.IsAny<Loan>())).ReturnsAsync(loan);
@@ -145,7 +146,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         public async Task AddAsync_WhenSaveFails_ShouldThrowCustomException()
         {
             // Arrange
-            var dto = new LoanDTO(1, 1, DateTime.Now, DateTime.Now.AddDays(7));
+            var dto = new LoanInputModel(1, 1, DateTime.Now, DateTime.Now.AddDays(7));
             var loan = new Loan { Id = 1, UserId = 1, InventoryId = 1, LoanDate = dto.LoanDate, LoanValidity = dto.LoanValidity, Returned = false };
             _mockMapper.Setup(m => m.Map<Loan>(dto)).Returns(loan);
             _mockUnitOfWork.Setup(uow => uow.Loans.AddAsync(It.IsAny<Loan>())).ReturnsAsync(loan);
@@ -162,7 +163,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         {
             // Arrange
             int loanId = 1;
-            var dto = new LoanDTO(1, 1, DateTime.Now, DateTime.Now.AddDays(7));
+            var dto = new LoanInputModel(1, 1, DateTime.Now, DateTime.Now.AddDays(7));
             var existingLoan = new Loan { Id = loanId, UserId = 1, InventoryId = 1, LoanDate = DateTime.Now, LoanValidity = DateTime.Now.AddDays(7), Returned = false };
 
             _mockUnitOfWork.Setup(uow => uow.Loans.GetByIdAsync(loanId)).ReturnsAsync(existingLoan);
@@ -184,7 +185,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         {
             // Arrange
             int loanId = 1;
-            var dto = new LoanDTO(1, 1, DateTime.Now, DateTime.Now.AddDays(7));
+            var dto = new LoanInputModel(1, 1, DateTime.Now, DateTime.Now.AddDays(7));
 
             _mockUnitOfWork.Setup(uow => uow.Loans.GetByIdAsync(loanId)).ReturnsAsync((Loan)null);
 
@@ -199,7 +200,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         {
             // Arrange
             int loanId = 1;
-            var dto = new LoanDTO(1, 1, DateTime.Now, DateTime.Now.AddDays(7));
+            var dto = new LoanInputModel(1, 1, DateTime.Now, DateTime.Now.AddDays(7));
             var existingLoan = new Loan { Id = loanId, UserId = 1, InventoryId = 1, LoanDate = DateTime.Now, LoanValidity = DateTime.Now.AddDays(7), Returned = false };
 
             _mockUnitOfWork.Setup(uow => uow.Loans.GetByIdAsync(loanId)).ReturnsAsync(existingLoan);
@@ -343,20 +344,20 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
                 new Inventory { Id = 1, LibraryId = libraryId, BookId = 1, Available = true },
                 new Inventory { Id = 2, LibraryId = libraryId, BookId = 2, Available = false }
             };
-                var loans = new List<Loan>
+            var loans = new List<Loan>
             {
                 new Loan { Id = 1, UserId = 1, InventoryId = 1, LoanDate = DateTime.Now, LoanValidity = DateTime.Now.AddDays(7), Returned = false },
                 new Loan { Id = 2, UserId = 2, InventoryId = 2, LoanDate = DateTime.Now, LoanValidity = DateTime.Now.AddDays(7), Returned = true }
             };
-                var books = new List<Book>
+            var books = new List<Book>
             {
                 new Book { Id = 1, Title = "Book 1" },
                 new Book { Id = 2, Title = "Book 2" }
             };
-                var users = new List<User>
+            var users = new List<UserViewModel>
             {
-                new User { Id = 1, Name = "User 1" },
-                new User { Id = 2, Name = "User 2" }
+                new UserViewModel(1, "User 1", "teste@email.com", "11988887777", Roles.Common),
+                new UserViewModel(2, "User 2", "teste@email.com", "11988887777", Roles.Common)
             };
 
             _mockInventoryService.Setup(service => service.GetByLibraryAsync(libraryId)).ReturnsAsync(inventories);
@@ -389,17 +390,17 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
                 new Book { Id = 1, Title = "Book 1" },
                 new Book { Id = 2, Title = "Book 2" }
             };
-                var inventories = new List<Inventory>
+            var inventories = new List<Inventory>
             {
                 new Inventory { Id = 1, LibraryId = 1, BookId = 1, Available = true },
                 new Inventory { Id = 2, LibraryId = 1, BookId = 2, Available = false }
             };
-                var users = new List<User>
+            var users = new List<UserViewModel>
             {
-                new User { Id = 1, Name = "User 1" },
-                new User { Id = 2, Name = "User 2" }
+                new UserViewModel (1, "User 1", "teste@email.com", "11988887777", Roles.Common),
+                new UserViewModel (2, "User 2", "teste@email.com", "11988887777", Roles.Common)
             };
-                var loans = new List<Loan>
+            var loans = new List<Loan>
             {
                 new Loan { Id = 1, UserId = 1, InventoryId = 1, LoanDate = DateTime.Now, LoanValidity = DateTime.Now.AddDays(7), Returned = false },
                 new Loan { Id = 2, UserId = 2, InventoryId = 2, LoanDate = DateTime.Now, LoanValidity = DateTime.Now.AddDays(7), Returned = true }

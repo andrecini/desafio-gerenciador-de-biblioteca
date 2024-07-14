@@ -60,7 +60,7 @@
         if (form.IsValid)
         {
             book.Year = Convert.ToInt32(yearInput);
-            var dto = new BookDTO(book.Title, book.Author, book.ISBN, book.Year);
+            var dto = new BookInputModel(book.Title, book.Author, book.ISBN, book.Year.Value);
             await bookService.UpdateAsync(Id, dto);
 
             Snackbar.Clear();

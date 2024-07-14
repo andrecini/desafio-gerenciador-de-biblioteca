@@ -1,4 +1,6 @@
 ﻿using Desafios.GerenciadorBiblioteca.Service.Mapping;
+using Desafios.GerenciadorBiblioteca.Service.Security;
+using Desafios.GerenciadorBiblioteca.Service.Security.Interfaces;
 using Desafios.GerenciadorBiblioteca.Service.Services;
 using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +18,8 @@ namespace Desafios.GerenciadorBiblioteca.Service
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IInventoryService, InventoryService>();
             services.AddTransient<ILoanService, LoanService>();
+
+            services.AddTransient<ICipherService, CipherService>();
 
             return services;
         }

@@ -206,7 +206,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         public async Task AddAsync_WhenDtoIsValid_ShouldReturnAddedLibrary()
         {
             // Arrange
-            var dto = new LibraryDTO("New Library", "123456", "111111111");
+            var dto = new LibraryInputModel("New Library", "123456", "111111111");
             var library = new Library { Id = 1, Name = "New Library", CNPJ = "123456", Phone = "111111111" };
             _mockMapper.Setup(m => m.Map<Library>(dto)).Returns(library);
             _mockUnitOfWork.Setup(uow => uow.Libraries.AddAsync(It.IsAny<Library>())).ReturnsAsync(library);
@@ -226,7 +226,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         public async Task AddAsync_WhenDtoIsNull_ShouldThrowCustomException()
         {
             // Arrange
-            LibraryDTO dto = null;
+            LibraryInputModel dto = null;
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _libraryService.AddAsync(dto));
@@ -237,7 +237,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         public async Task AddAsync_WhenSaveFails_ShouldThrowCustomException()
         {
             // Arrange
-            var dto = new LibraryDTO("New Library", "123456", "111111111");
+            var dto = new LibraryInputModel("New Library", "123456", "111111111");
             var library = new Library { Id = 1, Name = "New Library", CNPJ = "123456", Phone = "111111111" };
             _mockMapper.Setup(m => m.Map<Library>(dto)).Returns(library);
             _mockUnitOfWork.Setup(uow => uow.Libraries.AddAsync(It.IsAny<Library>())).ReturnsAsync(library);
@@ -253,7 +253,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         public async Task AddAsync_WhenValidationFails_ShouldThrowValidationException()
         {
             // Arrange
-            var dto = new LibraryDTO("Invalid Library", "123bb6", "111111111");
+            var dto = new LibraryInputModel("Invalid Library", "123bb6", "111111111");
 
             // Act & Assert
             await Assert.ThrowsAsync<CustomException>(() => _libraryService.AddAsync(dto));
@@ -264,7 +264,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         {
             // Arrange
             int libraryId = 1;
-            var dto = new LibraryDTO("Updated Library", "654321", "222222222");
+            var dto = new LibraryInputModel("Updated Library", "654321", "222222222");
             var existingLibrary = new Library { Id = libraryId, Name = "Old Library", CNPJ = "123456", Phone = "111111111" };
 
             _mockUnitOfWork.Setup(uow => uow.Libraries.GetByIdAsync(libraryId)).ReturnsAsync(existingLibrary);
@@ -285,7 +285,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         {
             // Arrange
             int libraryId = 1;
-            LibraryDTO dto = null;
+            LibraryInputModel dto = null;
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _libraryService.UpdateAsync(libraryId, dto));
@@ -297,7 +297,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         {
             // Arrange
             int libraryId = 1;
-            var dto = new LibraryDTO("Updated Library", "654321", "222222222");
+            var dto = new LibraryInputModel("Updated Library", "654321", "222222222");
 
             _mockUnitOfWork.Setup(uow => uow.Libraries.GetByIdAsync(libraryId)).ReturnsAsync((Library)null);
 
@@ -312,7 +312,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         {
             // Arrange
             int libraryId = 1;
-            var dto = new LibraryDTO("Updated Library", "654321", "222222222");
+            var dto = new LibraryInputModel("Updated Library", "654321", "222222222");
             var existingLibrary = new Library { Id = libraryId, Name = "Old Library", CNPJ = "123456", Phone = "111111111" };
 
             _mockUnitOfWork.Setup(uow => uow.Libraries.GetByIdAsync(libraryId)).ReturnsAsync(existingLibrary);
@@ -329,7 +329,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         {
             // Arrange
             int libraryId = 1;
-            var dto = new LibraryDTO("Invalid Library", "654bb1", "222222222");
+            var dto = new LibraryInputModel("Invalid Library", "654bb1", "222222222");
 
             // Act & Assert
             await Assert.ThrowsAsync<CustomException>(() => _libraryService.UpdateAsync(libraryId, dto));

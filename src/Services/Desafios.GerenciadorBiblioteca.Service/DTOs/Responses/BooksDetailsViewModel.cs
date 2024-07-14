@@ -2,6 +2,5 @@
 
 namespace Desafios.GerenciadorBiblioteca.Service.DTOs.Responses
 {
-    public record LoanDetailsDTO(Loan LoanDetails, string BookName, string Username)
-    { }
+    public record BookDetailsViewModel(Book BookDetails, int InventoryId, bool Available);
 }

@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Validators
 {
-    public class BookValidator : AbstractValidator<BookDTO>
+    public class BookValidator : AbstractValidator<BookInputModel>
     {
         public BookValidator()
         {

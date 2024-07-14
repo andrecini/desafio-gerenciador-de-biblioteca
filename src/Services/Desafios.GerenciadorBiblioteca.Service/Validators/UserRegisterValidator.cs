@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Validators
 {
-    public class UserValidator : AbstractValidator<UserDTO>
+    public class UserRegisterValidator : AbstractValidator<UserRegisterInputModel>
     {
-        public UserValidator()
+        public UserRegisterValidator()
         {
             RuleFor(b => b.Name)
                 .NotNull()
@@ -29,6 +29,10 @@ namespace Desafios.GerenciadorBiblioteca.Service.Validators
             RuleFor(b => b.Phone)
                 .Matches(@"^\d+$")
                 .WithMessage("Digite apenas números no Número de Telefone.");
+
+            RuleFor(b => b.Password)
+                .NotNull().NotEmpty()
+                .WithMessage("A Senha é obritatória.");
         }
     }
 }

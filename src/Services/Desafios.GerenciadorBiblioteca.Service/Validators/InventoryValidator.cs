@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Validators
 {
-    public class InventoryValidator : AbstractValidator<InventoryDTO>
+    public class InventoryValidator : AbstractValidator<InventoryInputModel>
     {
         public InventoryValidator()
         {

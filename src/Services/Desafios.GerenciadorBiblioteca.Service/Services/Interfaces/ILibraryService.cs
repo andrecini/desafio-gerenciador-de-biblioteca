@@ -1,11 +1,15 @@
 ﻿using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
-using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces.Base;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Services.Interfaces
 {
-    public interface ILibraryService : IService<LibraryDTO, Library>
+    public interface ILibraryService
     {
+        Task<IEnumerable<Library>> GetAllAsync();
+        Task<Library> GetByIdAsync(int id);
+        Task<Library> AddAsync(LibraryInputModel dto);
+        Task<Library> UpdateAsync(int id, LibraryInputModel dto);
+        Task<bool> RemoveAsync(int id);
         Task<IEnumerable<Library>> GetByNameAsync(string name);
     }
 }

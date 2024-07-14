@@ -219,7 +219,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         public async Task AddAsync_WhenDtoIsValid_ShouldReturnAddedBook()
         {
             // Arrange
-            var dto = new BookDTO("New Book", "Author", "123456", 2022);
+            var dto = new BookInputModel("New Book", "Author", "123456", 2022);
             var book = new Book { Id = 1, Title = "New Book", Author = "Author", ISBN = "123456", Year = 2022 };
             _mockMapper.Setup(m => m.Map<Book>(dto)).Returns(book);
             _mockUnitOfWork.Setup(uow => uow.Books.AddAsync(It.IsAny<Book>())).ReturnsAsync(book);
@@ -238,7 +238,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         public async Task AddAsync_WhenDtoIsNull_ShouldThrowCustomException()
         {
             // Arrange
-            BookDTO dto = null;
+            BookInputModel dto = null;
 
             // Act & Assert
             await Assert.ThrowsAsync<CustomException>(() => _bookService.AddAsync(dto));
@@ -248,7 +248,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         public async Task AddAsync_WhenSaveFails_ShouldThrowCustomException()
         {
             // Arrange
-            var dto = new BookDTO("New Book", "Author", "123456", 2022);
+            var dto = new BookInputModel("New Book", "Author", "123456", 2022);
             var book = new Book { Id = 1, Title = "New Book", Author = "Author", ISBN = "123456", Year = 2022 };
             _mockMapper.Setup(m => m.Map<Book>(dto)).Returns(book);
             _mockUnitOfWork.Setup(uow => uow.Books.AddAsync(It.IsAny<Book>())).ReturnsAsync(book);
@@ -265,7 +265,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         {
             // Arrange
             int bookId = 1;
-            var dto = new BookDTO("Updated Book", "Updated Author", "654321", 2023);
+            var dto = new BookInputModel("Updated Book", "Updated Author", "654321", 2023);
             var existingBook = new Book { Id = bookId, Title = "Old Book", Author = "Old Author", ISBN = "123456", Year = 2020 };
 
             _mockUnitOfWork.Setup(uow => uow.Books.GetByIdAsync(bookId)).ReturnsAsync(existingBook);
@@ -287,7 +287,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         {
             // Arrange
             int bookId = 1;
-            BookDTO dto = null;
+            BookInputModel dto = null;
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _bookService.UpdateAsync(bookId, dto));
@@ -299,7 +299,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         {
             // Arrange
             int bookId = 1;
-            var dto = new BookDTO("Updated Book", "Updated Author", "654321", 2023);
+            var dto = new BookInputModel("Updated Book", "Updated Author", "654321", 2023);
 
             _mockUnitOfWork.Setup(uow => uow.Books.GetByIdAsync(bookId)).ReturnsAsync((Book)null);
 
@@ -314,7 +314,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         {
             // Arrange
             int bookId = 1;
-            var dto = new BookDTO("Updated Book", "Updated Author", "654321", 2023);
+            var dto = new BookInputModel("Updated Book", "Updated Author", "654321", 2023);
             var existingBook = new Book { Id = bookId, Title = "Old Book", Author = "Old Author", ISBN = "123456", Year = 2020 };
 
             _mockUnitOfWork.Setup(uow => uow.Books.GetByIdAsync(bookId)).ReturnsAsync(existingBook);
@@ -331,7 +331,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         {
             // Arrange
             int bookId = 1;
-            var dto = new BookDTO("Invalid Book", "Author", "123B56", 2022);
+            var dto = new BookInputModel("Invalid Book", "Author", "123B56", 2022);
 
             // Act & Assert
             await Assert.ThrowsAsync<CustomException>(() => _bookService.UpdateAsync(bookId, dto));

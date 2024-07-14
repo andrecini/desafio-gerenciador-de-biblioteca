@@ -1,4 +1,5 @@
 ﻿@using System.ComponentModel.DataAnnotations
+@using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Users.Custom.Panels
 
 @inject IUserService userService;
@@ -24,10 +25,10 @@ else
 {
     <MudTable Items="users" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true" Class="d-flex flex-column w-100">
         <HeaderContent>
-            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Library, object>(x=>x.Id)">ID</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<User, object>(x=> x.Name)" Class="w-100">Nome</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<User, object>(x=> x.Email)">Email</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<User, object>(x=> x.Phone)">Telefone</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<UserViewModel, object>(x=>x.Id)">ID</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<UserViewModel, object>(x=> x.Name)" Class="w-100">Nome</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<UserViewModel, object>(x=> x.Email)">Email</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<UserViewModel, object>(x=> x.Phone)">Telefone</MudTableSortLabel></MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="ID">@context.Id</MudTd>
@@ -45,7 +46,7 @@ else
     [Parameter]
     public int Id { get; set; }
 
-    private IEnumerable<User> users;
+    private IEnumerable<UserViewModel> users;
     private Loan loan = new();
     private string userNameFilter = string.Empty;
 

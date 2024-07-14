@@ -46,11 +46,11 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
             return data;
         }
 
-        public async Task<Book> AddAsync(BookDTO dto)
+        public async Task<Book> AddAsync(BookInputModel dto)
         {
             CustomException.ThrowIfNull(dto, "Livro");
 
-            ValidateEntity<BookValidator, BookDTO>(dto);
+            ValidateEntity<BookValidator, BookInputModel>(dto);
 
             var entity = _mapper.Map<Book>(dto);
 
@@ -62,11 +62,11 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
                 HttpStatusCode.InternalServerError);
         }
 
-        public async Task<Book> UpdateAsync(int id, BookDTO dto)
+        public async Task<Book> UpdateAsync(int id, BookInputModel dto)
         {
             CustomException.ThrowIfNull(dto, "Livro");
 
-            ValidateEntity<BookValidator, BookDTO>(dto);
+            ValidateEntity<BookValidator, BookInputModel>(dto);
 
             var libraryRegistered = await GetByIdAsync(id) ??
                 throw new CustomException("Nenhum Livro foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
@@ -99,7 +99,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
                 HttpStatusCode.InternalServerError);
         }
 
-        public async Task<IEnumerable<BookDetailsDTO>> GetBooksDetailsByLibraryAsync(int libraryId)
+        public async Task<IEnumerable<BookDetailsViewModel>> GetBooksDetailsByLibraryAsync(int libraryId)
         {
             var inventories = await inventoryService.GetByLibraryAsync(libraryId);
 
@@ -111,13 +111,13 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
             {
                 var inventory = inventories.FirstOrDefault(inv => inv.BookId == book.Id);
                 bool available = inventory != null && inventory.Available;
-                return new BookDetailsDTO(book, inventory.Id, available);
+                return new BookDetailsViewModel(book, inventory.Id, available);
             });
 
             return booksViewModels;
         }
 
-        public async Task<IEnumerable<BookDetailsDTO>> GetBooksDetailsFilteredAsync(int libraryId, BookFilter filter, int available)
+        public async Task<IEnumerable<BookDetailsViewModel>> GetBooksDetailsFilteredAsync(int libraryId, BookFilter filter, int available)
         {
             var inventories = await inventoryService.GetByLibraryAsync(libraryId);
 
@@ -135,7 +135,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
             {
                 var inventory = inventories.FirstOrDefault(inv => inv.BookId == book.Id);
                 bool available = inventory != null && inventory.Available;
-                return new BookDetailsDTO(book, inventory.Id, available);
+                return new BookDetailsViewModel(book, inventory.Id, available);
             });
 
             return booksViewModels;

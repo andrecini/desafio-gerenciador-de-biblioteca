@@ -49,11 +49,11 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
             return data;
         }
 
-        public async Task<Inventory> AddAsync(InventoryDTO dto)
+        public async Task<Inventory> AddAsync(InventoryInputModel dto)
         {
             CustomException.ThrowIfNull(dto, "Inventário");
 
-            ValidateEntity<InventoryValidator, InventoryDTO>(dto);
+            ValidateEntity<InventoryValidator, InventoryInputModel>(dto);
 
             var entity = _mapper.Map<Inventory>(dto);
             entity.Available = true;
@@ -66,11 +66,11 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
                 HttpStatusCode.InternalServerError);
         }
 
-        public async Task<Inventory> UpdateAsync(int id, InventoryDTO dto)
+        public async Task<Inventory> UpdateAsync(int id, InventoryInputModel dto)
         {
             CustomException.ThrowIfNull(dto, "Inventário");
 
-            ValidateEntity<InventoryValidator, InventoryDTO>(dto);
+            ValidateEntity<InventoryValidator, InventoryInputModel>(dto);
 
             var InventoryRegistered = await GetByIdAsync(id) ??
                 throw new CustomException("Nenhum Inventário foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);

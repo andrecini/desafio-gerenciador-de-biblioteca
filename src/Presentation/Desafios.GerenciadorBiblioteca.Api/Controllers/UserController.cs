@@ -1,6 +1,7 @@
 using Desafios.GerenciadorBiblioteca.Api.Responses;
 using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
+using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
 using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,7 +24,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         public async Task<IActionResult> GetAll()
         {
             var data = await _service.GetAllAsync();
-            var response = new CustomResponse<IEnumerable<User>>(data, "Usuários Recupedados com Sucesso!");
+            var response = new CustomResponse<IEnumerable<UserViewModel>>(data, "Usuários Recupedados com Sucesso!");
 
             return data.Any() ? Ok(data) : NoContent();
         }
@@ -32,7 +33,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             var data = await _service.GetByIdAsync(id);
-            var response = new CustomResponse<User>(data, "Usuário Recupedado com Sucesso!");
+            var response = new CustomResponse<UserViewModel>(data, "Usuário Recupedado com Sucesso!");
 
             return data != null ? Ok(data) : NoContent();
         }
@@ -41,16 +42,16 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         public async Task<IActionResult> Filter([FromBody]string name)
         {
             var data = await _service.GetByNameAsync(name);
-            var response = new CustomResponse<IEnumerable<User>>(data, "Usuários Recupedados com Sucesso!");
+            var response = new CustomResponse<IEnumerable<UserViewModel>>(data, "Usuários Recupedados com Sucesso!");
 
             return data.Any() ? Ok(data) : NoContent();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(UserDTO request)
+        public async Task<IActionResult> Add(UserRegisterInputModel request)
         {
             var data = await _service.AddAsync(request);
-            var response = new CustomResponse<User>(data, "Usuário Adicionado com Sucesso!");
+            var response = new CustomResponse<UserViewModel>(data, "Usuário Adicionado com Sucesso!");
 
             var locationUri = Url.Link(nameof(GetById), new { id = data.Id });
 
@@ -58,10 +59,10 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, UserDTO request)
+        public async Task<IActionResult> Update(int id, UserUpdateInputModel request)
         {
             var data = await _service.UpdateAsync(id, request);
-            var response = new CustomResponse<User>(data, "Usuário Atualizado com Sucesso!");
+            var response = new CustomResponse<UserViewModel>(data, "Usuário Atualizado com Sucesso!");
 
             return Ok(response);
         }

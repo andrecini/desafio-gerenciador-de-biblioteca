@@ -34,7 +34,7 @@
     {
         if (form.IsValid)
         {
-            var dto = new UserDTO(user.Name, user.Email, user.Phone);
+            var dto = new UserRegisterInputModel(user.Name, user.Email, user.Phone, user.Password);
             await service.AddAsync(dto);
             MudDialog.Close(DialogResult.Ok(user));
         }

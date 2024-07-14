@@ -59,7 +59,7 @@
 
         if (form.IsValid)
         {
-            var dto = new LibraryDTO(library.Name, library.CNPJ, library.Phone);
+            var dto = new LibraryInputModel(library.Name, library.CNPJ, library.Phone);
             await libraryService.UpdateAsync(Id, dto);
 
             Snackbar.Clear();

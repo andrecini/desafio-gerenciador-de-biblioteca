@@ -121,7 +121,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         public async Task AddAsync_WhenDtoIsValid_ShouldReturnAddedInventory()
         {
             // Arrange
-            var dto = new InventoryDTO(1, 1);
+            var dto = new InventoryInputModel(1, 1);
             var inventory = new Inventory { Id = 1, LibraryId = 1, BookId = 1, Available = true };
             _mockMapper.Setup(m => m.Map<Inventory>(dto)).Returns(inventory);
             _mockUnitOfWork.Setup(uow => uow.Inventories.AddAsync(It.IsAny<Inventory>())).ReturnsAsync(inventory);
@@ -141,7 +141,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         public async Task AddAsync_WhenDtoIsNull_ShouldThrowCustomException()
         {
             // Arrange
-            InventoryDTO dto = null;
+            InventoryInputModel dto = null;
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _inventoryService.AddAsync(dto));
@@ -152,7 +152,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         public async Task AddAsync_WhenSaveFails_ShouldThrowCustomException()
         {
             // Arrange
-            var dto = new InventoryDTO(1, 1);
+            var dto = new InventoryInputModel(1, 1);
             var inventory = new Inventory { Id = 1, LibraryId = 1, BookId = 1, Available = true };
             _mockMapper.Setup(m => m.Map<Inventory>(dto)).Returns(inventory);
             _mockUnitOfWork.Setup(uow => uow.Inventories.AddAsync(It.IsAny<Inventory>())).ReturnsAsync(inventory);
@@ -169,7 +169,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         {
             // Arrange
             int inventoryId = 1;
-            var dto = new InventoryDTO(1, 1);
+            var dto = new InventoryInputModel(1, 1);
             var existingInventory = new Inventory { Id = inventoryId, LibraryId = 1, BookId = 1, Available = true };
 
             _mockUnitOfWork.Setup(uow => uow.Inventories.GetByIdAsync(inventoryId)).ReturnsAsync(existingInventory);
@@ -190,7 +190,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         {
             // Arrange
             int inventoryId = 1;
-            InventoryDTO dto = null;
+            InventoryInputModel dto = null;
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _inventoryService.UpdateAsync(inventoryId, dto));
@@ -202,7 +202,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         {
             // Arrange
             int inventoryId = 1;
-            var dto = new InventoryDTO(1, 1);
+            var dto = new InventoryInputModel(1, 1);
 
             _mockUnitOfWork.Setup(uow => uow.Inventories.GetByIdAsync(inventoryId)).ReturnsAsync((Inventory)null);
 
@@ -217,7 +217,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
         {
             // Arrange
             int inventoryId = 1;
-            var dto = new InventoryDTO(1, 1);
+            var dto = new InventoryInputModel(1, 1);
             var existingInventory = new Inventory { Id = inventoryId, LibraryId = 1, BookId = 1, Available = true };
 
             _mockUnitOfWork.Setup(uow => uow.Inventories.GetByIdAsync(inventoryId)).ReturnsAsync(existingInventory);

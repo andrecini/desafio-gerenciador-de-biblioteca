@@ -49,7 +49,7 @@
 
         if (form.IsValid)
         {
-            var dto = new InventoryDTO(LibraryId, bookId);
+            var dto = new InventoryInputModel(LibraryId, bookId);
             await inventoryService.AddAsync(dto);
             MudDialog.Close(DialogResult.Ok(true));
         }

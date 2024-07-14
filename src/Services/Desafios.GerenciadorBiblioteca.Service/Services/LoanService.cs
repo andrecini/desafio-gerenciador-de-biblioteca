@@ -58,9 +58,9 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
             return data;
         }
 
-        public async Task<Loan> AddAsync(LoanDTO dto)
+        public async Task<Loan> AddAsync(LoanInputModel dto)
         {
-            ValidateEntity<LoanValidator, LoanDTO>(dto);
+            ValidateEntity<LoanValidator, LoanInputModel>(dto);
 
             var entity = _mapper.Map<Loan>(dto);
 
@@ -74,11 +74,11 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
                 HttpStatusCode.InternalServerError);
         }
 
-        public async Task<Loan> UpdateAsync(int id, LoanDTO dto)
+        public async Task<Loan> UpdateAsync(int id, LoanInputModel dto)
         {
             CustomException.ThrowIfLessThanOne(id, "Empréstimo");
 
-            ValidateEntity<LoanValidator, LoanDTO>(dto);
+            ValidateEntity<LoanValidator, LoanInputModel>(dto);
 
             var loanRegistered = await GetByIdAsync(id) ??
                 throw new CustomException("Nenhum Emrpéstimo foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
@@ -130,7 +130,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
                 HttpStatusCode.InternalServerError);
         }
 
-        public async Task<List<LoanDetailsDTO>> GetLoanDetailsByLibraryAsync(int libraryId)
+        public async Task<List<LoanDetailsViewModel>> GetLoanDetailsByLibraryAsync(int libraryId)
         {
             CustomException.ThrowIfLessThanOne(libraryId, "Empréstimo");
 
@@ -145,7 +145,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
             var bookDict = books.ToDictionary(book => book.Id, book => book.Title);
             var userDict = users.ToDictionary(user => user.Id, user => user.Name);
 
-            var loansDtos = new List<LoanDetailsDTO>();
+            var loansDtos = new List<LoanDetailsViewModel>();
 
             foreach (var loan in loans)
             {
@@ -155,14 +155,14 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
                     bookDict.TryGetValue(inventory.BookId, out var bookTitle) &&
                     userDict.TryGetValue(loan.UserId, out var userName))
                 {
-                    loansDtos.Add(new LoanDetailsDTO(loan, bookTitle, userName));
+                    loansDtos.Add(new LoanDetailsViewModel(loan, bookTitle, userName));
                 }
             }
 
             return loansDtos;
         }
 
-        public async Task<List<LoanDetailsDTO>> GetFilteredLoanDetailsAsync(LoanDetailsFilter filter)
+        public async Task<List<LoanDetailsViewModel>> GetFilteredLoanDetailsAsync(LoanDetailsFilter filter)
         {
             var filteredBooks = await bookService.GetByFilterAsync(new() { Title = filter.BookName });
             var filteredBooksIds = filteredBooks.Select(x => x.Id).ToHashSet();
@@ -182,7 +182,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
             fiteredInventoriesIds.Contains(x.InventoryId) &&
             usersFilteredIds.Contains(x.UserId));
 
-            var loansDtos = new List<LoanDetailsDTO>();
+            var loansDtos = new List<LoanDetailsViewModel>();
 
             foreach (var loan in loansfiltered)
             {
@@ -192,7 +192,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
                     bookDict.TryGetValue(inventory.BookId, out var bookTitle) &&
                     userDict.TryGetValue(loan.UserId, out var userName))
                 {
-                    loansDtos.Add(new LoanDetailsDTO(loan, bookTitle, userName));
+                    loansDtos.Add(new LoanDetailsViewModel(loan, bookTitle, userName));
                 }
             }
 

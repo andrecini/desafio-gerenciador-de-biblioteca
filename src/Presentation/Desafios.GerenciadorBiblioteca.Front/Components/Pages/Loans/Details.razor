@@ -99,7 +99,7 @@
 
         if (form.IsValid)
         {
-            var dto = new LoanDTO(loan.InventoryId, loan.UserId, loanDate.Value, loanValidity.Value);
+            var dto = new LoanInputModel(loan.InventoryId, loan.UserId, loanDate.Value, loanValidity.Value);
             await loanService.UpdateAsync(Id, dto);
             await loanService.UpdateStatusAsync(Id, loan.Returned);
 

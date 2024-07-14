@@ -36,7 +36,7 @@
 
         if (form.IsValid)
         {
-            var dto = new LibraryDTO(library.Name, library.CNPJ, library.Phone);
+            var dto = new LibraryInputModel(library.Name, library.CNPJ, library.Phone);
             await service.AddAsync(dto);
             MudDialog.Close(DialogResult.Ok(library));
         }

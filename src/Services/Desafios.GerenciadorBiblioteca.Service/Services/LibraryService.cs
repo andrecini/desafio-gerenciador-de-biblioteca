@@ -41,11 +41,11 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
             return libraries;
         }
 
-        public async Task<Library> AddAsync(LibraryDTO dto)
+        public async Task<Library> AddAsync(LibraryInputModel dto)
         {
             CustomException.ThrowIfNull(dto, "Biblioteca");
 
-            ValidateEntity<LibraryValidator, LibraryDTO>(dto);
+            ValidateEntity<LibraryValidator, LibraryInputModel>(dto);
 
             var entity = _mapper.Map<Library>(dto);
 
@@ -57,11 +57,11 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
                 HttpStatusCode.InternalServerError);
         }
 
-        public async Task<Library> UpdateAsync(int id, LibraryDTO dto)
+        public async Task<Library> UpdateAsync(int id, LibraryInputModel dto)
         {
             CustomException.ThrowIfNull(dto, "Biblioteca");
 
-            ValidateEntity<LibraryValidator, LibraryDTO>(dto);
+            ValidateEntity<LibraryValidator, LibraryInputModel>(dto);
 
             var libraryRegistered = await GetByIdAsync(id) ??
                throw new CustomException("Nenhuma Biblioteca foi encontrada com essas informações. Tente novamente!", HttpStatusCode.NotFound);

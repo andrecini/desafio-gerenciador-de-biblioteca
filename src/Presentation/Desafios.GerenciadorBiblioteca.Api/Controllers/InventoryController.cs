@@ -57,7 +57,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(InventoryDTO request)
+        public async Task<IActionResult> Add(InventoryInputModel request)
         {
             var data = await _service.AddAsync(request);
             var response = new CustomResponse<Inventory>(data, "Inventário Adicionado com Sucesso!");
@@ -68,7 +68,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, InventoryDTO request)
+        public async Task<IActionResult> Update(int id, InventoryInputModel request)
         {
             var data = await _service.UpdateAsync(id, request);
             var response = new CustomResponse<Inventory>(data, "Inventários Atualizado com Sucesso!");

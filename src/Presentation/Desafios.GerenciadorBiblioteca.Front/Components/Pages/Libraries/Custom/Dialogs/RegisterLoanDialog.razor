@@ -76,7 +76,7 @@
 
         if (form.IsValid)
         {
-            var dto = new LoanDTO(inventoryId, userId, loanDate.Value, loanValidity.Value);
+            var dto = new LoanInputModel(inventoryId, userId, loanDate.Value, loanValidity.Value);
             await loanService.AddAsync(dto);
             MudDialog.Close(DialogResult.Ok(true));
         }

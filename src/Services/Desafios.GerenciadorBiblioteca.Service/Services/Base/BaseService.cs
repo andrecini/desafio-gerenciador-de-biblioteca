@@ -6,11 +6,11 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services.Base
 {
     public class BaseService
     {
-        protected void ValidateEntity<T, TDto>(TDto entity)
+        protected void ValidateEntity<T, TDto>(TDto dto)
             where T : AbstractValidator<TDto>, new()
         {
             var validatorInstance = new T();
-            var result = validatorInstance.Validate(entity);
+            var result = validatorInstance.Validate(dto);
 
             if (!result.IsValid)
                 throw new CustomException(

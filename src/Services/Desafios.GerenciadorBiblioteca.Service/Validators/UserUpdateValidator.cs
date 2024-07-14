@@ -3,23 +3,23 @@ using FluentValidation;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Validators
 {
-    public class LibraryValidator : AbstractValidator<LibraryInputModel>
+    public class UserUpdateValidator : AbstractValidator<UserUpdateInputModel>
     {
-        public LibraryValidator()
+        public UserUpdateValidator()
         {
             RuleFor(b => b.Name)
                 .NotNull()
                 .NotEmpty()
-                .WithMessage("O Nome da Biblioteca é obrigatório.");
+                .WithMessage("O Nome do Usuário é obrigatório.");
 
-            RuleFor(b => b.CNPJ)
+            RuleFor(b => b.Email)
                 .NotNull()
                 .NotEmpty()
-                .WithMessage("O CNPJ é obrigatório.");
+                .WithMessage("O Email é obrigatório.");
 
-            RuleFor(b => b.CNPJ)
-                .Matches(@"^\d+$")
-                .WithMessage("Digite apenas números no CNPJ.");
+            RuleFor(b => b.Email)
+            .EmailAddress()
+            .WithMessage("O Email está fora do padrão.");
 
             RuleFor(b => b.Phone)
                 .NotNull()

@@ -47,7 +47,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(LibraryDTO request)
+        public async Task<IActionResult> Add(LibraryInputModel request)
         {
             var data =  await _service.AddAsync(request);
             var response = new CustomResponse<Library>(data, "Biblioteca Adicionada com Sucesso!");
@@ -58,7 +58,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, LibraryDTO request)
+        public async Task<IActionResult> Update(int id, LibraryInputModel request)
         {
             var data = await _service.UpdateAsync(id, request);
             var response = new CustomResponse<Library>(data, "Biblioteca Atualizada com Sucesso!");
