@@ -8,16 +8,10 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class LibraryController : ControllerBase
+    public class LibraryController(ILogger<LibraryController> logger, ILibraryService service) : ControllerBase
     {
-        private readonly ILogger<LibraryController> _logger;
-        private readonly ILibraryService _service;
-
-        public LibraryController(ILogger<LibraryController> logger, ILibraryService service)
-        {
-            _service = service;
-            _logger = logger;
-        }
+        private readonly ILogger<LibraryController> _logger = logger;
+        private readonly ILibraryService _service = service;
 
         [HttpGet]
         public async Task<IActionResult> GetAll()

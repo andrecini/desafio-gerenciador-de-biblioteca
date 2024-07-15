@@ -5,6 +5,6 @@ namespace Desafios.GerenciadorBiblioteca.Service.Security.Interfaces
 {
     public interface ITokenService
     {
-        TokenModel GenerateJwtToken(string id, string name, Roles role);
+        TokenModel GenerateJwtToken(int id, string name, Roles role);
     }
 }

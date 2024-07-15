@@ -9,16 +9,10 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController : ControllerBase
+    public class UserController(ILogger<UserController> logger, IUserService service) : ControllerBase
     {
-        private readonly ILogger<UserController> _logger;
-        private readonly IUserService _service;
-
-        public UserController(ILogger<UserController> logger, IUserService service)
-        {
-            _service = service;
-            _logger = logger;
-        }
+        private readonly ILogger<UserController> _logger = logger;
+        private readonly IUserService _service = service;
 
         [HttpGet]
         public async Task<IActionResult> GetAll()

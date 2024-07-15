@@ -10,6 +10,7 @@ using Desafios.GerenciadorBiblioteca.Service.Security.Interfaces;
 using Desafios.GerenciadorBiblioteca.Service.Services.Base;
 using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces;
 using Desafios.GerenciadorBiblioteca.Service.Validators;
+using Microsoft.IdentityModel.Tokens;
 using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Services
@@ -58,6 +59,11 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
 
             ValidateEntity<UserRegisterValidator, UserRegisterInputModel>(dto);
 
+            var existingUseremail = await GetUserByEmailAsync(dto.Email);
+
+            if (existingUseremail != null)
+                throw new CustomException("Email já cadastrado!", HttpStatusCode.UnprocessableEntity);
+
             _cipher.ValidatePasswordPolicy(dto.Password);
 
             var entity = _mapper.Map<User>(dto);
@@ -100,6 +106,39 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
                  HttpStatusCode.InternalServerError);
         }
 
+        public async Task<bool> RemoveAsync(int id)
+        {
+            CustomException.ThrowIfLessThanOne(id, "Id");
+
+            var userRegistered = await _unitOfWork.Users.GetByIdAsync(id) ??
+                throw new CustomException("Nenhum Usuário foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
+
+            _unitOfWork.Users.Remove(userRegistered);
+            var result = await _unitOfWork.SaveAsync();
+
+            return result > 0 ? true : throw new CustomException(
+                "Não foi possível deletar o Usuário. Tente novamente!",
+                HttpStatusCode.InternalServerError);
+        }
+
+        public async Task<UserViewModel> LoginAsync(UserLoginInputModel dto)
+        {
+            CustomException.ThrowIfNull(dto, "Usuário");
+
+            if (string.IsNullOrEmpty(dto.Email))
+                throw new CustomException("O Email é obrigatório!", HttpStatusCode.UnprocessableEntity);
+            if (string.IsNullOrEmpty(dto.Password))
+                throw new CustomException("A Senha é obrigatória!", HttpStatusCode.UnprocessableEntity);
+
+            var user = await GetUserByEmailAsync(dto.Email) ?? throw new CustomException("Email e/ou Senha Inválidos!", HttpStatusCode.Unauthorized);
+
+            var isValid = _cipher.ValidatePassword(dto.Password, user.Password);
+
+            var viewModel = _mapper.Map<UserViewModel>(user);
+
+            return viewModel;
+        }
+
         public async Task<UserViewModel> UpdatePasswordAsync(int id, string newPassword)
         {
             if (string.IsNullOrEmpty(newPassword))
@@ -124,19 +163,11 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
                  HttpStatusCode.InternalServerError);
         }
 
-        public async Task<bool> RemoveAsync(int id)
+        private async Task<User> GetUserByEmailAsync(string email)
         {
-            CustomException.ThrowIfLessThanOne(id, "Id");
+            var users = await _unitOfWork.Users.FindAsync(x => x.Email == email);
 
-            var userRegistered = await _unitOfWork.Users.GetByIdAsync(id) ??
-                throw new CustomException("Nenhum Usuário foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
-
-            _unitOfWork.Users.Remove(userRegistered);
-            var result = await _unitOfWork.SaveAsync();
-
-            return result > 0 ? true : throw new CustomException(
-                "Não foi possível deletar o Usuário. Tente novamente!",
-                HttpStatusCode.InternalServerError);
+            return users.FirstOrDefault();
         }
     }
 }

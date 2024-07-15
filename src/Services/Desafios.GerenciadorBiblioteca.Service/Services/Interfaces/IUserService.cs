@@ -12,5 +12,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services.Interfaces
         Task<UserViewModel> UpdateAsync(int id, UserUpdateInputModel dto);
         Task<bool> RemoveAsync(int id);
         Task<IEnumerable<UserViewModel>> GetByNameAsync(string name);
+        Task<UserViewModel> LoginAsync(UserLoginInputModel dto);
+        Task<UserViewModel> UpdatePasswordAsync(int id, string newPassword);
     }
 }

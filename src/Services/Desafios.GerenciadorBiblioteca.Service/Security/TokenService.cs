@@ -13,7 +13,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Security
     {
         private readonly IConfiguration _configuration = configuration;
 
-        public TokenModel GenerateJwtToken(string id, string name, Roles role)
+        public TokenModel GenerateJwtToken(int id, string name, Roles role)
         {
             var claims = CreateClaims(id, name, role);
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
@@ -29,13 +29,13 @@ namespace Desafios.GerenciadorBiblioteca.Service.Security
             return new TokenModel(id, name, new JwtSecurityTokenHandler().WriteToken(token), role, token.ValidTo);
         }
 
-        private Claim[] CreateClaims(string id, string name, Roles role)
+        private Claim[] CreateClaims(int id, string name, Roles role)
         {
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, name),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.NameIdentifier, id),
+                new Claim(ClaimTypes.NameIdentifier, id.ToString()),
                 new Claim(ClaimTypes.Role, role.ToString())
             };
 

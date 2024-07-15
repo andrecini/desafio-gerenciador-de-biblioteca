@@ -9,16 +9,10 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class LoanController : ControllerBase
+    public class LoanController(ILogger<LoanController> logger, ILoanService service) : ControllerBase
     {
-        private readonly ILogger<LoanController> _logger;
-        private readonly ILoanService _service;
-
-        public LoanController(ILogger<LoanController> logger, ILoanService service)
-        {
-            _service = service;
-            _logger = logger;
-        }
+        private readonly ILogger<LoanController> _logger = logger;
+        private readonly ILoanService _service = service;
 
         [HttpGet]
         public async Task<IActionResult> GetAll()

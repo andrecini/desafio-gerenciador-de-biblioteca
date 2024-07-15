@@ -9,16 +9,10 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class InventoryController : ControllerBase
+    public class InventoryController(ILogger<InventoryController> logger, IInventoryService service) : ControllerBase
     {
-        private readonly ILogger<InventoryController> _logger;
-        private readonly IInventoryService _service;
-
-        public InventoryController(ILogger<InventoryController> logger, IInventoryService service)
-        {
-            _service = service;
-            _logger = logger;
-        }
+        private readonly ILogger<InventoryController> _logger = logger;
+        private readonly IInventoryService _service = service;
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
