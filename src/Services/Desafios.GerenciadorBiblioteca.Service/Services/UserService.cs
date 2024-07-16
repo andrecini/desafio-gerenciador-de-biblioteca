@@ -132,7 +132,9 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
 
             var user = await GetUserByEmailAsync(dto.Email) ?? throw new CustomException("Email e/ou Senha Inválidos!", HttpStatusCode.Unauthorized);
 
-            var isValid = _cipher.ValidatePassword(dto.Password, user.Password);
+            var passwordEncrypted = _cipher.Encrypt(dto.Password);
+            
+            var isValid = _cipher.ValidatePassword(passwordEncrypted, user.Password);
 
             var viewModel = _mapper.Map<UserViewModel>(user);
 

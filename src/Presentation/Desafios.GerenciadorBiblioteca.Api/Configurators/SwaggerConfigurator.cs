@@ -16,9 +16,6 @@ namespace Desafios.GerenciadorBiblioteca.Api.Configurators
                     Description = "API de Gerenciamento de Bibliotecas - Mentoria NextWave."
                 });
 
-                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                c.IncludeXmlComments(xmlPath);
 
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
@@ -27,7 +24,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Configurators
                     Name = "Authorization",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.Http,
-                    Description = "Acesso protegido utilizando o accessToken obtido em \"api/Authenticate/login\""
+                    Description = "Acesso protegido utilizando o accessToken obtido em \"api/Login\""
                 });
 
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement

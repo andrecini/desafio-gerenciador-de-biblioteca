@@ -20,6 +20,7 @@ namespace Desafios.GerenciadorBiblioteca.Service
             services.AddTransient<ILoanService, LoanService>();
 
             services.AddTransient<ICipherService, CipherService>();
+            services.AddTransient<ITokenService, TokenService>();
 
             return services;
         }
