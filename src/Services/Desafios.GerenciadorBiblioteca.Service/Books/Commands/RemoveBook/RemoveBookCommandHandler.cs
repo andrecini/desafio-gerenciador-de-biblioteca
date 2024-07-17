@@ -6,14 +6,9 @@ using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Books.Commands.RemoveBook
 {
-    public class RemoveBookCommandHandler : IRequestHandler<RemoveBookCommand, bool>
+    public class RemoveBookCommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<RemoveBookCommand, bool>
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public RemoveBookCommandHandler(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
         public async Task<bool> Handle(RemoveBookCommand request, CancellationToken cancellationToken)
         {

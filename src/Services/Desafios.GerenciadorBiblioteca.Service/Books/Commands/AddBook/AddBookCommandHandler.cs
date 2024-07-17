@@ -8,21 +8,13 @@ using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Books.Commands.AddBook
 {
-    public class AddBookCommandHandler : IRequestHandler<AddBookCommand, Book>
+    public class AddBookCommandHandler(IUnitOfWork unitOfWork, IMapper mapper) : IRequestHandler<AddBookCommand, Book>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-
-        public AddBookCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IMapper _mapper = mapper;
 
         public async Task<Book> Handle(AddBookCommand request, CancellationToken cancellationToken)
         {
-            CustomException.ThrowIfNull(request, "Livro");
-
             ValidatorHelper.ValidateEntity<AddBookCommandValidator, AddBookCommand>(request);
 
             var entity = _mapper.Map<Book>(request);
