@@ -1,8 +1,6 @@
 ﻿using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
 using Desafios.GerenciadorBiblioteca.Service.Helpers;
-using Desafios.GerenciadorBiblioteca.Service.Inventories.Queries.GetAllInventories;
-using Desafios.GerenciadorBiblioteca.Service.Inventories.Queries.GetInventoryByLibrary;
 using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces;
 using MediatR;
 

@@ -8,10 +8,9 @@ using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Inventories.Command.UpdateInventory
 {
-    public class UpdateInventoryCommandHandler(IUnitOfWork unitOfWork, IMapper mapper) : IRequestHandler<UpdateInventoryCommand, Inventory>
+    public class UpdateInventoryCommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<UpdateInventoryCommand, Inventory>
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
-        private readonly IMapper _mapper = mapper;
 
         public async Task<Inventory> Handle(UpdateInventoryCommand request, CancellationToken cancellationToken)
         {

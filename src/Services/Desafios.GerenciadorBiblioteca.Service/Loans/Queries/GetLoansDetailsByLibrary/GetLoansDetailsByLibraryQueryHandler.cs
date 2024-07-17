@@ -1,19 +1,13 @@
-﻿using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
-using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
+﻿using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
 using Desafios.GerenciadorBiblioteca.Service.Helpers;
 using MediatR;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Loans.Queries.GetLoansDetailsByLibrary
 {
-    public class GetLoansDetailsByLibraryQueryHandler : IRequestHandler<GetLoansDetailsByLibraryQuery, IEnumerable<LoanDetailsViewModel>>
+    public class GetLoansDetailsByLibraryQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetLoansDetailsByLibraryQuery, IEnumerable<LoanDetailsViewModel>>
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public GetLoansDetailsByLibraryQueryHandler(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
         public async Task<IEnumerable<LoanDetailsViewModel>> Handle(GetLoansDetailsByLibraryQuery request, CancellationToken cancellationToken)
         {
@@ -30,7 +24,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Loans.Queries.GetLoansDetailsBy
             var bookDict = books.ToDictionary(book => book.Id, book => book.Title);
             var userDict = users.ToDictionary(user => user.Id, user => user.Name);
 
-            var loansDtos = new List<LoanDetailsViewModel>();
+            var viewModels = new List<LoanDetailsViewModel>();
 
             foreach (var loan in loans)
             {
@@ -40,11 +34,13 @@ namespace Desafios.GerenciadorBiblioteca.Service.Loans.Queries.GetLoansDetailsBy
                     bookDict.TryGetValue(inventory.BookId, out var bookTitle) &&
                     userDict.TryGetValue(loan.UserId, out var userName))
                 {
-                    loansDtos.Add(new LoanDetailsViewModel(loan, bookTitle, userName));
+                    viewModels.Add(new LoanDetailsViewModel(loan, bookTitle, userName));
                 }
             }
 
-            return loansDtos;
+            var paginatedData = viewModels.Take(request.Size).Skip(request.Page);
+
+            return viewModels;
         }
     }
 }

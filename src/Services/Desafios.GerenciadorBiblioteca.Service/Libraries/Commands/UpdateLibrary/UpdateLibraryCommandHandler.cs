@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Desafios.GerenciadorBiblioteca.Domain.Entities;
+﻿using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
 using Desafios.GerenciadorBiblioteca.Service.Helpers;
@@ -8,10 +7,9 @@ using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Libraries.Commands.UpdateLibrary
 {
-    public class UpdateLibraryCommandHandler(IUnitOfWork unitOfWork, IMapper mapper) : IRequestHandler<UpdateLibraryCommand, Library>
+    public class UpdateLibraryCommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<UpdateLibraryCommand, Library>
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
-        private readonly IMapper _mapper = mapper;
 
         public async Task<Library> Handle(UpdateLibraryCommand request, CancellationToken cancellationToken)
         {

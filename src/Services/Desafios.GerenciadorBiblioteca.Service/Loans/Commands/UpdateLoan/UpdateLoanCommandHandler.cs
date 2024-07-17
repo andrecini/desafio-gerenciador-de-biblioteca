@@ -8,16 +8,9 @@ using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Loans.Commands.UpdateLoan
 {
-    public class UpdateLoanCommandHandler : IRequestHandler<UpdateLoanCommand, Loan>
+    public class UpdateLoanCommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<UpdateLoanCommand, Loan>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-
-        public UpdateLoanCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
         public async Task<Loan> Handle(UpdateLoanCommand request, CancellationToken cancellationToken)
         {
