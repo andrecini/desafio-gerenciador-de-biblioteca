@@ -11,23 +11,14 @@ using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Users.Commands.AddUser
 {
-    public class AddUserCommandHandler : IRequestHandler<AddUserCommand, UserViewModel>
+    public class AddUserCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICipherService cipher) : IRequestHandler<AddUserCommand, UserViewModel>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-        private readonly ICipherService _cipher;
-
-        public AddUserCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICipherService cipher)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-            _cipher = cipher;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IMapper _mapper = mapper;
+        private readonly ICipherService _cipher = cipher;
 
         public async Task<UserViewModel> Handle(AddUserCommand request, CancellationToken cancellationToken)
         {
-            CustomException.ThrowIfNull(request, "Usuário");
-
             ValidatorHelper.ValidateEntity<AddUserCommandValidator, AddUserCommand>(request);
 
             var existingUseremail = await _unitOfWork.Users.FindAsync(x => x.Email == request.Email);

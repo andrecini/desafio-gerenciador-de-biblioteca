@@ -2,21 +2,20 @@
 using Desafios.GerenciadorBiblioteca.Domain.Enums;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
+using Desafios.GerenciadorBiblioteca.Service.Helpers;
 using MediatR;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Loans.Queries.GetFilteredLoanDetails
 {
-    public class GetFilteredLoanDetailsQueryHandler : IRequestHandler<GetFilteredLoanDetailsQuery, IEnumerable<LoanDetailsViewModel>>
+    public class GetFilteredLoanDetailsQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetFilteredLoanDetailsQuery, IEnumerable<LoanDetailsViewModel>>
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public GetFilteredLoanDetailsQueryHandler(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
         public async Task<IEnumerable<LoanDetailsViewModel>> Handle(GetFilteredLoanDetailsQuery request, CancellationToken cancellationToken)
         {
+            ValidatorHelper.ValidateEntity<GetFilteredLoanDetailsQueryValidator, GetFilteredLoanDetailsQuery>(request);
+
+            //TODO: Refatorar com Dapper
             var filteredBooks = await _unitOfWork.Books.FindAsync(x => x.Title.Contains(request.BookName, StringComparison.CurrentCultureIgnoreCase));
             var filteredBooksIds = filteredBooks.Select(x => x.Id).ToHashSet();
 
@@ -53,7 +52,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Loans.Queries.GetFilteredLoanDe
             return paginatedLoansViewModels;
         }
 
-        private IEnumerable<Loan> FilterLoans(IEnumerable<Loan> loans, GetFilteredLoanDetailsQuery request)
+        private static IEnumerable<Loan> FilterLoans(IEnumerable<Loan> loans, GetFilteredLoanDetailsQuery request)
         {
             if (request.InventoryId > 0)
                 loans = loans.Where(x => x.InventoryId == request.InventoryId);

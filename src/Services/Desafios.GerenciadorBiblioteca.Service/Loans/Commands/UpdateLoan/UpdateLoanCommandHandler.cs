@@ -24,7 +24,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Loans.Commands.UpdateLoan
             ValidatorHelper.ValidateEntity<UpdateLoanCommandValidator, UpdateLoanCommand>(request);
 
             var loanRegistered = await _unitOfWork.Loans.GetByIdAsync(request.Id) ??
-                throw new CustomException("Nenhum Empréstimo foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
+                throw new CustomException("Nenhum Empréstimo foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound); //TODO: Criar Lógica de verificação de ID
 
             loanRegistered.UserId = request.UserId;
             loanRegistered.InventoryId = request.InventoryId;

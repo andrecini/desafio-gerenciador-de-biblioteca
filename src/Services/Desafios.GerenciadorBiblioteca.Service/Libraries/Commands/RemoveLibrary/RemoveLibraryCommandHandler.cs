@@ -6,19 +6,12 @@ using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Libraries.Commands.RemoveLibrary
 {
-    internal class RemoveLibraryCommandHandler : IRequestHandler<RemoveLibraryCommand, bool>
+    internal class RemoveLibraryCommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<RemoveLibraryCommand, bool>
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public RemoveLibraryCommandHandler(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
         public async Task<bool> Handle(RemoveLibraryCommand request, CancellationToken cancellationToken)
         {
-            ValidatorHelper.ValidateEntity<RemoveLibraryCommandValidator, RemoveLibraryCommand>(request);
-
             var libraryRegistered = await _unitOfWork.Libraries.GetByIdAsync(request.Id) ??
                 throw new CustomException("Nenhuma Biblioteca foi encontrada com essas informações. Tente novamente!", HttpStatusCode.NotFound);
 

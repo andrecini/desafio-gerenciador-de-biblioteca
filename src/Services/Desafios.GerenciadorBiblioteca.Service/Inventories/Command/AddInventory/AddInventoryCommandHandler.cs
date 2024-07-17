@@ -2,29 +2,19 @@
 using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
-using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
 using Desafios.GerenciadorBiblioteca.Service.Helpers;
-using Desafios.GerenciadorBiblioteca.Service.Validators;
 using MediatR;
 using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Inventories.Command.AddInventory
 {
-    public class AddInventoryCommandHandler : IRequestHandler<AddInventoryCommandHandler, IEnumerable<Book>>
+    public class AddInventoryCommandHandler(IUnitOfWork unitOfWork, IMapper mapper) : IRequestHandler<AddInventoryCommand, Inventory>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-
-        public AddInventoryCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IMapper _mapper = mapper;
 
         public async Task<Inventory> Handle(AddInventoryCommand request, CancellationToken cancellationToken)
         {
-            CustomException.ThrowIfNull(request, "Inventário");
-
             ValidatorHelper.ValidateEntity<AddInventoryCommandValidator, AddInventoryCommand>(request);
 
             var entity = _mapper.Map<Inventory>(request);

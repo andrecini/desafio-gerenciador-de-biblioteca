@@ -15,18 +15,11 @@ using System.Threading.Tasks;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Users.Commands.UpdateUserPassword
 {
-    public class UpdateUserPasswordCommandHandler : IRequestHandler<UpdateUserPasswordCommand, UserViewModel>
+    public class UpdateUserPasswordCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICipherService cipher) : IRequestHandler<UpdateUserPasswordCommand, UserViewModel>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-        private readonly ICipherService _cipher;
-
-        public UpdateUserPasswordCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICipherService cipher)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-            _cipher = cipher;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IMapper _mapper = mapper;
+        private readonly ICipherService _cipher = cipher;
 
         public async Task<UserViewModel> Handle(UpdateUserPasswordCommand request, CancellationToken cancellationToken)
         {

@@ -6,23 +6,16 @@ using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Loans.Commands.RemoveLoan
 {
-    public class RemoveLoanCommandHandler : IRequestHandler<RemoveLoanCommand, bool>
+    public class RemoveLoanCommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<RemoveLoanCommand, bool>
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public RemoveLoanCommandHandler(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
         public async Task<bool> Handle(RemoveLoanCommand request, CancellationToken cancellationToken)
         {
             ValidatorHelper.ValidateEntity<RemoveLoanCommandValidator, RemoveLoanCommand>(request);
 
-            CustomException.ThrowIfLessThanOne(request.Id, "Empréstimo");
-
             var loanRegistered = await _unitOfWork.Loans.GetByIdAsync(request.Id) ??
-                throw new CustomException("Nenhum Empréstimo foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
+                throw new CustomException("Nenhum Empréstimo foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound); //TODO: Criar Lógica de verificação de ID
 
             _unitOfWork.Loans.Remove(loanRegistered);
             var result = await _unitOfWork.SaveAsync();

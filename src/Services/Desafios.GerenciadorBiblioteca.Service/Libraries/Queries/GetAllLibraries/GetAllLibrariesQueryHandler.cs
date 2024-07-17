@@ -5,14 +5,9 @@ using MediatR;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Libraries.Queries.GetAllLibraries
 {
-    public class GetAllLibrariesQueryHandler : IRequestHandler<GetAllLibrariesQuery, IEnumerable<Library>>
+    public class GetAllLibrariesQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetAllLibrariesQuery, IEnumerable<Library>>
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public GetAllLibrariesQueryHandler(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
         public async Task<IEnumerable<Library>> Handle(GetAllLibrariesQuery request, CancellationToken cancellationToken)
         {

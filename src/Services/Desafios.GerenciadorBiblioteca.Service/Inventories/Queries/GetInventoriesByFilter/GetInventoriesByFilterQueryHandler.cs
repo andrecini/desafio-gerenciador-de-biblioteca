@@ -6,14 +6,9 @@ using MediatR;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Inventories.Queries.GetInventoriesByFilter
 {
-    public class GetInventoriesByFilterQueryHandler : IRequestHandler<GetInventoriesByFilterQuery, IEnumerable<Inventory>>
+    public class GetInventoriesByFilterQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetInventoriesByFilterQuery, IEnumerable<Inventory>>
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public GetInventoriesByFilterQueryHandler(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
         public async Task<IEnumerable<Inventory>> Handle(GetInventoriesByFilterQuery request, CancellationToken cancellationToken)
         {
@@ -30,7 +25,9 @@ namespace Desafios.GerenciadorBiblioteca.Service.Inventories.Queries.GetInventor
             if (request.Status == InventoryStatus.Unavailable)
                 data = data.Where(x => x.Available == false);
 
-            return data;
+            var paginatedData = data.Take(request.Size).Skip(request.Page);
+
+            return paginatedData;
         }
     }
 }

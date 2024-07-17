@@ -10,26 +10,18 @@ using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Books.Commands.UpdateBook
 {
-    public class UpdateBookCommandHandler : IRequestHandler<UpdateBookCommand, Book>
+    public class UpdateBookCommandHandler(IUnitOfWork unitOfWork, IMapper mapper) : IRequestHandler<UpdateBookCommand, Book>
     {
 
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-
-        public UpdateBookCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IMapper _mapper = mapper;
 
         public async Task<Book> Handle(UpdateBookCommand request, CancellationToken cancellationToken)
         {
-            CustomException.ThrowIfNull(request, "Livro");
-
             ValidatorHelper.ValidateEntity<UpdateBookCommandValidator, UpdateBookCommand>(request);
 
             var libraryRegistered = await _unitOfWork.Books.GetByIdAsync(request.Id) ??
-                throw new CustomException("Nenhum Livro foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
+                throw new CustomException("Nenhum Livro foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound); //TODO: Criar Lógica de verificação de ID
 
             libraryRegistered.Title = request.Title;
             libraryRegistered.Author = request.Author;

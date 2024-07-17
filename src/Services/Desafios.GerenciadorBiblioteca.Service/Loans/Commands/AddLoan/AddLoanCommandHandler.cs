@@ -11,18 +11,11 @@ using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Loans.Commands.AddLoan
 {
-    public class AddLoanCommandHandler : IRequestHandler<AddLoanCommand, Loan>
+    public class AddLoanCommandHandler(IUnitOfWork unitOfWork, IInventoryService inventoryService, IMapper mapper) : IRequestHandler<AddLoanCommand, Loan>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IInventoryService _inventoryService;
-        private readonly IMapper _mapper;
-
-        public AddLoanCommandHandler(IUnitOfWork unitOfWork, IInventoryService inventoryService, IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _inventoryService = inventoryService;
-            _mapper = mapper;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IInventoryService _inventoryService = inventoryService;
+        private readonly IMapper _mapper = mapper;
 
         public async Task<Loan> Handle(AddLoanCommand request, CancellationToken cancellationToken)
         {

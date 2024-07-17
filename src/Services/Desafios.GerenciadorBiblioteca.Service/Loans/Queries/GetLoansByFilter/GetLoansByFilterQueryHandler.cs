@@ -6,14 +6,9 @@ using MediatR;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Loans.Queries.GetLoansByFilter
 {
-    public class GetLoansByFilterQueryHandler : IRequestHandler<GetLoansByFilterQuery, IEnumerable<Loan>>
+    public class GetLoansByFilterQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetLoansByFilterQuery, IEnumerable<Loan>>
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public GetLoansByFilterQueryHandler(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
         public async Task<IEnumerable<Loan>> Handle(GetLoansByFilterQuery request, CancellationToken cancellationToken)
         {

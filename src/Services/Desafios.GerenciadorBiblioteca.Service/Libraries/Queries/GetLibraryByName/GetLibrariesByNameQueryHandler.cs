@@ -5,14 +5,9 @@ using MediatR;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Libraries.Queries.GetLibraryByName
 {
-    public class GetLibrariesByNameQueryHandler : IRequestHandler<GetLibrariesByNameQuery, IEnumerable<Library>>
+    public class GetLibrariesByNameQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetLibrariesByNameQuery, IEnumerable<Library>>
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public GetLibrariesByNameQueryHandler(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
         public async Task<IEnumerable<Library>> Handle(GetLibrariesByNameQuery request, CancellationToken cancellationToken)
         {
@@ -25,7 +20,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Libraries.Queries.GetLibraryByN
 
             var paginatedData = data.Take(request.Size).Skip(request.Page);
 
-            return data;
+            return paginatedData;
         }
     }
 }

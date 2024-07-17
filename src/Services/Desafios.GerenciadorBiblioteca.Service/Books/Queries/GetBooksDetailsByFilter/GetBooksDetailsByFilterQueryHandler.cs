@@ -8,20 +8,14 @@ using MediatR;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Books.Queries.GetBooksDetailsByFilter
 {
-    public class GetBooksDetailsByFilterQueryHandler : IRequestHandler<GetBooksDetailsByFilterQuery, IEnumerable<BookDetailsViewModel>>
+    public class GetBooksDetailsByFilterQueryHandler(IUnitOfWork unitOfWork, IInventoryService inventoryService) : IRequestHandler<GetBooksDetailsByFilterQuery, IEnumerable<BookDetailsViewModel>>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IInventoryService _inventoryService;
-
-        public GetBooksDetailsByFilterQueryHandler(IUnitOfWork unitOfWork, IInventoryService inventoryService)
-        {
-            _unitOfWork = unitOfWork;
-            _inventoryService = inventoryService;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IInventoryService _inventoryService = inventoryService;
 
         public async Task<IEnumerable<BookDetailsViewModel>> Handle(GetBooksDetailsByFilterQuery request, CancellationToken cancellationToken)
         {
-            ValidatorHelper.ValidateEntity<GetBooksDetailsByFilterQueryValidator, GetBooksDetailsByFilterQuery>(request);
+            ValidatorHelper.ValidateEntity<GetBooksDetailsByFilterQueryValidator, GetBooksDetailsByFilterQuery>(request); //TODO: Criar Chamada com Dapper
 
             var inventories = await _inventoryService.GetByLibraryAsync(request.LibraryId);
 

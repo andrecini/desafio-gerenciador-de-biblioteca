@@ -9,18 +9,11 @@ using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Users.Commands.UserLogin
 {
-    public class UserLoginCommandHandler : IRequestHandler<UserLoginCommand, UserViewModel>
+    public class UserLoginCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICipherService cipher) : IRequestHandler<UserLoginCommand, UserViewModel>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-        private readonly ICipherService _cipher;
-
-        public UserLoginCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICipherService cipher)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-            _cipher = cipher;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IMapper _mapper = mapper;
+        private readonly ICipherService _cipher = cipher;
 
         public async Task<UserViewModel> Handle(UserLoginCommand request, CancellationToken cancellationToken)
         {

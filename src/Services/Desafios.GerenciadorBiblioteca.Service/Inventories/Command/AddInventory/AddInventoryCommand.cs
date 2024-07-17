@@ -3,5 +3,5 @@ using MediatR;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Inventories.Command.AddInventory
 {
-    public record AddInventoryCommand(int LibraryId, int BookId) : IRequest<IEnumerable<Inventory>>;
+    public record AddInventoryCommand(int LibraryId, int BookId) : IRequest<Inventory>;
 }

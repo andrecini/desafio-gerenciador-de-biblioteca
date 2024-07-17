@@ -1,6 +1,6 @@
 ﻿using Desafios.GerenciadorBiblioteca.Domain.Entities;
-using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
+using Desafios.GerenciadorBiblioteca.Service.Helpers;
 using MediatR;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Libraries.Queries.GetLibraryById
@@ -16,11 +16,9 @@ namespace Desafios.GerenciadorBiblioteca.Service.Libraries.Queries.GetLibraryByI
 
         public async Task<Library> Handle(GetLibraryByIdQuery request, CancellationToken cancellationToken)
         {
-            var id = request.Id;
+            ValidatorHelper.ValidateEntity<GetLibraryByIdQueryValidator, GetLibraryByIdQuery>(request);
 
-            CustomException.ThrowIfLessThanOne(id, "Id");
-
-            var data = await _unitOfWork.Libraries.GetByIdAsync(id);
+            var data = await _unitOfWork.Libraries.GetByIdAsync(request.Id);
 
             return data;
         }

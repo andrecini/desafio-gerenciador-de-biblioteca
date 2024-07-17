@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
+﻿using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
 using Desafios.GerenciadorBiblioteca.Service.Helpers;
 using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces;
@@ -7,16 +6,10 @@ using MediatR;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Books.Queries.GetBooksDetailsByLibrary
 {
-    public class GetBooksDetailsByLibraryQueryHandler : IRequestHandler<GetBooksDetailsByLibraryQuery, IEnumerable<BookDetailsViewModel>>
+    public class GetBooksDetailsByLibraryQueryHandler(IUnitOfWork unitOfWork, IInventoryService inventoryService) : IRequestHandler<GetBooksDetailsByLibraryQuery, IEnumerable<BookDetailsViewModel>>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IInventoryService _inventoryService;
-
-        public GetBooksDetailsByLibraryQueryHandler(IUnitOfWork unitOfWork, IInventoryService inventoryService)
-        {
-            _unitOfWork = unitOfWork;
-            _inventoryService = inventoryService;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IInventoryService _inventoryService = inventoryService;
 
         public async Task<IEnumerable<BookDetailsViewModel>> Handle(GetBooksDetailsByLibraryQuery request, CancellationToken cancellationToken)
         {

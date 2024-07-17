@@ -5,14 +5,9 @@ using MediatR;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Books.Queries.GetBookById
 {
-    public class GetBookByIdQueryHandler : IRequestHandler<GetBookByIdQuery, Book>
+    public class GetBookByIdQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetBookByIdQuery, Book>
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public GetBookByIdQueryHandler(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
         public async Task<Book> Handle(GetBookByIdQuery request, CancellationToken cancellationToken)
         {

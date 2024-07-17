@@ -6,21 +6,16 @@ using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Inventories.Command.RemoveInventory
 {
-    public class RemoveInventoryCommandHandler : IRequestHandler<RemoveInventoryCommand, bool>
+    public class RemoveInventoryCommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<RemoveInventoryCommand, bool>
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public RemoveInventoryCommandHandler(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
         public async Task<bool> Handle(RemoveInventoryCommand request, CancellationToken cancellationToken)
         {
             ValidatorHelper.ValidateEntity<RemoveInventoryCommandValidator,  RemoveInventoryCommand>(request);
 
-            var InventoryRegistered = await _unitOfWork.Inventories.GetByIdAsync(id) ??
-                throw new CustomException("Nenhum Inventário foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
+            var InventoryRegistered = await _unitOfWork.Inventories.GetByIdAsync(request.Id) ??
+                throw new CustomException("Nenhum Inventário foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound); //TODO: Criar Lógica de verificação de ID
 
             _unitOfWork.Inventories.Remove(InventoryRegistered);
             var result = await _unitOfWork.SaveAsync();

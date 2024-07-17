@@ -6,14 +6,9 @@ using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Users.Commands.RemoveUser
 {
-    public class RemoveUserCommandHandler : IRequestHandler<RemoveUserCommand, bool>
+    public class RemoveUserCommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<RemoveUserCommand, bool>
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public RemoveUserCommandHandler(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
         public async Task<bool> Handle(RemoveUserCommand request, CancellationToken cancellationToken)
         {

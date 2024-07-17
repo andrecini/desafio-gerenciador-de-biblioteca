@@ -5,14 +5,9 @@ using MediatR;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Inventories.Queries.GetInventoryByLibrary
 {
-    public class GetInventoryByLibraryQueryHandler : IRequestHandler<GetInventoryByLibraryQuery, IEnumerable<Inventory>>
+    public class GetInventoryByLibraryQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetInventoryByLibraryQuery, IEnumerable<Inventory>>
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public GetInventoryByLibraryQueryHandler(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
         public async Task<IEnumerable<Inventory>> Handle(GetInventoryByLibraryQuery request, CancellationToken cancellationToken)
         {

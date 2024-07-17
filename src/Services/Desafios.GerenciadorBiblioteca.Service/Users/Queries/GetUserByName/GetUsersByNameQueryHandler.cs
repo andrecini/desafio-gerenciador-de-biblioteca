@@ -6,16 +6,10 @@ using MediatR;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Users.Queries.GetUserByName
 {
-    public class GetUsersByNameQueryHandler : IRequestHandler<GetUsersByNameQuery, IEnumerable<UserViewModel>>
+    public class GetUsersByNameQueryHandler(IUnitOfWork unitOfWork, IMapper mapper) : IRequestHandler<GetUsersByNameQuery, IEnumerable<UserViewModel>>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-
-        public GetUsersByNameQueryHandler(IUnitOfWork unitOfWork, IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IMapper _mapper = mapper;
 
         public async Task<IEnumerable<UserViewModel>> Handle(GetUsersByNameQuery request, CancellationToken cancellationToken)
         {

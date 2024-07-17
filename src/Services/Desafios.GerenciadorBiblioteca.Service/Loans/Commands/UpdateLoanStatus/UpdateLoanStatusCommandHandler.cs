@@ -8,23 +8,17 @@ using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Loans.Commands.UpdateLoanStatus
 {
-    public class UpdateLoanStatusCommandHandler : IRequestHandler<UpdateLoanStatusCommand, Loan>
+    public class UpdateLoanStatusCommandHandler(IUnitOfWork unitOfWork, IInventoryService inventoryService) : IRequestHandler<UpdateLoanStatusCommand, Loan>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IInventoryService _inventoryService;
-
-        public UpdateLoanStatusCommandHandler(IUnitOfWork unitOfWork, IInventoryService inventoryService)
-        {
-            _unitOfWork = unitOfWork;
-            _inventoryService = inventoryService;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IInventoryService _inventoryService = inventoryService;
 
         public async Task<Loan> Handle(UpdateLoanStatusCommand request, CancellationToken cancellationToken)
         {
             ValidatorHelper.ValidateEntity<UpdateLoanStatusCommandValidator, UpdateLoanStatusCommand>(request);
 
             var loanRegistered = await _unitOfWork.Loans.GetByIdAsync(request.Id) ??
-                throw new CustomException("Nenhum Empréstimo foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
+                throw new CustomException("Nenhum Empréstimo foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound); //TODO: Criar Lógica de verificação de ID
 
             loanRegistered.Returned = request.Returned;
 

@@ -1,6 +1,7 @@
 ﻿using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
+using Desafios.GerenciadorBiblioteca.Service.Helpers;
 using MediatR;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Loans.Queries.GetLoansDetailsByLibrary
@@ -16,11 +17,9 @@ namespace Desafios.GerenciadorBiblioteca.Service.Loans.Queries.GetLoansDetailsBy
 
         public async Task<IEnumerable<LoanDetailsViewModel>> Handle(GetLoansDetailsByLibraryQuery request, CancellationToken cancellationToken)
         {
-            var libraryId = request.LibraryId;
+            ValidatorHelper.ValidateEntity<GetLoansDetailsByLibraryQueryValidator, GetLoansDetailsByLibraryQuery>(request);
 
-            CustomException.ThrowIfLessThanOne(libraryId, "Empréstimo");
-
-            var inventories = await _unitOfWork.Inventories.FindAsync(x => x.LibraryId == libraryId);
+            var inventories = await _unitOfWork.Inventories.FindAsync(x => x.LibraryId == request.LibraryId);
             var allLoans = await _unitOfWork.Loans.GetAllAsync();
             var books = await _unitOfWork.Books.GetAllAsync();
             var users = await _unitOfWork.Users.GetAllAsync();

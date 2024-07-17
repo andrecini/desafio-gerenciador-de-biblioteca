@@ -15,7 +15,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Books.Commands.RemoveBook
             ValidatorHelper.ValidateEntity<RemoveBookCommandValidator, RemoveBookCommand>(request);
 
             var libraryRegistered = await _unitOfWork.Books.GetByIdAsync(request.Id) ??
-                throw new CustomException("Nenhum Livro foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
+                throw new CustomException("Nenhum Livro foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound); //TODO: Criar Lógica de verificação de ID
 
             _unitOfWork.Books.Remove(libraryRegistered);
             var result = await _unitOfWork.SaveAsync();

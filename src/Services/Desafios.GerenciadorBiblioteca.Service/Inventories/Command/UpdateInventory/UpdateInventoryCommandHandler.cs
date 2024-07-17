@@ -8,25 +8,17 @@ using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Inventories.Command.UpdateInventory
 {
-    public class UpdateInventoryCommandHandler : IRequestHandler<UpdateInventoryCommand, Inventory>
+    public class UpdateInventoryCommandHandler(IUnitOfWork unitOfWork, IMapper mapper) : IRequestHandler<UpdateInventoryCommand, Inventory>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-
-        public UpdateInventoryCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IMapper _mapper = mapper;
 
         public async Task<Inventory> Handle(UpdateInventoryCommand request, CancellationToken cancellationToken)
         {
-            CustomException.ThrowIfNull(request, "Inventário");
-
             ValidatorHelper.ValidateEntity<UpdateInventoryCommandValidator, UpdateInventoryCommand>(request);
 
             var InventoryRegistered = await _unitOfWork.Inventories.GetByIdAsync(request.Id) ??
-                throw new CustomException("Nenhum Inventário foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound);
+                throw new CustomException("Nenhum Inventário foi encontrado com essas informações. Tente novamente!", HttpStatusCode.NotFound); //TODO: Criar Lógica de verificação de ID
 
             InventoryRegistered.LibraryId = request.LibraryId;
             InventoryRegistered.BookId = request.BookId;
