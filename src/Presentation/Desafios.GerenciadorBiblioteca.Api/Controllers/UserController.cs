@@ -1,11 +1,11 @@
 using Desafios.GerenciadorBiblioteca.Api.Responses;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.AddUser;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.RemoveUser;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.UpdateUser;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Queries.GetAllUsers;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Queries.GetUserById;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Queries.GetUserByName;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
-using Desafios.GerenciadorBiblioteca.Service.Users.Commands.AddUser;
-using Desafios.GerenciadorBiblioteca.Service.Users.Commands.RemoveUser;
-using Desafios.GerenciadorBiblioteca.Service.Users.Commands.UpdateUser;
-using Desafios.GerenciadorBiblioteca.Service.Users.Queries.GetAllUsers;
-using Desafios.GerenciadorBiblioteca.Service.Users.Queries.GetUserById;
-using Desafios.GerenciadorBiblioteca.Service.Users.Queries.GetUserByName;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

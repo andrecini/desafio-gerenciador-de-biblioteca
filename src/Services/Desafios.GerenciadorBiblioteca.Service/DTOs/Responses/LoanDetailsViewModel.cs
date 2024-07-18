@@ -1,6 +1,12 @@
-﻿using Desafios.GerenciadorBiblioteca.Domain.Entities;
-
-namespace Desafios.GerenciadorBiblioteca.Service.DTOs.Responses
+﻿namespace Desafios.GerenciadorBiblioteca.Service.DTOs.Responses
 {
-    public record LoanDetailsViewModel(Loan LoanDetails, string BookName, string Username);
+    public record LoanDetailsViewModel(
+        int Id,
+        int InventoryId,
+        int UserId,
+        DateTime LoanDate,
+        DateTime LoanValidity,
+        bool Returned,
+        string BookName,
+        string Username);
 }

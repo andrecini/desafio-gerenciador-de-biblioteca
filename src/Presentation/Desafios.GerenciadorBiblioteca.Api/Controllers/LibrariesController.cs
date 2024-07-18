@@ -1,11 +1,11 @@
 using Desafios.GerenciadorBiblioteca.Api.Responses;
 using Desafios.GerenciadorBiblioteca.Domain.Entities;
-using Desafios.GerenciadorBiblioteca.Service.Libraries.Commands.AddLibrary;
-using Desafios.GerenciadorBiblioteca.Service.Libraries.Commands.RemoveLibrary;
-using Desafios.GerenciadorBiblioteca.Service.Libraries.Commands.UpdateLibrary;
-using Desafios.GerenciadorBiblioteca.Service.Libraries.Queries.GetAllLibraries;
-using Desafios.GerenciadorBiblioteca.Service.Libraries.Queries.GetLibraryById;
-using Desafios.GerenciadorBiblioteca.Service.Libraries.Queries.GetLibraryByName;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Commands.AddLibrary;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Commands.RemoveLibrary;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Commands.UpdateLibrary;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Queries.GetAllLibraries;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Queries.GetLibraryById;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Queries.GetLibraryByName;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,16 +1,13 @@
-using Azure.Core;
 using Desafios.GerenciadorBiblioteca.Api.Responses;
 using Desafios.GerenciadorBiblioteca.Domain.Entities;
-using Desafios.GerenciadorBiblioteca.Domain.Entities.Filters;
-using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
-using Desafios.GerenciadorBiblioteca.Service.Inventories.Command.AddInventory;
-using Desafios.GerenciadorBiblioteca.Service.Inventories.Command.RemoveInventory;
-using Desafios.GerenciadorBiblioteca.Service.Inventories.Command.UpdateInventory;
-using Desafios.GerenciadorBiblioteca.Service.Inventories.Command.UpdateInventoryStatus;
-using Desafios.GerenciadorBiblioteca.Service.Inventories.Queries.GetAllInventories;
-using Desafios.GerenciadorBiblioteca.Service.Inventories.Queries.GetInventoriesByFilter;
-using Desafios.GerenciadorBiblioteca.Service.Inventories.Queries.GetInventoryById;
-using Desafios.GerenciadorBiblioteca.Service.Inventories.Queries.GetInventoryByLibrary;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Command.AddInventory;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Command.RemoveInventory;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Command.UpdateInventory;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Command.UpdateInventoryStatus;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetAllInventories;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetInventoriesByFilter;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetInventoryById;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetInventoryByLibrary;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,17 +1,16 @@
 using Desafios.GerenciadorBiblioteca.Api.Responses;
 using Desafios.GerenciadorBiblioteca.Domain.Entities;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Commands.AddLoan;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Commands.RemoveLoan;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Commands.UpdateLoan;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Commands.UpdateLoanStatus;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetAllLoans;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetFilteredLoanDetails;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoanById;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansByFilter;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansByUser;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsByLibrary;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
-using Desafios.GerenciadorBiblioteca.Service.Libraries.Queries.GetLibraryById;
-using Desafios.GerenciadorBiblioteca.Service.Loans.Commands.AddLoan;
-using Desafios.GerenciadorBiblioteca.Service.Loans.Commands.RemoveLoan;
-using Desafios.GerenciadorBiblioteca.Service.Loans.Commands.UpdateLoan;
-using Desafios.GerenciadorBiblioteca.Service.Loans.Commands.UpdateLoanStatus;
-using Desafios.GerenciadorBiblioteca.Service.Loans.Queries.GetAllLoans;
-using Desafios.GerenciadorBiblioteca.Service.Loans.Queries.GetFilteredLoanDetails;
-using Desafios.GerenciadorBiblioteca.Service.Loans.Queries.GetLoanById;
-using Desafios.GerenciadorBiblioteca.Service.Loans.Queries.GetLoansByFilter;
-using Desafios.GerenciadorBiblioteca.Service.Loans.Queries.GetLoansByUser;
-using Desafios.GerenciadorBiblioteca.Service.Loans.Queries.GetLoansDetailsByLibrary;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -66,7 +65,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         }
 
         [HttpPost("filter/details")]
-        public async Task<IActionResult> GEtFilteredDetails(GetFilteredLoanDetailsQuery request)
+        public async Task<IActionResult> GEtFilteredDetails(GetLoansDetailsFilteredQuery request)
         {
             var data = await _mediator.Send(request);
 

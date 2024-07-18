@@ -1,5 +1,5 @@
-﻿@using Desafios.GerenciadorBiblioteca.Domain.Entities.Filters
-@using Desafios.GerenciadorBiblioteca.Domain.Enums
+﻿@using Desafios.GerenciadorBiblioteca.Domain.Enums
+@using Desafios.GerenciadorBiblioteca.Domain.Models.Filters
 @using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Common
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Libraries.Custom.Dialogs
@@ -43,24 +43,24 @@ else
             <col width="280" />
         </ColGroup>
         <HeaderContent>
-            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<LoanDetailsViewModel, object>(x =>  x.LoanDetails.Id)">ID</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<LoanDetailsViewModel, object>(x =>  x.Id)">ID</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<LoanDetailsViewModel, object>(x => x.BookName)" Class="w-100">Livro</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<LoanDetailsViewModel, object>(x => x.LoanDetails.LoanDate)">Data Empréstimo</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<LoanDetailsViewModel, object>(x => x.LoanDetails.LoanValidity)">Validade</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<LoanDetailsViewModel, object>(x => x.LoanDate)">Data Empréstimo</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<LoanDetailsViewModel, object>(x => x.LoanValidity)">Validade</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<LoanDetailsViewModel, object>(x => x.Username)">Responsável</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<LoanDetailsViewModel, object>(x => x.LoanDetails.Returned)">Status</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<LoanDetailsViewModel, object>(x => x.Returned)">Status</MudTableSortLabel></MudTh>
             <MudTh>Ações</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="ID">@context.LoanDetails.Id.ToString()</MudTd>
+            <MudTd DataLabel="ID">@context.Id.ToString()</MudTd>
             <MudTd DataLabel="Livro">@context.BookName</MudTd>
-            <MudTd DataLabel="Empréstimo">@context.LoanDetails.LoanDate.ToString("dd/MM/yyyy")</MudTd>
-            <MudTd DataLabel="Validade">@context.LoanDetails.LoanValidity.ToString("dd/MM/yyyy")</MudTd>
+            <MudTd DataLabel="Empréstimo">@context.LoanDate.ToString("dd/MM/yyyy")</MudTd>
+            <MudTd DataLabel="Validade">@context.LoanValidity.ToString("dd/MM/yyyy")</MudTd>
             <MudTd DataLabel="Responsáve">@context.Username</MudTd>
-            <MudTd DataLabel="Status">@(context.LoanDetails.Returned ? "Devolvido" : "Pendente")</MudTd>
+            <MudTd DataLabel="Status">@(context.Returned ? "Devolvido" : "Pendente")</MudTd>
             <MudTd DataLabel="Ações" Class="d-flex gap-2">
-                <MudButton Href="@($"/loans/details/{context.LoanDetails.Id}")" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Search">Detalhes</MudButton>
-                <MudButton @onclick="@((e) => DeleteDialogHandleAsync(context.LoanDetails.Id))" Variant="Variant.Outlined" Color="Color.Error" EndIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error">Excluir</MudButton>
+                <MudButton Href="@($"/loans/details/{context.Id}")" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Search">Detalhes</MudButton>
+                <MudButton @onclick="@((e) => DeleteDialogHandleAsync(context.Id))" Variant="Variant.Outlined" Color="Color.Error" EndIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error">Excluir</MudButton>
             </MudTd>
         </RowTemplate>
         <PagerContent>

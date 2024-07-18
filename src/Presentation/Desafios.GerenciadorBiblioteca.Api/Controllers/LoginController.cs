@@ -1,10 +1,10 @@
 ﻿using Azure.Core;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.UpdateUserPassword;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.UserLogin;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
 using Desafios.GerenciadorBiblioteca.Service.Security.Interfaces;
 using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces;
-using Desafios.GerenciadorBiblioteca.Service.Users.Commands.UpdateUserPassword;
-using Desafios.GerenciadorBiblioteca.Service.Users.Commands.UserLogin;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

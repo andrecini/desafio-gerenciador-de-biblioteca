@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Desafios.GerenciadorBiblioteca.Domain.Entities;
-using Desafios.GerenciadorBiblioteca.Domain.Entities.Filters;
 using Desafios.GerenciadorBiblioteca.Domain.Enums;
 using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
+using Desafios.GerenciadorBiblioteca.Domain.Models.Filters;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
@@ -155,7 +155,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
                     bookDict.TryGetValue(inventory.BookId, out var bookTitle) &&
                     userDict.TryGetValue(loan.UserId, out var userName))
                 {
-                    loansDtos.Add(new LoanDetailsViewModel(loan, bookTitle, userName));
+                    loansDtos.Add(new LoanDetailsViewModel(loan.Id, loan.InventoryId, loan.UserId, loan.LoanDate, loan.LoanValidity, loan.Returned, bookTitle, userName));
                 }
             }
 
@@ -192,7 +192,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Services
                     bookDict.TryGetValue(inventory.BookId, out var bookTitle) &&
                     userDict.TryGetValue(loan.UserId, out var userName))
                 {
-                    loansDtos.Add(new LoanDetailsViewModel(loan, bookTitle, userName));
+                    loansDtos.Add(new LoanDetailsViewModel(loan.Id, loan.InventoryId, loan.UserId, loan.LoanDate, loan.LoanValidity, loan.Returned, bookTitle, userName));
                 }
             }
 

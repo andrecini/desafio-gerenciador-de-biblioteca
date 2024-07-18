@@ -1,5 +1,5 @@
 ﻿using Desafios.GerenciadorBiblioteca.Domain.Entities;
-using Desafios.GerenciadorBiblioteca.Domain.Entities.Filters;
+using Desafios.GerenciadorBiblioteca.Domain.Models.Filters;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Services.Interfaces
