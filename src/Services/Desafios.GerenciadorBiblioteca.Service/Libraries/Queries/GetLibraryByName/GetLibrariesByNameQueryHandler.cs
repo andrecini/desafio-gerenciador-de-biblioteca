@@ -18,7 +18,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Libraries.Queries.GetLibraryByN
             if (!string.IsNullOrEmpty(request.Name))
                 return data.Where(x => x.Name.Contains(request.Name, StringComparison.CurrentCultureIgnoreCase));
 
-            var paginatedData = data.Take(request.Size).Skip(request.Page);
+            var paginatedData = data.Paginate(request.Page, request.Size);
 
             return paginatedData;
         }

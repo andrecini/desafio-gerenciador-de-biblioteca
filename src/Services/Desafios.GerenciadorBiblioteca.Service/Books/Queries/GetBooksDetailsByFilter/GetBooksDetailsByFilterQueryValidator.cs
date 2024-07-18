@@ -17,10 +17,6 @@ namespace Desafios.GerenciadorBiblioteca.Service.Books.Queries.GetBooksDetailsBy
             RuleFor(x => x.LibraryId)
                 .GreaterThanOrEqualTo(1)
                 .WithMessage("O Id da Biblioteca deve ser igual ou maior do que 1.");
-
-            RuleFor(x => x.Year)
-                .GreaterThanOrEqualTo(1)
-                .WithMessage("O Ano deve ser igual ou maior do que 1.");
         }
     }
 }

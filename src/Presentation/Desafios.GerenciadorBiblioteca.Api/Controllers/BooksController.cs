@@ -26,7 +26,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         {
             var data = await _mediator.Send(request);
 
-            var response = new CustomResponse<IEnumerable<Book>>(data, "Livros Recupedados com Sucesso!");
+            var response = new CustomResponse<IEnumerable<Book>>(data, "Livros Recuperados com Sucesso!");
 
             return data.Any() ? Ok(response) : NoContent();
         }
@@ -36,7 +36,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         {
             var data = await _mediator.Send(request);
 
-            var response = new CustomResponse<Book>(data, "Livro Recupedado com Sucesso!");
+            var response = new CustomResponse<Book>(data, "Livro Recuperado com Sucesso!");
 
             return data != null ? Ok(response) : NoContent();
         }
@@ -46,7 +46,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         {
             var data = await _mediator.Send(request);
 
-            var response = new CustomResponse<IEnumerable<Book>>(data, "Livros Recupedados com Sucesso!");
+            var response = new CustomResponse<IEnumerable<Book>>(data, "Livros Recuperados com Sucesso!");
 
             return data.Any() ? Ok(response) : NoContent();
         }
@@ -56,17 +56,17 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         {
             var data = await _mediator.Send(request);
 
-            var response = new CustomResponse<IEnumerable<BookDetailsViewModel>>(data, "Livros Recupedados com Sucesso!");
+            var response = new CustomResponse<IEnumerable<BookDetailsViewModel>>(data, "Livros Recuperados com Sucesso!");
 
             return data.Any() ? Ok(response) : NoContent();
         }
 
-        [HttpPost("library/{libraryId}")]
+        [HttpPost("library/{libraryId}/details")]
         public async Task<IActionResult> GetDetailsByLibrary(int libraryId, GetBooksDetailsByLibraryQuery request)
         {
             var data = await _mediator.Send(request);
 
-            var response = new CustomResponse<IEnumerable<BookDetailsViewModel>>(data, "Livros Recupedados com Sucesso!");
+            var response = new CustomResponse<IEnumerable<BookDetailsViewModel>>(data, "Livros Recuperados com Sucesso!");
 
             return data.Any() ? Ok(response) : NoContent();
         }

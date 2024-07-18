@@ -30,3 +30,4 @@ namespace Desafios.GerenciadorBiblioteca.Service.Libraries.Commands.UpdateLibrar
                 HttpStatusCode.InternalServerError);
         }
     }
+}

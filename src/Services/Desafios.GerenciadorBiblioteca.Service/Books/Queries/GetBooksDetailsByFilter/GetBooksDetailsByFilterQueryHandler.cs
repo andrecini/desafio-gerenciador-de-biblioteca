@@ -1,50 +1,63 @@
-﻿using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
+﻿using Dapper;
+using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
 using Desafios.GerenciadorBiblioteca.Service.Helpers;
 using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces;
 using MediatR;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
+using System.Text;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Books.Queries.GetBooksDetailsByFilter
 {
-    public class GetBooksDetailsByFilterQueryHandler(IUnitOfWork unitOfWork, IInventoryService inventoryService) : IRequestHandler<GetBooksDetailsByFilterQuery, IEnumerable<BookDetailsViewModel>>
+    public class GetBooksDetailsByFilterQueryHandler(IUnitOfWork unitOfWork, IInventoryService inventoryService, IConfiguration configuration) : IRequestHandler<GetBooksDetailsByFilterQuery, IEnumerable<BookDetailsViewModel>>
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IInventoryService _inventoryService = inventoryService;
+        private readonly string? _connectionString = configuration.GetConnectionString("DefaultConnection");
 
         public async Task<IEnumerable<BookDetailsViewModel>> Handle(GetBooksDetailsByFilterQuery request, CancellationToken cancellationToken)
         {
-            ValidatorHelper.ValidateEntity<GetBooksDetailsByFilterQueryValidator, GetBooksDetailsByFilterQuery>(request); //TODO: Criar Chamada com Dapper
+            ValidatorHelper.ValidateEntity<GetBooksDetailsByFilterQueryValidator, GetBooksDetailsByFilterQuery>(request); 
 
-            var inventories = await _inventoryService.GetByLibraryAsync(request.LibraryId);
+            using SqlConnection connection = new(_connectionString);
 
-            if (request.Available != 0)
-            {
-                bool isAvailable = request.Available == 1;
-                inventories = inventories.Where(x => x.Available == isAvailable).ToList();
-            }
+            StringBuilder sb = new();
 
-            var bookIds = inventories.Select(inv => inv.BookId).ToHashSet();
-            var allBooks = await _unitOfWork.Books.GetAllAsync();
+            sb.AppendLine(@"SELECT 
+	                        b.Id AS Id,
+                            b.Title AS Title,
+                            b.Author AS Author,
+                            b.ISBN AS ISBN,
+                            b.Year AS Year,
+	                        i.Id AS InventoryId,
+	                        i.Available AS Available
+                        FROM Books AS b
+                        INNER JOIN Inventories AS i
+                        ON b.Id = i.BookId
+                        WHERE i.LibraryId = @LibraryId");
 
             if (!string.IsNullOrEmpty(request.Title))
-                allBooks = allBooks.Where(x => x.Title.Contains(request.Title, StringComparison.CurrentCultureIgnoreCase));
+                sb.AppendLine("AND LOWER(b.Title) LIKE LOWER(@Title)");
             if (!string.IsNullOrEmpty(request.Author))
-                allBooks = allBooks.Where(x => x.Author.Contains(request.Author, StringComparison.CurrentCultureIgnoreCase));
+                sb.AppendLine("AND LOWER(b.Author) LIKE LOWER(@Author)");
             if (!string.IsNullOrEmpty(request.ISBN))
-                allBooks = allBooks.Where(x => x.ISBN.Contains(request.ISBN, StringComparison.CurrentCultureIgnoreCase));
+                sb.AppendLine("AND LOWER(b.ISBN) LIKE LOWER(@ISBN)");
             if (request.Year > 0)
-                allBooks = allBooks.Where(x => x.Year == request.Year);
+                sb.AppendLine("AND b.Year = @Year");
+            if (request.Available > 0)
+                sb.AppendLine("AND i.Available = @Available");
 
-            var filteredBooks = allBooks.Where(book => bookIds.Contains(book.Id)).ToList();
-
-            var data = filteredBooks.Select(book =>
-            {
-                var inventory = inventories.FirstOrDefault(inv => inv.BookId == book.Id);
-                bool availableFlag = inventory != null && inventory.Available;
-                return new BookDetailsViewModel(book, inventory.Id, availableFlag);
+            var data = await connection.QueryAsync<BookDetailsViewModel>(sb.ToString(), new {
+                request.LibraryId,
+                Title = $"%{request.Title}%",
+                Author = $"%{request.Author}%",
+                ISBN = $"%{request.ISBN}%",
+                request.Year,
+                Available = request.Available == 2 ? 0 : 1,
             });
 
-            var paginatedData = data.Take(request.Size).Skip(request.Page);
+            var paginatedData = data.Paginate(request.Page, request.Size);
 
             return paginatedData;
         }

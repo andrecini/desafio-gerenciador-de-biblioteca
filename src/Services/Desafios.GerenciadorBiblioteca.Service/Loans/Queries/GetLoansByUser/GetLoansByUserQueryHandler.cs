@@ -15,7 +15,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Loans.Queries.GetLoansByUser
 
             var data = await _unitOfWork.Loans.FindAsync(x => x.UserId == request.UserId);
 
-            var paginatedData = data.Take(request.Size).Skip(request.Page);
+            var paginatedData = data.Paginate(request.Page, request.Size);
 
             return paginatedData;
         }

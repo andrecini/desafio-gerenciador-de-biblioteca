@@ -1,9 +1,5 @@
-using Azure.Core;
 using Desafios.GerenciadorBiblioteca.Api.Responses;
-using Desafios.GerenciadorBiblioteca.Domain.Entities;
-using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
-using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces;
 using Desafios.GerenciadorBiblioteca.Service.Users.Commands.AddUser;
 using Desafios.GerenciadorBiblioteca.Service.Users.Commands.RemoveUser;
 using Desafios.GerenciadorBiblioteca.Service.Users.Commands.UpdateUser;

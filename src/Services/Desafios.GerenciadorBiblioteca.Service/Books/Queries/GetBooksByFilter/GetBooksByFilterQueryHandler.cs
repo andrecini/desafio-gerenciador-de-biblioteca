@@ -25,7 +25,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Books.Queries.GetBooksByFilter
             if (request.Year > 0)
                 data = data.Where(x => x.Year == request.Year);
 
-            var paginatedData = data.Take(request.Size).Skip(request.Page);
+            var paginatedData = data.Paginate(request.Page, request.Size);
 
             return paginatedData;
         }

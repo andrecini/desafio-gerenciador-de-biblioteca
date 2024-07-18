@@ -15,7 +15,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Inventories.Queries.GetInventor
 
             var data = await _unitOfWork.Inventories.FindAsync(x => x.LibraryId == request.LibraryId);
 
-            var paginatedData = data.Take(request.Size).Skip(request.Page);
+            var paginatedData = data.Paginate(request.Page, request.Size);
 
             return paginatedData;
         }

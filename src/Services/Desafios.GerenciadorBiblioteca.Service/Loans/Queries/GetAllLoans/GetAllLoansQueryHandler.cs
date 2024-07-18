@@ -15,7 +15,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Loans.Queries.GetAllLoans
 
             var data = await _unitOfWork.Loans.GetAllAsync();
             
-            var paginatedData = data.Take(request.Size).Skip(request.Page);
+            var paginatedData = data.Paginate(request.Page, request.Size);
 
             return paginatedData;
         }

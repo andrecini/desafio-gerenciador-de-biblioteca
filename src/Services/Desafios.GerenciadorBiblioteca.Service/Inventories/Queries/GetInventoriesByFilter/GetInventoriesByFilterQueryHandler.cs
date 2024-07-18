@@ -25,7 +25,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Inventories.Queries.GetInventor
             if (request.Status == InventoryStatus.Unavailable)
                 data = data.Where(x => x.Available == false);
 
-            var paginatedData = data.Take(request.Size).Skip(request.Page);
+            var paginatedData = data.Paginate(request.Page, request.Size);
 
             return paginatedData;
         }

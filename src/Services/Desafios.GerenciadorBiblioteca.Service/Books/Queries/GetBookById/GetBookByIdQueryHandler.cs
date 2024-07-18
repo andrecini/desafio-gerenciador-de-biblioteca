@@ -13,7 +13,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.Books.Queries.GetBookById
         {
             ValidatorHelper.ValidateEntity<GetBookByIdQueryValidator, GetBookByIdQuery>(request);
 
-            var data = await _unitOfWork.Books.GetByIdAsync(request.Id;
+            var data = await _unitOfWork.Books.GetByIdAsync(request.Id);
 
             return data;
         }

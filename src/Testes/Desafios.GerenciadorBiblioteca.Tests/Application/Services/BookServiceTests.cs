@@ -422,8 +422,8 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
             // Assert
             Assert.NotNull(result);
             Assert.Equal(2, result.Count());
-            Assert.Contains(result, dto => dto.BookDetails.Id == 1 && dto.InventoryId == 1 && dto.Available);
-            Assert.Contains(result, dto => dto.BookDetails.Id == 2 && dto.InventoryId == 2 && !dto.Available);
+            Assert.Contains(result, dto => dto.Id == 1 && dto.InventoryId == 1 && dto.Available);
+            Assert.Contains(result, dto => dto.Id == 2 && dto.InventoryId == 2 && !dto.Available);
         }
 
         [Fact]
@@ -475,8 +475,8 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
             // Assert
             Assert.NotNull(result);
             Assert.Equal(2, result.Count());
-            Assert.Contains(result, dto => dto.BookDetails.Id == 1 && dto.InventoryId == 1 && dto.Available);
-            Assert.Contains(result, dto => dto.BookDetails.Id == 2 && dto.InventoryId == 2 && !dto.Available);
+            Assert.Contains(result, dto => dto.Id == 1 && dto.InventoryId == 1 && dto.Available);
+            Assert.Contains(result, dto => dto.Id == 2 && dto.InventoryId == 2 && !dto.Available);
         }
 
         [Fact]
@@ -529,7 +529,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
             // Assert
             Assert.NotNull(result);
             Assert.Single(result);
-            Assert.Contains(result, dto => dto.BookDetails.Id == 1 && dto.InventoryId == 1 && dto.Available);
+            Assert.Contains(result, dto => dto.Id == 1 && dto.InventoryId == 1 && dto.Available);
         }
     }
 }
