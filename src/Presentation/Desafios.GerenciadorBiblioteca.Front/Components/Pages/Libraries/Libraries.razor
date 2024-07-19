@@ -1,9 +1,14 @@
 ﻿@page "/libraries"
+@using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Commands.RemoveLibrary
+@using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Queries.GetLibraryByName
+@using Desafios.GerenciadorBiblioteca.Service.DTOs
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Common
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Libraries.Custom.Dialogs
+@using Desafios.GerenciadorBiblioteca.Website.Services
 @rendermode InteractiveServer
-@inject ILibraryService libraryService
 @inject IDialogService DialogService
+@inject HttpService httpService
+@inject AlertService alertService
 
 <PageTitle>Bibliotecas</PageTitle>
 
@@ -69,12 +74,24 @@ else
 
     private async Task LoadLibrariesAsync()
     {
-        libraries = await libraryService.GetAllAsync();
+        var result = await httpService.GetAsync<CustomResponse<IEnumerable<Library>>>($"/api/libraries?page=1&size=10");
+
+        if (result.IsSuccess)
+            libraries = result.Content.Data;
+        else
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
     }
 
     private async Task FilterLibsHandleAsync()
     {
-        libraries = await libraryService.GetByNameAsync(libraryNameFilter);
+        GetLibrariesByNameQuery body = new(1, 10, libraryNameFilter);
+        var result = await httpService.PostAsync<GetLibrariesByNameQuery, CustomResponse<IEnumerable<Library>>>($"/api/Libraries/filter", body);
+
+        if (result.IsSuccess)
+            libraries = result.Content.Data;
+        else
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
+
         StateHasChanged();
     }
 
@@ -91,7 +108,13 @@ else
 
         if (!result.Canceled)
         {
-            await libraryService.RemoveAsync(id);
+            RemoveLibraryCommand body = new(id);
+
+            var deleteResult = await httpService.DeleteAsync<RemoveLibraryCommand>($"/api/Books/{id}", body);
+
+            if (!deleteResult.IsSuccess)
+                alertService.ShowErrors(deleteResult.ErrorDetails, deleteResult.StatusCode);
+
             await LoadLibrariesAsync();
         }
     }

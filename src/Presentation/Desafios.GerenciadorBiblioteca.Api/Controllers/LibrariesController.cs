@@ -20,8 +20,10 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> GetAll(GetAllLibrariesQuery request)
+        public async Task<IActionResult> GetAll(int page, int size)
         {
+            GetAllLibrariesQuery request = new(page, size);
+
             var response = await _mediator.Send(request);
 
             return Ok(response);
