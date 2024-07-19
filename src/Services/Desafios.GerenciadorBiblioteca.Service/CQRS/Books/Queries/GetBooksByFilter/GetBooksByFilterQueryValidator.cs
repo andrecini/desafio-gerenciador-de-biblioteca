@@ -13,10 +13,6 @@ namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Books.Queries.GetBooksByFi
             RuleFor(x => x.Size)
                 .GreaterThanOrEqualTo(5)
                 .WithMessage("O Tamanho da Página deve ser maior ou igual a 5.");
-
-            RuleFor(x => x.Year)
-                .GreaterThanOrEqualTo(1)
-                .WithMessage("O Ano deve ser maior ou igual a 1.");
         }
     }
 }

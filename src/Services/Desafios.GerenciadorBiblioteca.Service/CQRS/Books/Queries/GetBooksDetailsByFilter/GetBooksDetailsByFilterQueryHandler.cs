@@ -1,18 +1,19 @@
 ﻿using AutoMapper;
 using Desafios.GerenciadorBiblioteca.Domain.QueryModels.QueryRequests;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
+using Desafios.GerenciadorBiblioteca.Service.DTOs;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
 using Desafios.GerenciadorBiblioteca.Service.Helpers;
 using MediatR;
 
 namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Books.Queries.GetBooksDetailsByFilter
 {
-    public class GetBooksDetailsByFilterQueryHandler(IUnitOfWork unitOfWork, IMapper mapper) : IRequestHandler<GetBooksDetailsByFilterQuery, IEnumerable<BookDetailsViewModel>>
+    public class GetBooksDetailsByFilterQueryHandler(IUnitOfWork unitOfWork, IMapper mapper) : IRequestHandler<GetBooksDetailsByFilterQuery, CustomResponse<IEnumerable<BookDetailsViewModel>>>
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IMapper _mapper = mapper;
 
-        public async Task<IEnumerable<BookDetailsViewModel>> Handle(GetBooksDetailsByFilterQuery request, CancellationToken cancellationToken)
+        public async Task<CustomResponse<IEnumerable<BookDetailsViewModel>>> Handle(GetBooksDetailsByFilterQuery request, CancellationToken cancellationToken)
         {
             ValidatorHelper.ValidateEntity<GetBooksDetailsByFilterQueryValidator, GetBooksDetailsByFilterQuery>(request);
 
@@ -24,7 +25,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Books.Queries.GetBooksDeta
 
             var paginatedData = data.Paginate(request.Page, request.Size);
 
-            return paginatedData;
+            return new CustomResponse<IEnumerable<BookDetailsViewModel>>(paginatedData, "Livros recuperados com sucesso!", data.Count());
         }
     }
 }

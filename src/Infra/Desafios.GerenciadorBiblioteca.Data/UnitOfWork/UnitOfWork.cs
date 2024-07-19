@@ -21,7 +21,7 @@ namespace Desafios.GerenciadorBiblioteca.Data.UnitOfWork
             _context = context;
 
             Books = new BookRepository(_context, configuration);
-            Libraries = new LibraryRepository(_context);
+            Libraries = new LibraryRepository(_context, configuration);
             Users = new UserRepository(_context);
             Inventories = new InventoryRepository(_context);
             Loans = new LoanRepository(_context, configuration);

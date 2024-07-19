@@ -1,10 +1,11 @@
 ﻿@using System.ComponentModel.DataAnnotations
+@using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Queries.GetLibrariesByBookFiltered
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Users.Custom.Panels
-
-@inject IBookService bookService;
-@inject ILibraryService libraryService
-@inject IInventoryService inventoryService
-@inject IDialogService DialogService
+@using Desafios.GerenciadorBiblioteca.Website.Models.Responses
+@using Desafios.GerenciadorBiblioteca.Website.Services
+@inject IDialogService dialogService
+@inject HttpService httpService
+@inject AlertService alertService
 
 <PageTitle>Livros</PageTitle>
 
@@ -59,32 +60,29 @@ else
 
     private async Task InitializeDataAsync()
     {
-        await InitializeInventoriesAsync();
         await InitializeLibrariesAsync();
-    }
-
-    private async Task InitializeInventoriesAsync()
-    {
-        inventories = await inventoryService.GetAllAsync();
-        inventories = inventories.Where(x => x.BookId == Id);
     }
 
     private async Task InitializeLibrariesAsync()
     {
-        libraries = await libraryService.GetAllAsync();
-        FilterLibraries();
-    }
+        var result = await httpService.GetAsync<CustomResponse<IEnumerable<Library>>>($"/api/Libraries/book/{Id}?page=1&size=10");
 
-    private void FilterLibraries()
-    {
-        var libraryIds = inventories.Select(x => x.LibraryId);
-        libraries = libraries.Where(x => libraryIds.Contains(x.Id));
+        if (!result.IsSuccess)
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
+        else
+            libraries = result.Content.Data;
     }
 
     private async Task FilterLibsHandleAsync()
     {
-        libraries = await libraryService.GetByNameAsync(libraryNameFilter);
-        FilterLibraries();
+        GetLibrariesByBookFilteredQuery body = new(1, 10, Id, libraryNameFilter);
+        var result = await httpService.PostAsync<GetLibrariesByBookFilteredQuery, CustomResponse<IEnumerable<Library>>>($"/api/Libraries/book/{Id}/filtered", body);
+
+        if (!result.IsSuccess)
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
+        else
+            libraries = result.Content.Data;
+
         StateHasChanged();
     }
 

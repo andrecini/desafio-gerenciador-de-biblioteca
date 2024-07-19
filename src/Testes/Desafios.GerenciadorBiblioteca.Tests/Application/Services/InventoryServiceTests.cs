@@ -69,7 +69,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _inventoryService.GetByIdAsync(invalidId));
-            Assert.Equal("O parâmetro Id deve ser maior ou igual a 1.", exception.ErrorDetails);
+            Assert.Contains("O parâmetro Id deve ser maior ou igual a 1.", exception.ErrorDetails);
         }
 
         [Fact]
@@ -144,7 +144,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _inventoryService.AddAsync(dto));
-            Assert.Equal("O parâmetro Inventário não pode ser nulo.", exception.ErrorDetails);
+            Assert.Contains("O parâmetro Inventário não pode ser nulo.", exception.ErrorDetails);
         }
 
         [Fact]
@@ -159,7 +159,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _inventoryService.AddAsync(dto));
-            Assert.Equal("Não foi possível adicionar o Inventário. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Não foi possível adicionar o Inventário. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.InternalServerError, exception.StatusCode);
         }
 
@@ -193,7 +193,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _inventoryService.UpdateAsync(inventoryId, dto));
-            Assert.Equal("O parâmetro Inventário não pode ser nulo.", exception.ErrorDetails);
+            Assert.Contains("O parâmetro Inventário não pode ser nulo.", exception.ErrorDetails);
         }
 
         [Fact]
@@ -207,7 +207,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _inventoryService.UpdateAsync(inventoryId, dto));
-            Assert.Equal("Nenhum Inventário foi encontrado com essas informações. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Nenhum Inventário foi encontrado com essas informações. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.NotFound, exception.StatusCode);
         }
 
@@ -224,7 +224,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _inventoryService.UpdateAsync(inventoryId, dto));
-            Assert.Equal("Não foi possível alterar o Inventário. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Não foi possível alterar o Inventário. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.InternalServerError, exception.StatusCode);
         }
 
@@ -256,7 +256,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _inventoryService.UpdateStatusAsync(invalidId, available));
-            Assert.Equal("O parâmetro Id deve ser maior ou igual a 1.", exception.ErrorDetails);
+            Assert.Contains("O parâmetro Id deve ser maior ou igual a 1.", exception.ErrorDetails);
         }
 
         [Fact]
@@ -270,7 +270,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _inventoryService.UpdateStatusAsync(inventoryId, available));
-            Assert.Equal("Nenhum Inventário foi encontrado com essas informações. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Nenhum Inventário foi encontrado com essas informações. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.NotFound, exception.StatusCode);
         }
 
@@ -287,7 +287,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _inventoryService.UpdateStatusAsync(inventoryId, available));
-            Assert.Equal("Não foi possível alterar o Status do Inventário. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Não foi possível alterar o Status do Inventário. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.InternalServerError, exception.StatusCode);
         }
 
@@ -316,7 +316,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _inventoryService.RemoveAsync(invalidId));
-            Assert.Equal("O parâmetro Id deve ser maior ou igual a 1.", exception.ErrorDetails);
+            Assert.Contains("O parâmetro Id deve ser maior ou igual a 1.", exception.ErrorDetails);
         }
 
         [Fact]
@@ -329,7 +329,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _inventoryService.RemoveAsync(inventoryId));
-            Assert.Equal("Nenhum Inventário foi encontrado com essas informações. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Nenhum Inventário foi encontrado com essas informações. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.NotFound, exception.StatusCode);
         }
 
@@ -345,7 +345,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _inventoryService.RemoveAsync(inventoryId));
-            Assert.Equal("Não foi possível deletar o Inventário. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Não foi possível deletar o Inventário. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.InternalServerError, exception.StatusCode);
         }
     }

@@ -8,8 +8,8 @@ using Desafios.GerenciadorBiblioteca.Service.CQRS.Books.Queries.GetBooksDetailsB
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Command.AddInventory;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Commands.AddLibrary;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Commands.AddLoan;
-using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetFilteredLoanDetails;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsByLibrary;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsFiltered;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.AddUser;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
@@ -58,10 +58,10 @@ namespace Desafios.GerenciadorBiblioteca.Service.Mapping
 
             CreateMap<GetBooksDetailsByFilterQuery, BookDetailsFilteredQueryRequest>()
                 .ForMember(x => x.LibraryId, opt => opt.MapFrom(src => src.LibraryId))
-                .ForMember(x => x.Title, opt => opt.MapFrom(src => src.Title))
-                .ForMember(x => x.Author, opt => opt.MapFrom(src => src.Author))
-                .ForMember(x => x.ISBN, opt => opt.MapFrom(src => src.ISBN))
-                .ForMember(x => x.Year, opt => opt.MapFrom(src => src.Year))
+                .ForMember(x => x.Title, opt => opt.MapFrom(src =>  $"%{src.Title}%"))
+                .ForMember(x => x.Author, opt => opt.MapFrom(src => $"%{src.Author}%"))
+                .ForMember(x => x.ISBN, opt => opt.MapFrom(src => $"%{src.ISBN}%"))
+                .ForMember(x => x.Year, opt => opt.MapFrom(src => $"%{src.Year}%"))
                 .ForMember(x => x.Available, opt => opt.MapFrom(src => src.Available));
 
             CreateMap<BookDetailsQueryResult, BookDetailsViewModel>()
@@ -93,8 +93,8 @@ namespace Desafios.GerenciadorBiblioteca.Service.Mapping
                 .ForMember(x => x.LoanDate, opt => opt.MapFrom(src => src.LoanDate))
                 .ForMember(x => x.LoanValidity, opt => opt.MapFrom(src => src.LoanValidity))
                 .ForMember(x => x.Status, opt => opt.MapFrom(src => src.Status))
-                .ForMember(x => x.BookName, opt => opt.MapFrom(src => src.BookName))
-                .ForMember(x => x.UserName, opt => opt.MapFrom(src => src.UserName));
+                .ForMember(x => x.BookName, opt => opt.MapFrom(src => $"%{src.BookName}%"))
+                .ForMember(x => x.UserName, opt => opt.MapFrom(src => $"%{src.UserName}%"));
 
             CreateMap<LoanDetailsQueryResult, LoanDetailsViewModel>()
                 .ForMember(x => x.Id, opt => opt.MapFrom(src => src.Id))

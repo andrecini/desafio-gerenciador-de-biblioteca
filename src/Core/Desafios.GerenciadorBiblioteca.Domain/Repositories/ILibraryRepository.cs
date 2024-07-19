@@ -5,5 +5,7 @@ namespace Desafios.GerenciadorBiblioteca.Domain.Repositories
 {
     public interface ILibraryRepository : IGenericRepository<Library, int>
     {
+        Task<IEnumerable<Library>> GetLibrariesByBook(int bookId);
+        Task<IEnumerable<Library>> GetLibrariesByBookFiltered(int bookId, string name);
     }
 }

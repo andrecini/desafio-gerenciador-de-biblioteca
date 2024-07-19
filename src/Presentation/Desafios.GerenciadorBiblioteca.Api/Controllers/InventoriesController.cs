@@ -5,6 +5,7 @@ using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Command.RemoveInve
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Command.UpdateInventory;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Command.UpdateInventoryStatus;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetAllInventories;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetAllInventoriesCount;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetInventoriesByFilter;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetInventoryById;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetInventoryByLibrary;
@@ -25,8 +26,9 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         public async Task<IActionResult> GetAll(GetAllInventoriesQuery request)
         {
             var data = await _mediator.Send(request);
+            var total = await _mediator.Send(new GetAllInventoriesCountQuery());
 
-            var response = new CustomResponse<IEnumerable<Inventory>>(data, "Inventários Recupedados com Sucesso!");
+            var response = new CustomResponse<IEnumerable<Inventory>>(data, "Inventários Recupedados com Sucesso!", total);
 
             return data.Any() ? Ok(response) : NoContent();
         }
@@ -45,8 +47,9 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         public async Task<IActionResult> GetByLibrary(int libraryId, GetInventoryByLibraryQuery request)
         {
             var data = await _mediator.Send(request);
+            var total = await _mediator.Send(new GetAllInventoriesCountQuery());
 
-            var response = new CustomResponse<IEnumerable<Inventory>>(data, "Inventários Recupedado com Sucesso!");
+            var response = new CustomResponse<IEnumerable<Inventory>>(data, "Inventários Recupedado com Sucesso!", total);
 
             return data != null ? Ok(response) : NoContent();
         }
@@ -55,8 +58,9 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         public async Task<IActionResult> Filter(GetInventoriesByFilterQuery request)
         {
             var data = await _mediator.Send(request);
+            var total = await _mediator.Send(new GetAllInventoriesCountQuery());
 
-            var response = new CustomResponse<IEnumerable<Inventory>>(data, "Inventários Recupedados com Sucesso!");
+            var response = new CustomResponse<IEnumerable<Inventory>>(data, "Inventários Recupedados com Sucesso!", total);
 
             return data.Any() ? Ok(response) : NoContent();
         }

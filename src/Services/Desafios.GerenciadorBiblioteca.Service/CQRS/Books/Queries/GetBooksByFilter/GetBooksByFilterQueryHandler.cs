@@ -1,15 +1,16 @@
 ﻿using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
+using Desafios.GerenciadorBiblioteca.Service.DTOs;
 using Desafios.GerenciadorBiblioteca.Service.Helpers;
 using MediatR;
 
 namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Books.Queries.GetBooksByFilter
 {
-    public class GetBooksByFilterQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetBooksByFilterQuery, IEnumerable<Book>>
+    public class GetBooksByFilterQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetBooksByFilterQuery, CustomResponse<IEnumerable<Book>>>
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-        public async Task<IEnumerable<Book>> Handle(GetBooksByFilterQuery request, CancellationToken cancellationToken)
+        public async Task<CustomResponse<IEnumerable<Book>>> Handle(GetBooksByFilterQuery request, CancellationToken cancellationToken)
         {
             ValidatorHelper.ValidateEntity<GetBooksByFilterQueryValidator, GetBooksByFilterQuery>(request);
 
@@ -26,7 +27,8 @@ namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Books.Queries.GetBooksByFi
 
             var paginatedData = data.Paginate(request.Page, request.Size);
 
-            return paginatedData;
+            return new CustomResponse<IEnumerable<Book>>(paginatedData, "Livros recuperados com sucesso!", data.Count());
+
         }
     }
 }

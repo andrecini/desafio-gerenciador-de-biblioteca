@@ -3,6 +3,7 @@ using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.AddUser;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.RemoveUser;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.UpdateUser;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Queries.GetAllUsers;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Queries.GetAllUsersCount;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Queries.GetUserById;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Queries.GetUserByName;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
@@ -22,7 +23,9 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         public async Task<IActionResult> GetAll(GetAllUsersQuery request)
         {
             var data = await _mediator.Send(request);
-            var response = new CustomResponse<IEnumerable<UserViewModel>>(data, "Usuários Recupedados com Sucesso!");
+            var total = await _mediator.Send(new GetAllUsersCountQuery());
+            
+            var response = new CustomResponse<IEnumerable<UserViewModel>>(data, "Usuários Recupedados com Sucesso!", total);
 
             return data.Any() ? Ok(data) : NoContent();
         }
@@ -41,8 +44,9 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         public async Task<IActionResult> GetFiltered(GetUsersByNameQuery request)
         {
             var data = await _mediator.Send(request);
+            var total = await _mediator.Send(new GetAllUsersCountQuery());
 
-            var response = new CustomResponse<IEnumerable<UserViewModel>>(data, "Usuários Recupedados com Sucesso!");
+            var response = new CustomResponse<IEnumerable<UserViewModel>>(data, "Usuários Recupedados com Sucesso!", total);
 
             return data.Any() ? Ok(data) : NoContent();
         }

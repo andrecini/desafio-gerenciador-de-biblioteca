@@ -3,14 +3,14 @@ using Desafios.GerenciadorBiblioteca.Domain.Enums;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
 using MediatR;
 
-namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetFilteredLoanDetails
+namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsFiltered
 {
     public record GetLoansDetailsFilteredQuery(
         int Page,
         int Size,
         int LibraryId,
-        string BookName,
-        string UserName,
+        string? BookName,
+        string? UserName,
         DateTime LoanDate,
         DateTime LoanValidity,
         LoanStatus Status) : IRequest<IEnumerable<LoanDetailsViewModel>>;

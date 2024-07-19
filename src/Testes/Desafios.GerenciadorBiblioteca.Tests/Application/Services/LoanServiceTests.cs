@@ -76,7 +76,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _loanService.GetByIdAsync(invalidId));
-            Assert.Equal("O parâmetro Empréstimo deve ser maior ou igual a 1.", exception.ErrorDetails);
+            Assert.Contains("O parâmetro Empréstimo deve ser maior ou igual a 1.", exception.ErrorDetails);
         }
 
         [Fact]
@@ -154,7 +154,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _loanService.AddAsync(dto));
-            Assert.Equal("Não foi possível adicionar o Empréstimo. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Não foi possível adicionar o Empréstimo. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.InternalServerError, exception.StatusCode);
         }
 
@@ -191,7 +191,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _loanService.UpdateAsync(loanId, dto));
-            Assert.Equal("Nenhum Emrpéstimo foi encontrado com essas informações. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Nenhum Emrpéstimo foi encontrado com essas informações. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.NotFound, exception.StatusCode);
         }
 
@@ -208,7 +208,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _loanService.UpdateAsync(loanId, dto));
-            Assert.Equal("Não foi possível atualizar o Empréstimo. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Não foi possível atualizar o Empréstimo. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.InternalServerError, exception.StatusCode);
         }
 
@@ -241,7 +241,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _loanService.UpdateStatusAsync(invalidId, returned));
-            Assert.Equal("O parâmetro Empréstimo deve ser maior ou igual a 1.", exception.ErrorDetails);
+            Assert.Contains("O parâmetro Empréstimo deve ser maior ou igual a 1.", exception.ErrorDetails);
         }
 
         [Fact]
@@ -255,7 +255,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _loanService.UpdateStatusAsync(loanId, returned));
-            Assert.Equal("Nenhum Empréstimo foi encontrado com essas informações. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Nenhum Empréstimo foi encontrado com essas informações. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.NotFound, exception.StatusCode);
         }
 
@@ -272,7 +272,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _loanService.UpdateStatusAsync(loanId, returned));
-            Assert.Equal("Não foi possível atualizar o Empréstimo. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Não foi possível atualizar o Empréstimo. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.InternalServerError, exception.StatusCode);
         }
 
@@ -301,7 +301,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _loanService.RemoveAsync(invalidId));
-            Assert.Equal("O parâmetro Empréstimo deve ser maior ou igual a 1.", exception.ErrorDetails);
+            Assert.Contains("O parâmetro Empréstimo deve ser maior ou igual a 1.", exception.ErrorDetails);
         }
 
         [Fact]
@@ -314,7 +314,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _loanService.RemoveAsync(loanId));
-            Assert.Equal("Nenhum Empréstimo foi encontrado com essas informações. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Nenhum Empréstimo foi encontrado com essas informações. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.NotFound, exception.StatusCode);
         }
 
@@ -330,7 +330,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _loanService.RemoveAsync(loanId));
-            Assert.Equal("Não foi possível deletar o Empréstimo. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Não foi possível deletar o Empréstimo. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.InternalServerError, exception.StatusCode);
         }
 

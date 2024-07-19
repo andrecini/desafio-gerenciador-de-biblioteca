@@ -1,6 +1,3 @@
-using Desafios.GerenciadorBiblioteca.Api.Responses;
-using Desafios.GerenciadorBiblioteca.Domain.Entities;
-using Desafios.GerenciadorBiblioteca.Domain.QueryModels.QueryResults;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Books.Commands.AddBook;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Books.Commands.RemoveBook;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Books.Commands.UpdateBook;
@@ -9,7 +6,6 @@ using Desafios.GerenciadorBiblioteca.Service.CQRS.Books.Queries.GetBookById;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Books.Queries.GetBooksByFilter;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Books.Queries.GetBooksDetailsByFilter;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Books.Queries.GetBooksDetailsByLibrary;
-using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,63 +19,55 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         private readonly IMediator _mediator = mediator;
 
         [HttpGet]
-        public async Task<IActionResult> GetAll(GetAllBooksQuery request)
+        public async Task<IActionResult> GetAll(int page, int size)
         {
-            var data = await _mediator.Send(request);
+            GetAllBooksQuery request = new(page, size);
 
-            var response = new CustomResponse<IEnumerable<Book>>(data, "Livros Recuperados com Sucesso!");
+            var response = await _mediator.Send(request);
 
-            return data.Any() ? Ok(response) : NoContent();
+            return Ok(response);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id, GetBookByIdQuery request)
+        public async Task<IActionResult> GetById(int id)
         {
-            var data = await _mediator.Send(request);
+            GetBookByIdQuery request = new(id);
 
-            var response = new CustomResponse<Book>(data, "Livro Recuperado com Sucesso!");
+            var response = await _mediator.Send(request);
 
-            return data != null ? Ok(response) : NoContent();
+            return Ok(response);
         }
 
         [HttpPost("filter")]
         public async Task<IActionResult> Filter(GetBooksByFilterQuery request)
         {
-            var data = await _mediator.Send(request);
+            var response = await _mediator.Send(request);
 
-            var response = new CustomResponse<IEnumerable<Book>>(data, "Livros Recuperados com Sucesso!");
-
-            return data.Any() ? Ok(response) : NoContent();
+            return Ok(response);
         }
 
         [HttpPost("filter/details")]
         public async Task<IActionResult> GetDetailsByFilter(GetBooksDetailsByFilterQuery request)
         {
-            var data = await _mediator.Send(request);
+            var response = await _mediator.Send(request);
 
-            var response = new CustomResponse<IEnumerable<BookDetailsViewModel>>(data, "Livros Recuperados com Sucesso!");
-
-            return data.Any() ? Ok(response) : NoContent();
+            return Ok(response);
         }
 
         [HttpPost("library/{libraryId}/details")]
         public async Task<IActionResult> GetDetailsByLibrary(int libraryId, GetBooksDetailsByLibraryQuery request)
         {
-            var data = await _mediator.Send(request);
+            var response = await _mediator.Send(request);
 
-            var response = new CustomResponse<IEnumerable<BookDetailsViewModel>>(data, "Livros Recuperados com Sucesso!");
-
-            return data.Any() ? Ok(response) : NoContent();
+            return Ok(response);
         }
 
         [HttpPost]
         public async Task<IActionResult> Add(AddBookCommand request)
         {
-            var data = await _mediator.Send(request);
+            var response = await _mediator.Send(request);
 
-            var response = new CustomResponse<Book>(data, "Livro Adicionado com Sucesso!");
-
-            var locationUri = Url.Link(nameof(GetById), new { id = data.Id });
+            var locationUri = Url.Link(nameof(GetById), new { id = response.Data.Id });
 
             return Created(locationUri, response);
         }
@@ -87,9 +75,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateBookCommand request)
         {
-            var data = await _mediator.Send(request);
-
-            var response = new CustomResponse<Book>(data, "Livro Atualizado com Sucesso!");
+            var response = await _mediator.Send(request);
 
             return Ok(response);
         }
@@ -97,9 +83,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Remove(int id, RemoveBookCommand request)
         {
-            var data = await _mediator.Send(request);
-
-            var response = new CustomResponse<bool>(data, "Livro Removido com Sucesso!");
+            var response = await _mediator.Send(request);
 
             return Ok(response);
         }
