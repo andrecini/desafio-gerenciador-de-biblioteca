@@ -5,11 +5,12 @@ using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Commands.RemoveLoan;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Commands.UpdateLoan;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Commands.UpdateLoanStatus;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetAllLoans;
-using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetFilteredLoanDetails;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetAllLoansCount;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoanById;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansByFilter;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansByUser;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsByLibrary;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsFiltered;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -28,8 +29,9 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         public async Task<IActionResult> GetAll(GetAllLoansQuery request)
         {
             var data = await _mediator.Send(request);
+            var total = await _mediator.Send(new GetAllLoansCountQuery());
 
-            var response = new CustomResponse<IEnumerable<Loan>>(data, "Empréstimos Recupedados com Sucesso!");
+            var response = new CustomResponse<IEnumerable<Loan>>(data, "Empréstimos Recupedados com Sucesso!", total);
 
             return data.Any() ? Ok(response) : NoContent();
         }
@@ -48,8 +50,9 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         public async Task<IActionResult> GetByUser(int userId, GetLoansByUserQuery request)
         {
             var data = await _mediator.Send(request);
+            var total = await _mediator.Send(new GetAllLoansCountQuery());
 
-            var response = new CustomResponse<IEnumerable<Loan>>(data, "Empréstimos Recupedado com Sucesso!");
+            var response = new CustomResponse<IEnumerable<Loan>>(data, "Empréstimos Recupedado com Sucesso!", total);
 
             return data != null ? Ok(response) : NoContent();
         }
@@ -58,8 +61,9 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         public async Task<IActionResult> GetFiltered(GetLoansByFilterQuery request)
         {
             var data = await _mediator.Send(request);
+            var total = await _mediator.Send(new GetAllLoansCountQuery());
 
-            var response = new CustomResponse<IEnumerable<Loan>>(data, "Empréstimos Recupedados com Sucesso!");
+            var response = new CustomResponse<IEnumerable<Loan>>(data, "Empréstimos Recupedados com Sucesso!", total);
 
             return data.Any() ? Ok(response) : NoContent();
         }
@@ -68,8 +72,9 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         public async Task<IActionResult> GEtFilteredDetails(GetLoansDetailsFilteredQuery request)
         {
             var data = await _mediator.Send(request);
+            var total = await _mediator.Send(new GetAllLoansCountQuery());
 
-            var response = new CustomResponse<IEnumerable<LoanDetailsViewModel>>(data, "Empréstimos Recupedados com Sucesso!");
+            var response = new CustomResponse<IEnumerable<LoanDetailsViewModel>>(data, "Empréstimos Recupedados com Sucesso!", total);
 
             return data.Any() ? Ok(response) : NoContent();
         }
@@ -78,8 +83,9 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         public async Task<IActionResult> GetDetailsByLibrary(GetLoansDetailsByLibraryQuery request)
         {
             var data = await _mediator.Send(request);
+            var total = await _mediator.Send(new GetAllLoansCountQuery());
 
-            var response = new CustomResponse<IEnumerable<LoanDetailsViewModel>>(data, "Empréstimos Recupedados com Sucesso!");
+            var response = new CustomResponse<IEnumerable<LoanDetailsViewModel>>(data, "Empréstimos Recupedados com Sucesso!", total);
 
             return data.Any() ? Ok(response) : NoContent();
         }

@@ -1,9 +1,9 @@
-using Desafios.GerenciadorBiblioteca.Api.Responses;
-using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Commands.AddLibrary;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Commands.RemoveLibrary;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Commands.UpdateLibrary;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Queries.GetAllLibraries;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Queries.GetLibrariesByBook;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Queries.GetLibrariesByBookFiltered;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Queries.GetLibraryById;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Queries.GetLibraryByName;
 using MediatR;
@@ -22,41 +22,50 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll(GetAllLibrariesQuery request)
         {
-            var data = await _mediator.Send(request);
+            var response = await _mediator.Send(request);
 
-            var response = new CustomResponse<IEnumerable<Library>>(data, "Bibliotecas Recupedadas com Sucesso!");
+            return Ok(response);
+        }
 
-            return data.Any() ? Ok(response) : NoContent();
+        [HttpGet("book/{bookId}")]
+        public async Task<IActionResult> GetLibrariesByBook(int bookId, int page, int size)
+        {
+            var request = new GetLibrariesByBookQuery(page, size, bookId);
+            var response = await _mediator.Send(request);
+
+            return Ok(response);
+        }
+
+        [HttpPost("book/{id}/filtered")]
+        public async Task<IActionResult> PostLibrariesByBookFiltered(int bookId, GetLibrariesByBookFilteredQuery request)
+        {
+            var response = await _mediator.Send(request);
+
+            return Ok(response);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(GetLibraryByIdQuery request)
         {
-            var data = await _mediator.Send(request);
+            var response = await _mediator.Send(request);
 
-            var response = new CustomResponse<Library>(data, "Biblioteca Recupedada com Sucesso!");
-
-            return data != null ? Ok(response) : NoContent();
+            return Ok(response);
         }
 
         [HttpPost("filter")]
         public async Task<IActionResult> Filter(GetLibrariesByNameQuery request)
         {
-            var data = await _mediator.Send(request);
-
-            var response = new CustomResponse<IEnumerable<Library>>(data, "Bibliotecas Recupedadas com Sucesso!");
-
-            return data.Any() ? Ok(response) : NoContent();
+            var response = await _mediator.Send(request);
+            
+            return Ok(response);
         }
 
         [HttpPost]
         public async Task<IActionResult> Add(AddLibraryCommand request)
         {
-            var data = await _mediator.Send(request);
+            var response = await _mediator.Send(request);
 
-            var response = new CustomResponse<Library>(data, "Biblioteca Adicionada com Sucesso!");
-
-            var locationUri = Url.Link(nameof(GetById), new { id = data.Id });
+            var locationUri = Url.Link(nameof(GetById), new { id = response.Data.Id });
 
             return Created(locationUri, response);
         }
@@ -64,9 +73,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateLibraryCommand request)
         {
-            var data = await _mediator.Send(request);
-
-            var response = new CustomResponse<Library>(data, "Biblioteca Atualizada com Sucesso!");
+            var response = await _mediator.Send(request);
 
             return Ok(response);
         }
@@ -74,9 +81,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Remove(int id, RemoveLibraryCommand request)
         {
-            var data = await _mediator.Send(request);
-
-            var response = new CustomResponse<bool>(data, "Biblioteca Removido com Sucesso!");
+            var response = await _mediator.Send(request);
 
             return Ok(response);
         }

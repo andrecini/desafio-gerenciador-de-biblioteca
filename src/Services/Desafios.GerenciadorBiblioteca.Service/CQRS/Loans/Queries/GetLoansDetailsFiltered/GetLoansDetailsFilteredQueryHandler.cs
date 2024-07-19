@@ -7,7 +7,7 @@ using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
 using Desafios.GerenciadorBiblioteca.Service.Helpers;
 using MediatR;
 
-namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetFilteredLoanDetails
+namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsFiltered
 {
     public class GetLoansDetailsFilteredQueryHandler(IUnitOfWork unitOfWork, IMapper mapper) : IRequestHandler<GetLoansDetailsFilteredQuery, IEnumerable<LoanDetailsViewModel>>
     {

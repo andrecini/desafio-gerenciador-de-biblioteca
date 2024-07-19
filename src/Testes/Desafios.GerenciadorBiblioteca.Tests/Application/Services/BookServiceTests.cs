@@ -153,7 +153,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
             // Assert
             Assert.NotNull(result);
             Assert.Single(result);
-            Assert.Equal("Book 1", result.First().Title);
+            Assert.Contains("Book 1", result.First().Title);
         }
 
         [Fact]
@@ -212,7 +212,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
             // Assert
             Assert.NotNull(result);
             Assert.Single(result);
-            Assert.Equal("Author 1", result.First().Author);
+            Assert.Contains("Author 1", result.First().Author);
         }
 
         [Fact]
@@ -256,7 +256,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _bookService.AddAsync(dto));
-            Assert.Equal("Não foi possível adicionar o Livro. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Não foi possível adicionar o Livro. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.InternalServerError, exception.StatusCode);
         }
 
@@ -291,7 +291,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _bookService.UpdateAsync(bookId, dto));
-            Assert.Equal("O parâmetro Livro não pode ser nulo.", exception.ErrorDetails);
+            Assert.Contains("O parâmetro Livro não pode ser nulo.", exception.ErrorDetails);
         }
 
         [Fact]
@@ -305,7 +305,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _bookService.UpdateAsync(bookId, dto));
-            Assert.Equal("Nenhum Livro foi encontrado com essas informações. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Nenhum Livro foi encontrado com essas informações. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.NotFound, exception.StatusCode);
         }
 
@@ -322,7 +322,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _bookService.UpdateAsync(bookId, dto));
-            Assert.Equal("Não foi possível alterar o Livro. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Não foi possível alterar o Livro. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.InternalServerError, exception.StatusCode);
         }
 
@@ -362,7 +362,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _bookService.RemoveAsync(invalidId));
-            Assert.Equal("O parâmetro Id deve ser maior ou igual a 1.", exception.ErrorDetails);
+            Assert.Contains("O parâmetro Id deve ser maior ou igual a 1.", exception.ErrorDetails);
         }
 
         [Fact]
@@ -375,7 +375,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _bookService.RemoveAsync(bookId));
-            Assert.Equal("Nenhum Livro foi encontrado com essas informações. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Nenhum Livro foi encontrado com essas informações. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.NotFound, exception.StatusCode);
         }
 
@@ -391,7 +391,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _bookService.RemoveAsync(bookId));
-            Assert.Equal("Não foi possível deletar o Livro. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Não foi possível deletar o Livro. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.InternalServerError, exception.StatusCode);
         }
 

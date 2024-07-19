@@ -2,9 +2,9 @@
 
 namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Queries.GetAllLibraries
 {
-    public class GetAllLibrariesQueryValidator : AbstractValidator<GetAllLibrariesQuery>
+    public class GetAllLibrariesValidator : AbstractValidator<GetAllLibrariesQuery>
     {
-        public GetAllLibrariesQueryValidator()
+        public GetAllLibrariesValidator()
         {
             RuleFor(x => x.Page)
                 .GreaterThanOrEqualTo(1)

@@ -1,5 +1,7 @@
 ﻿@using System.ComponentModel.DataAnnotations
-@inject IBookService service
+@using Desafios.GerenciadorBiblioteca.Service.CQRS.Books.Commands.AddBook
+@using Desafios.GerenciadorBiblioteca.Website.Services
+@inject HttpService httpService
 
 <MudDialog>
     <DialogContent>
@@ -34,9 +36,9 @@
         {
             book.Year = Convert.ToInt32(yearInput);
 
-            var dto = new BookInputModel(book.Title, book.Author, book.ISBN, book.Year.Value);
+            var body = new AddBookCommand(book.Title, book.Author, book.ISBN, book.Year.Value);
 
-            await service.AddAsync(dto);
+            await httpService.PostAsync<AddBookCommand>($"/api/Books", body);
 
             MudDialog.Close(DialogResult.Ok(book));
         }

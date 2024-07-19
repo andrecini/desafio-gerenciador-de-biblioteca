@@ -1,16 +1,17 @@
 ﻿using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
+using Desafios.GerenciadorBiblioteca.Service.DTOs;
 using Desafios.GerenciadorBiblioteca.Service.Helpers;
 using MediatR;
 using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Books.Commands.RemoveBook
 {
-    public class RemoveBookCommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<RemoveBookCommand, bool>
+    public class RemoveBookCommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<RemoveBookCommand, CustomResponse<bool>>
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-        public async Task<bool> Handle(RemoveBookCommand request, CancellationToken cancellationToken)
+        public async Task<CustomResponse<bool>> Handle(RemoveBookCommand request, CancellationToken cancellationToken)
         {
             ValidatorHelper.ValidateEntity<RemoveBookCommandValidator, RemoveBookCommand>(request);
 
@@ -20,9 +21,9 @@ namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Books.Commands.RemoveBook
             _unitOfWork.Books.Remove(libraryRegistered);
             var result = await _unitOfWork.SaveAsync();
 
-            return result > 0 ? true : throw new CustomException(
-                "Não foi possível deletar o Livro. Tente novamente!",
-                HttpStatusCode.InternalServerError);
+            return result > 0 ? 
+                new CustomResponse<bool>(true, "Livro removido com Sucesso!") : 
+                throw new CustomException("Não foi possível deletar o Livro. Tente novamente!", HttpStatusCode.InternalServerError);
         }
     }
 }

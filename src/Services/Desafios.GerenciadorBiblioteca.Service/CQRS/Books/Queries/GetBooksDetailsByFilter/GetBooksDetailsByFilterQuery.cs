@@ -1,4 +1,5 @@
-﻿using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
+﻿using Desafios.GerenciadorBiblioteca.Service.DTOs;
+using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
 using MediatR;
 
 namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Books.Queries.GetBooksDetailsByFilter
@@ -7,9 +8,9 @@ namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Books.Queries.GetBooksDeta
         int Page,
         int Size,
         int LibraryId,
-        string Title,
-        string Author,
-        string ISBN,
+        string? Title,
+        string? Author,
+        string? ISBN,
         int Year,
-        int Available) : IRequest<IEnumerable<BookDetailsViewModel>>;
+        int Available) : IRequest<CustomResponse<IEnumerable<BookDetailsViewModel>>>;
 }

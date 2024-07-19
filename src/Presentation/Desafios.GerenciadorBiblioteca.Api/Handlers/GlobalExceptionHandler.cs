@@ -11,7 +11,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Handlers
         {
             _logger.LogError(exception, "Ocorreu uma Exceção: {Message}", exception.Message);
 
-            var response = new CustomErrorResponse(exception.Message, "Exception");
+            var response = new CustomResponse<string[]>([exception.Message], "Exception");
 
             httpContext.Response.StatusCode = 500;
             await httpContext.Response.WriteAsJsonAsync(response, cancellationToken: cancellationToken);

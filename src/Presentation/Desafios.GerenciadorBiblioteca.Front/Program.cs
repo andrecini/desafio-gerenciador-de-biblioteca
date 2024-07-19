@@ -2,7 +2,9 @@ using Desafios.GerenciadorBiblioteca.Website.Components;
 using MudBlazor.Services;
 using Desafios.GerenciadorBiblioteca.Service;
 using Desafios.GerenciadorBiblioteca.Data;
-using MudBlazor;
+using System.Net.Http.Headers;
+using Desafios.GerenciadorBiblioteca.Website.Services;
+using Desafios.GerenciadorBiblioteca.Website.Services.Auth;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +18,22 @@ builder.Services.AddDataModule(builder.Configuration);
 
 builder.Services.AddMudServices();
 builder.Services.AddServerSideBlazor().AddCircuitOptions(options => { options.DetailedErrors = true; });
+
+builder.Services.AddAuthentication("Cookies")
+           .AddCookie(options =>
+           {
+               options.Cookie.HttpOnly = true;
+               options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+               options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+               options.SlidingExpiration = true;
+               options.LoginPath = "/login";
+           });
+builder.Services.AddAuthorization();
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped(sp => new HttpService(builder.Configuration["API:BaseUrl"], sp.GetService<AuthService>()));
+builder.Services.AddScoped<AlertService>();
 
 var app = builder.Build();
 
@@ -31,6 +49,9 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();

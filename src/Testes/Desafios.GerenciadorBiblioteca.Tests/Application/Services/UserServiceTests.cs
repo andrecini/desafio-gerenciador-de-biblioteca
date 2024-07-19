@@ -71,7 +71,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _userService.GetByIdAsync(invalidId));
-            Assert.Equal("O parâmetro Id deve ser maior ou igual a 1.", exception.ErrorDetails);
+            Assert.Contains("O parâmetro Id deve ser maior ou igual a 1.", exception.ErrorDetails);
         }
 
         [Fact]
@@ -167,7 +167,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _userService.AddAsync(dto));
-            Assert.Equal("O parâmetro Usuário não pode ser nulo.", exception.ErrorDetails);
+            Assert.Contains("O parâmetro Usuário não pode ser nulo.", exception.ErrorDetails);
         }
 
         [Fact]
@@ -182,7 +182,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _userService.AddAsync(dto));
-            Assert.Equal("Não foi possível adicionar o Usuário. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Não foi possível adicionar o Usuário. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.InternalServerError, exception.StatusCode);
         }
 
@@ -216,7 +216,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _userService.UpdateAsync(userId, dto));
-            Assert.Equal("O parâmetro Usuário não pode ser nulo.", exception.ErrorDetails);
+            Assert.Contains("O parâmetro Usuário não pode ser nulo.", exception.ErrorDetails);
         }
 
         [Fact]
@@ -230,7 +230,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _userService.UpdateAsync(userId, dto));
-            Assert.Equal("Nenhum Usuário foi encontrado com essas informações. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Nenhum Usuário foi encontrado com essas informações. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.NotFound, exception.StatusCode);
         }
 
@@ -247,7 +247,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _userService.UpdateAsync(userId, dto));
-            Assert.Equal("Não foi possível alterar o Usuário. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Não foi possível alterar o Usuário. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.InternalServerError, exception.StatusCode);
         }
 
@@ -276,7 +276,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _userService.RemoveAsync(invalidId));
-            Assert.Equal("O parâmetro Id deve ser maior ou igual a 1.", exception.ErrorDetails);
+            Assert.Contains("O parâmetro Id deve ser maior ou igual a 1.", exception.ErrorDetails);
         }
 
         [Fact]
@@ -289,7 +289,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _userService.RemoveAsync(userId));
-            Assert.Equal("Nenhum Usuário foi encontrado com essas informações. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Nenhum Usuário foi encontrado com essas informações. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.NotFound, exception.StatusCode);
         }
 
@@ -305,7 +305,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _userService.RemoveAsync(userId));
-            Assert.Equal("Não foi possível deletar o Usuário. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Não foi possível deletar o Usuário. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.InternalServerError, exception.StatusCode);
         }
     }

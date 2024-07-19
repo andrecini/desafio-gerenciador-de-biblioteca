@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetFilteredLoanDetails
+namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsFiltered
 {
     public class GetLoansDetailsFilteredQueryValidator : AbstractValidator<GetLoansDetailsFilteredQuery>
     {

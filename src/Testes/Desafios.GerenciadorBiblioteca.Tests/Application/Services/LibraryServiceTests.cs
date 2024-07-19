@@ -95,7 +95,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _libraryService.GetByIdAsync(invalidId));
-            Assert.Equal("O parâmetro Id deve ser maior ou igual a 1.", exception.ErrorDetails);
+            Assert.Contains("O parâmetro Id deve ser maior ou igual a 1.", exception.ErrorDetails);
         }
 
         [Fact]
@@ -230,7 +230,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _libraryService.AddAsync(dto));
-            Assert.Equal("O parâmetro Biblioteca não pode ser nulo.", exception.ErrorDetails);
+            Assert.Contains("O parâmetro Biblioteca não pode ser nulo.", exception.ErrorDetails);
         }
 
         [Fact]
@@ -245,7 +245,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _libraryService.AddAsync(dto));
-            Assert.Equal("Não foi possível adicionar a Biblioteca. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Não foi possível adicionar a Biblioteca. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.InternalServerError, exception.StatusCode);
         }
 
@@ -289,7 +289,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _libraryService.UpdateAsync(libraryId, dto));
-            Assert.Equal("O parâmetro Biblioteca não pode ser nulo.", exception.ErrorDetails);
+            Assert.Contains("O parâmetro Biblioteca não pode ser nulo.", exception.ErrorDetails);
         }
 
         [Fact]
@@ -303,7 +303,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _libraryService.UpdateAsync(libraryId, dto));
-            Assert.Equal("Nenhuma Biblioteca foi encontrada com essas informações. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Nenhuma Biblioteca foi encontrada com essas informações. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.NotFound, exception.StatusCode);
         }
 
@@ -320,7 +320,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _libraryService.UpdateAsync(libraryId, dto));
-            Assert.Equal("Não foi possível alterar a Biblioteca. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Não foi possível alterar a Biblioteca. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.InternalServerError, exception.StatusCode);
         }
 
@@ -360,7 +360,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _libraryService.RemoveAsync(invalidId));
-            Assert.Equal("O parâmetro Id deve ser maior ou igual a 1.", exception.ErrorDetails);
+            Assert.Contains("O parâmetro Id deve ser maior ou igual a 1.", exception.ErrorDetails);
         }
 
         [Fact]
@@ -373,7 +373,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _libraryService.RemoveAsync(libraryId));
-            Assert.Equal("Nenhuma Biblioteca foi encontrada com essas informações. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Nenhuma Biblioteca foi encontrada com essas informações. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.NotFound, exception.StatusCode);
         }
 
@@ -389,7 +389,7 @@ namespace Desafios.GerenciadorBiblioteca.Tests.Application.Services
 
             // Act & Assert
             var exception = await Assert.ThrowsAsync<CustomException>(() => _libraryService.RemoveAsync(libraryId));
-            Assert.Equal("Não foi possível deletar a Biblioteca. Tente novamente!", exception.ErrorDetails);
+            Assert.Contains("Não foi possível deletar a Biblioteca. Tente novamente!", exception.ErrorDetails);
             Assert.Equal(HttpStatusCode.InternalServerError, exception.StatusCode);
         }
     }
