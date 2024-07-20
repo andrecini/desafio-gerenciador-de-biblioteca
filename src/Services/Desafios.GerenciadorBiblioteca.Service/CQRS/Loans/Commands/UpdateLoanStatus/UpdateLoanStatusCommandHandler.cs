@@ -1,6 +1,7 @@
 ﻿using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
+using Desafios.GerenciadorBiblioteca.Service.DTOs;
 using Desafios.GerenciadorBiblioteca.Service.Helpers;
 using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces;
 using MediatR;
@@ -8,12 +9,12 @@ using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Commands.UpdateLoanStatus
 {
-    public class UpdateLoanStatusCommandHandler(IUnitOfWork unitOfWork, IInventoryService inventoryService) : IRequestHandler<UpdateLoanStatusCommand, Loan>
+    public class UpdateLoanStatusCommandHandler(IUnitOfWork unitOfWork, IInventoryService inventoryService) : IRequestHandler<UpdateLoanStatusCommand, CustomResponse<Loan>>
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IInventoryService _inventoryService = inventoryService;
 
-        public async Task<Loan> Handle(UpdateLoanStatusCommand request, CancellationToken cancellationToken)
+        public async Task<CustomResponse<Loan>> Handle(UpdateLoanStatusCommand request, CancellationToken cancellationToken)
         {
             ValidatorHelper.ValidateEntity<UpdateLoanStatusCommandValidator, UpdateLoanStatusCommand>(request);
 
@@ -27,9 +28,9 @@ namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Commands.UpdateLoanS
 
             await _inventoryService.UpdateStatusAsync(loanRegistered.InventoryId, request.Returned);
 
-            return result > 0 ? loanRegistered : throw new CustomException(
-                "Não foi possível atualizar o Empréstimo. Tente novamente!",
-                HttpStatusCode.InternalServerError);
+            return result > 0 ?
+               new CustomResponse<Loan>(loanRegistered, "Empréstimo alterar com sucesso!") :
+               throw new CustomException("Não foi possível alterar o Empréstimo. Tente novamente!", HttpStatusCode.InternalServerError);
         }
     }
 }

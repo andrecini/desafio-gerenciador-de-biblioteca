@@ -109,6 +109,19 @@ namespace Desafios.GerenciadorBiblioteca.Website.Services
             }
         }
 
+        public async Task<HttpServiceResponse> DeleteAsync(string uri)
+        {
+            try
+            {
+                var response = await CreateRequest(uri).SendAsync(HttpMethod.Delete);
+                return await ProcessResponse(response);
+            }
+            catch (FlurlHttpException ex)
+            {
+                return await ProcessErrorResponse(ex);
+            }
+        }
+
         private async Task<HttpServiceResponse<T>> ProcessResponse<T>(IFlurlResponse response)
         {
             var httpServiceResponse = new HttpServiceResponse<T>

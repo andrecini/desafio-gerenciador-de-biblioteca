@@ -47,8 +47,10 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(GetLibraryByIdQuery request)
+        public async Task<IActionResult> GetById(int id)
         {
+            GetLibraryByIdQuery request = new(id);
+
             var response = await _mediator.Send(request);
 
             return Ok(response);
@@ -81,8 +83,9 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         }
         
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Remove(int id, RemoveLibraryCommand request)
+        public async Task<IActionResult> Remove(int id)
         {
+            RemoveLibraryCommand request = new(id);
             var response = await _mediator.Send(request);
 
             return Ok(response);

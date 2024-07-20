@@ -1,18 +1,19 @@
 ﻿using AutoMapper;
 using Desafios.GerenciadorBiblioteca.Domain.QueryModels.QueryRequests;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
+using Desafios.GerenciadorBiblioteca.Service.DTOs;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
 using Desafios.GerenciadorBiblioteca.Service.Helpers;
 using MediatR;
 
 namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsByLibrary
 {
-    public class GetLoansDetailsByLibraryQueryHandler(IUnitOfWork unitOfWork, IMapper mapper) : IRequestHandler<GetLoansDetailsByLibraryQuery, IEnumerable<LoanDetailsViewModel>>
+    public class GetLoansDetailsByLibraryQueryHandler(IUnitOfWork unitOfWork, IMapper mapper) : IRequestHandler<GetLoansDetailsByLibraryQuery, CustomResponse<IEnumerable<LoanDetailsViewModel>>>
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IMapper _mapper = mapper;
 
-        public async Task<IEnumerable<LoanDetailsViewModel>> Handle(GetLoansDetailsByLibraryQuery request, CancellationToken cancellationToken)
+        public async Task<CustomResponse<IEnumerable<LoanDetailsViewModel>>> Handle(GetLoansDetailsByLibraryQuery request, CancellationToken cancellationToken)
         {
             ValidatorHelper.ValidateEntity<GetLoansDetailsByLibraryQueryValidator, GetLoansDetailsByLibraryQuery>(request);
 
@@ -24,7 +25,8 @@ namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDeta
 
             var paginatedData = data.Paginate(request.Page, request.Size);
 
-            return paginatedData;
+            return new CustomResponse<IEnumerable<LoanDetailsViewModel>>(paginatedData, "Empréstimos recuperados com Sucesso!", data.Count());
+
         }
     }
 }

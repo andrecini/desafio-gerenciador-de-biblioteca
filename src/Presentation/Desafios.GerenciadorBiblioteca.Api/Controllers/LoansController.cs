@@ -1,17 +1,13 @@
-using Desafios.GerenciadorBiblioteca.Api.Responses;
-using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Commands.AddLoan;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Commands.RemoveLoan;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Commands.UpdateLoan;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Commands.UpdateLoanStatus;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetAllLoans;
-using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetAllLoansCount;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoanById;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansByFilter;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansByUser;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsByLibrary;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsFiltered;
-using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,76 +24,63 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll(GetAllLoansQuery request)
         {
-            var data = await _mediator.Send(request);
-            var total = await _mediator.Send(new GetAllLoansCountQuery());
+            var response = await _mediator.Send(request);
 
-            var response = new CustomResponse<IEnumerable<Loan>>(data, "Empréstimos Recupedados com Sucesso!", total);
-
-            return data.Any() ? Ok(response) : NoContent();
+            return Ok(response);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id, GetLoanByIdQuery request)
+        public async Task<IActionResult> GetById(int id)
         {
-            var data = await _mediator.Send(request);
+            GetLoanByIdQuery request = new(id);
 
-            var response = new CustomResponse<Loan>(data, "Empréstimo Recupedado com Sucesso!");
+            var response = await _mediator.Send(request);
 
-            return data != null ? Ok(response) : NoContent();
+            return Ok(response);
         }
 
         [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetByUser(int userId, GetLoansByUserQuery request)
+        public async Task<IActionResult> GetByUser(int userId, int page, int size)
         {
-            var data = await _mediator.Send(request);
-            var total = await _mediator.Send(new GetAllLoansCountQuery());
+            GetLoansByUserQuery request = new(page, size, userId);
 
-            var response = new CustomResponse<IEnumerable<Loan>>(data, "Empréstimos Recupedado com Sucesso!", total);
+            var response = await _mediator.Send(request);
 
-            return data != null ? Ok(response) : NoContent();
+            return Ok(response);
         }
 
         [HttpPost("filter")]
         public async Task<IActionResult> GetFiltered(GetLoansByFilterQuery request)
         {
-            var data = await _mediator.Send(request);
-            var total = await _mediator.Send(new GetAllLoansCountQuery());
+            var response = await _mediator.Send(request);
 
-            var response = new CustomResponse<IEnumerable<Loan>>(data, "Empréstimos Recupedados com Sucesso!", total);
-
-            return data.Any() ? Ok(response) : NoContent();
+            return Ok(response);
         }
 
-        [HttpPost("filter/details")]
-        public async Task<IActionResult> GEtFilteredDetails(GetLoansDetailsFilteredQuery request)
+        [HttpPost("library/{libraryId}/details/filter")]
+        public async Task<IActionResult> GetFilteredDetails(int libraryId, GetLoansDetailsFilteredQuery request)
         {
-            var data = await _mediator.Send(request);
-            var total = await _mediator.Send(new GetAllLoansCountQuery());
+            var response = await _mediator.Send(request);
 
-            var response = new CustomResponse<IEnumerable<LoanDetailsViewModel>>(data, "Empréstimos Recupedados com Sucesso!", total);
-
-            return data.Any() ? Ok(response) : NoContent();
+            return Ok(response);
         }
 
-        [HttpPost("details")]
-        public async Task<IActionResult> GetDetailsByLibrary(GetLoansDetailsByLibraryQuery request)
+        [HttpGet("library/{libraryId}/details")]
+        public async Task<IActionResult> GetDetailsByLibrary(int libraryId, int page, int size)
         {
-            var data = await _mediator.Send(request);
-            var total = await _mediator.Send(new GetAllLoansCountQuery());
+            GetLoansDetailsByLibraryQuery request = new(page, size, libraryId);
 
-            var response = new CustomResponse<IEnumerable<LoanDetailsViewModel>>(data, "Empréstimos Recupedados com Sucesso!", total);
+            var response = await _mediator.Send(request);
 
-            return data.Any() ? Ok(response) : NoContent();
+            return Ok(response);
         }
 
         [HttpPost]
         public async Task<IActionResult> Add(AddLoanCommand request)
         {
-            var data = await _mediator.Send(request);
+            var response = await _mediator.Send(request);
 
-            var response = new CustomResponse<Loan>(data, "Empréstimo Adicionado com Sucesso!");
-
-            var locationUri = Url.Link(nameof(GetById), new { id = data.Id });
+            var locationUri = Url.Link(nameof(GetById), new { id = response.Data.Id });
 
             return Created(locationUri, response);
         }
@@ -105,29 +88,25 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateLoanCommand request)
         {
-            var data = await _mediator.Send(request);
-
-            var response = new CustomResponse<Loan>(data, "Empréstimo Atualizado com Sucesso!");
+            var response = await _mediator.Send(request);
 
             return Ok(response);
         }
 
-        [HttpPut("status/{id}")]
+        [HttpPut("{id}/status")]
         public async Task<IActionResult> UpdateStatus(int id, UpdateLoanStatusCommand request)
         {
-            var data = await _mediator.Send(request);
-
-            var response = new CustomResponse<Loan>(data, "Empréstimo Atualizado com Sucesso!");
+            var response = await _mediator.Send(request);
 
             return Ok(response);
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Remove(int id, RemoveLoanCommand request)
+        public async Task<IActionResult> Remove(int id)
         {
-            var data = await _mediator.Send(request);
+            RemoveLoanCommand request = new(id);
 
-            var response = new CustomResponse<bool>(data, "Empréstimo Removido com Sucesso!");
+            var response = await _mediator.Send(request);
 
             return Ok(response);
         }

@@ -69,7 +69,15 @@ namespace Desafios.GerenciadorBiblioteca.Data.Repositories
             if (request.Available > 0)
                 sb.AppendLine("AND i.Available = @Available");
 
-            var data = await connection.QueryAsync<BookDetailsQueryResult>(sb.ToString(), request);
+            var data = await connection.QueryAsync<BookDetailsQueryResult>(sb.ToString(), new
+            {
+                request.LibraryId,
+                Title = $"%{request.Title}%",
+                Autor = $"%{request.Author}%",
+                ISBN = $"%{request.ISBN}%",
+                request.Year,
+                request.Available,
+            });
 
             return data;
         }

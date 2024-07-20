@@ -1,11 +1,13 @@
 ﻿@using Desafios.GerenciadorBiblioteca.Domain.Models.Filters
+@using Desafios.GerenciadorBiblioteca.Service.CQRS.Books.Queries.GetBooksDetailsByFilter
 @using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Common
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Libraries.Custom.Dialogs
-@inject ILibraryService libraryService
-@inject IBookService bookService
-@inject IInventoryService inventoryService
+@using Desafios.GerenciadorBiblioteca.Website.Models.Responses
+@using Desafios.GerenciadorBiblioteca.Website.Services
 @inject IDialogService dialogService
+@inject HttpService httpService
+@inject AlertService alertService
 
 <MudText Typo="Typo.h6">Livros</MudText>
 
@@ -75,8 +77,6 @@ else
     public int Id { get; set; }
 
     private IEnumerable<BookDetailsViewModel> details;
-    private IEnumerable<Inventory> inventories;
-    private IEnumerable<Book> books;
 
     private BookFilter filter = new();
     private string yearFilter;
@@ -93,12 +93,25 @@ else
 
     private async Task InitializeBooksDetailsAsync()
     {
-        details = await bookService.GetBooksDetailsByLibraryAsync(Id);
+        var result = await httpService.GetAsync<CustomResponse<IEnumerable<BookDetailsViewModel>>>($"/api/Books/library/{Id}/details?page=1&size=10");
+
+        if (result.IsSuccess)
+            details = result.Content.Data;
+        else
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
     }
 
     private async Task FilterBooksDetailsAsync()
     {
-        details = await bookService.GetBooksDetailsFilteredAsync(Id, filter, availableFilter);
+        GetBooksDetailsByFilterQuery body = new(1, 10, Id, filter.Title, filter.Author, filter.ISBN, filter.Year, availableFilter);
+
+        var result = await httpService
+            .PostAsync<GetBooksDetailsByFilterQuery, CustomResponse<IEnumerable<BookDetailsViewModel>>>($"/api/Books/library/{Id}/details/filter", body);
+
+        if (result.IsSuccess)
+            details = result.Content.Data;
+        else
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
     }
 
     private string ValidateDate(string arg)
@@ -148,7 +161,11 @@ else
 
         if (!result.Canceled)
         {
-            await inventoryService.RemoveAsync(id);
+            var deleteResult = await httpService.DeleteAsync($"/api/Books/{id}");
+
+            if (!deleteResult.IsSuccess)
+                alertService.ShowErrors(deleteResult.ErrorDetails, deleteResult.StatusCode);
+
             await InitializeBooksDetailsAsync();
         }
     }

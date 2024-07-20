@@ -1,16 +1,17 @@
 ﻿using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Desafios.GerenciadorBiblioteca.Domain.Enums;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
+using Desafios.GerenciadorBiblioteca.Service.DTOs;
 using Desafios.GerenciadorBiblioteca.Service.Helpers;
 using MediatR;
 
 namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansByFilter
 {
-    public class GetLoansByFilterQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetLoansByFilterQuery, IEnumerable<Loan>>
+    public class GetLoansByFilterQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetLoansByFilterQuery, CustomResponse<IEnumerable<Loan>>>
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-        public async Task<IEnumerable<Loan>> Handle(GetLoansByFilterQuery request, CancellationToken cancellationToken)
+        public async Task<CustomResponse<IEnumerable<Loan>>> Handle(GetLoansByFilterQuery request, CancellationToken cancellationToken)
         {
             ValidatorHelper.ValidateEntity<GetLoansByFilterQueryValidator, GetLoansByFilterQuery>(request);
 
@@ -31,7 +32,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansByFi
 
             var paginatedData = data.Take(request.Size).Take(request.Page);
 
-            return paginatedData;
+            return new CustomResponse<IEnumerable<Loan>>(paginatedData, "Empréstimos recuperados com Sucesso!", data.Count());
         }
     }
 }

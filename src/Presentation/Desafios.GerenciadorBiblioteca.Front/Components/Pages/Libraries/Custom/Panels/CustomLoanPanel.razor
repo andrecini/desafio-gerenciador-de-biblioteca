@@ -1,11 +1,14 @@
 ﻿@using Desafios.GerenciadorBiblioteca.Domain.Enums
 @using Desafios.GerenciadorBiblioteca.Domain.Models.Filters
+@using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsFiltered
 @using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Common
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Libraries.Custom.Dialogs
-
-@inject ILoanService loanService;
+@using Desafios.GerenciadorBiblioteca.Website.Models.Responses
+@using Desafios.GerenciadorBiblioteca.Website.Services
 @inject IDialogService dialogService
+@inject HttpService httpService
+@inject AlertService alertService
 
 <MudText Typo="Typo.h6">Empréstimos</MudText>
 
@@ -74,7 +77,7 @@ else
     [Parameter]
     public int Id { get; set; }
 
-    private List<LoanDetailsViewModel> loansDetails = new();
+    private IEnumerable<LoanDetailsViewModel> loansDetails = new List<LoanDetailsViewModel>();
 
     private LoanFilter filter = new();
     private string bookFilter;
@@ -90,7 +93,12 @@ else
 
     private async Task InitializeLoansDetailsAsync()
     {
-        loansDetails = await loanService.GetLoanDetailsByLibraryAsync(Id);
+        var result = await httpService.GetAsync<CustomResponse<IEnumerable<LoanDetailsViewModel>>>($"/api/Loans/library/{Id}/details?page=1&size=10");
+
+        if (result.IsSuccess)
+            loansDetails = result.Content.Data;
+        else
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
     }
 
     private async Task FilterLoansDetailsAsync()
@@ -99,15 +107,14 @@ else
         filter.LoanDate = loanDateFilter ?? new DateTime();
         filter.Status = (LoanStatus)statusFilter;
 
-        var loanDetailFilter = new LoanDetailsFilter
-            {
-                LibraryId = Id,
-                LoanFilter = filter,
-                UserName = userFilter,
-                BookName = bookFilter
-            };
+        GetLoansDetailsFilteredQuery body = new(1, 10, Id, bookFilter, userFilter, filter.LoanDate, filter.LoanValidity, filter.Status);
 
-        loansDetails = await loanService.GetFilteredLoanDetailsAsync(loanDetailFilter);
+        var result = await httpService.PostAsync<GetLoansDetailsFilteredQuery, CustomResponse<IEnumerable<LoanDetailsViewModel>>>($"/api/Loans/library/{Id}/details/filter", body);
+
+        if (result.IsSuccess)
+            loansDetails = result.Content.Data;
+        else
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
 
         StateHasChanged();
     }
@@ -137,7 +144,11 @@ else
 
         if (!result.Canceled)
         {
-            await loanService.RemoveAsync(id);
+            var deleteResult = await httpService.DeleteAsync($"/api/loans/{Id}");
+
+            if (!deleteResult.IsSuccess)
+                alertService.ShowErrors(deleteResult.ErrorDetails, deleteResult.StatusCode);
+
             await InitializeLoansDetailsAsync();
         }
     }

@@ -1,7 +1,10 @@
 ﻿@page "/libraries/details/{Id:int}"
+@using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Commands.UpdateLibrary
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Libraries.Custom.Panels
-@inject ISnackbar Snackbar
-@inject ILibraryService libraryService;
+@using Desafios.GerenciadorBiblioteca.Website.Models.Responses
+@using Desafios.GerenciadorBiblioteca.Website.Services
+@inject HttpService httpService
+@inject AlertService alertService
 
 <PageTitle>Bibliotecas</PageTitle>
 
@@ -50,7 +53,12 @@
 
     private async Task InitializeLibraryAsync()
     {
-        library = await libraryService.GetByIdAsync(Id);
+        var result = await httpService.GetAsync<CustomResponse<Library>>($"/api/Libraries/{Id}");
+
+        if (result.IsSuccess)
+            library = result.Content.Data;
+        else
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
     }
 
     private async Task EditLibraryAsync()
@@ -59,12 +67,13 @@
 
         if (form.IsValid)
         {
-            var dto = new LibraryInputModel(library.Name, library.CNPJ, library.Phone);
-            await libraryService.UpdateAsync(Id, dto);
+            UpdateLibraryCommand body = new(Id, library.Name, library.CNPJ, library.Phone);
+            var result = await httpService.PutAsync<UpdateLibraryCommand, CustomResponse<Library>>($"/api/Libraries/{Id}", body);
 
-            Snackbar.Clear();
-            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopEnd;
-            Snackbar.Add("Dados alterados com sucesso!", Severity.Success);
+            if (result.IsSuccess)
+                library = result.Content.Data;
+            else
+                alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
         }
     }
 

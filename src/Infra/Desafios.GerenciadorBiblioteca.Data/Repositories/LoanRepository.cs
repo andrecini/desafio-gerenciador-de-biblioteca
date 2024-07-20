@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using Azure.Core;
+using Dapper;
 using Desafios.GerenciadorBiblioteca.Data.Context;
 using Desafios.GerenciadorBiblioteca.Data.Repositories.Base;
 using Desafios.GerenciadorBiblioteca.Domain.Entities;
@@ -48,9 +49,17 @@ namespace Desafios.GerenciadorBiblioteca.Data.Repositories
             if (request.LoanValidity != default)
                 sb.AppendLine("AND CAST(l.LoanValidity AS DATE) = CAST(@LoanValidity AS DATE)");
             if (request.Status > 0)
-                sb.AppendLine("AND i.Returned = @Status");
+                sb.AppendLine("AND l.Returned = @Status");
 
-            return await connection.QueryAsync<LoanDetailsQueryResult>(sb.ToString(), request);
+            return await connection.QueryAsync<LoanDetailsQueryResult>(sb.ToString(), new
+            {
+                request.LibraryId,
+                BookName = $"%{request.BookName}%",
+                UserName = $"%{request.UserName}%",
+                request.LoanDate,
+                request.LoanValidity,
+                request.Status,
+            });
         }
 
         public async Task<IEnumerable<LoanDetailsQueryResult>> GetLoanDetailsByLibraryAsync(LoanDetailsQueryRequest request)

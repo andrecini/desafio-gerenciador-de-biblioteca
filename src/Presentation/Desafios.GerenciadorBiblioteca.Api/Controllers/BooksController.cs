@@ -46,16 +46,18 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
-        [HttpPost("filter/details")]
-        public async Task<IActionResult> GetDetailsByFilter(GetBooksDetailsByFilterQuery request)
+        [HttpGet("library/{libraryId}/details")]
+        public async Task<IActionResult> GetDetailsByLibrary(int libraryId, int page, int size)
         {
+            GetBooksDetailsByLibraryQuery request = new(page, size, libraryId);
+
             var response = await _mediator.Send(request);
 
             return Ok(response);
         }
 
-        [HttpPost("library/{libraryId}/details")]
-        public async Task<IActionResult> GetDetailsByLibrary(int libraryId, GetBooksDetailsByLibraryQuery request)
+        [HttpPost("library/{libraryId}/details/filter")]
+        public async Task<IActionResult> GetDetailsByFilter(GetBooksDetailsByFilterQuery request)
         {
             var response = await _mediator.Send(request);
 
@@ -81,8 +83,10 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         }
         
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Remove(int id, RemoveBookCommand request)
+        public async Task<IActionResult> Remove(int id)
         {
+            RemoveBookCommand request = new(id);
+
             var response = await _mediator.Send(request);
 
             return Ok(response);

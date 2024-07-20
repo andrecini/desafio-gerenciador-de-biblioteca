@@ -155,8 +155,7 @@ else
 
         if (!dialogResult.Canceled)
         {
-            RemoveBookCommand body = new(id);
-            var result = await httpService.DeleteAsync<RemoveBookCommand>($"/api/Books/{id}", body);
+            var result = await httpService.DeleteAsync($"/api/Books/{id}");
 
             if (!result.IsSuccess)
                 alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
