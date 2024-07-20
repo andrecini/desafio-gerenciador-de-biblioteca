@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
+using Desafios.GerenciadorBiblioteca.Service.DTOs;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
 using Desafios.GerenciadorBiblioteca.Service.Helpers;
 using Desafios.GerenciadorBiblioteca.Service.Security.Interfaces;
@@ -9,13 +10,13 @@ using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.UserLogin
 {
-    public class UserLoginCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICipherService cipher) : IRequestHandler<UserLoginCommand, UserViewModel>
+    public class UserLoginCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICipherService cipher) : IRequestHandler<UserLoginCommand, CustomResponse<UserViewModel>>
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IMapper _mapper = mapper;
         private readonly ICipherService _cipher = cipher;
 
-        public async Task<UserViewModel> Handle(UserLoginCommand request, CancellationToken cancellationToken)
+        public async Task<CustomResponse<UserViewModel>> Handle(UserLoginCommand request, CancellationToken cancellationToken)
         {
             ValidatorHelper.ValidateEntity<UserLoginCommandValidator, UserLoginCommand>(request);
 
@@ -30,7 +31,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.UserLogin
 
             var viewModel = _mapper.Map<UserViewModel>(userRegistered);
 
-            return viewModel;
+            return new CustomResponse<UserViewModel>(viewModel, "Login realizado com sucesso!");
         }
     }
 }

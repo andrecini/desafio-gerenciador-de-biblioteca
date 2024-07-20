@@ -1,17 +1,18 @@
 ﻿using AutoMapper;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
+using Desafios.GerenciadorBiblioteca.Service.DTOs;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
 using Desafios.GerenciadorBiblioteca.Service.Helpers;
 using MediatR;
 
 namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Queries.GetUserByName
 {
-    public class GetUsersByNameQueryHandler(IUnitOfWork unitOfWork, IMapper mapper) : IRequestHandler<GetUsersByNameQuery, IEnumerable<UserViewModel>>
+    public class GetUsersByNameQueryHandler(IUnitOfWork unitOfWork, IMapper mapper) : IRequestHandler<GetUsersByNameQuery, CustomResponse<IEnumerable<UserViewModel>>>
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IMapper _mapper = mapper;
 
-        public async Task<IEnumerable<UserViewModel>> Handle(GetUsersByNameQuery request, CancellationToken cancellationToken)
+        public async Task<CustomResponse<IEnumerable<UserViewModel>>> Handle(GetUsersByNameQuery request, CancellationToken cancellationToken)
         {
             ValidatorHelper.ValidateEntity<GetUsersByNameQueryValidator, GetUsersByNameQuery>(request);
 
@@ -24,7 +25,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Queries.GetUserByNam
 
             var paginatedViewModels = viewModels.Take(request.Size).Skip(request.Page);
 
-            return paginatedViewModels;
+            return new CustomResponse<IEnumerable<UserViewModel>>(paginatedViewModels, "Usuários recuperados com sucesso!", viewModels.Count());
         }
     }
 }

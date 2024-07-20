@@ -20,8 +20,8 @@ namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetInv
                 .WithMessage("O Tamanho da Página deve ser maior ou igual a 5.");
 
             RuleFor(x => x.LibraryId)
-                .GreaterThanOrEqualTo(5)
-                .WithMessage("O Id da Biblioteca deve ser maior ou igual a 5.");
+                .GreaterThanOrEqualTo(1)
+                .WithMessage("O Id da Biblioteca deve ser maior ou igual a 1.");
         }
     }
 }

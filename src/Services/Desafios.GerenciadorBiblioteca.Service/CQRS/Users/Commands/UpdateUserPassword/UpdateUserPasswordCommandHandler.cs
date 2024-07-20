@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
+using Desafios.GerenciadorBiblioteca.Service.DTOs;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
 using Desafios.GerenciadorBiblioteca.Service.Helpers;
 using Desafios.GerenciadorBiblioteca.Service.Security.Interfaces;
@@ -15,13 +16,13 @@ using System.Threading.Tasks;
 
 namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.UpdateUserPassword
 {
-    public class UpdateUserPasswordCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICipherService cipher) : IRequestHandler<UpdateUserPasswordCommand, UserViewModel>
+    public class UpdateUserPasswordCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICipherService cipher) : IRequestHandler<UpdateUserPasswordCommand, CustomResponse<UserViewModel>>
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IMapper _mapper = mapper;
         private readonly ICipherService _cipher = cipher;
 
-        public async Task<UserViewModel> Handle(UpdateUserPasswordCommand request, CancellationToken cancellationToken)
+        public async Task<CustomResponse<UserViewModel>> Handle(UpdateUserPasswordCommand request, CancellationToken cancellationToken)
         {
             ValidatorHelper.ValidateEntity<UpdateUserPasswordCommandValidator, UpdateUserPasswordCommand>(request);
 
@@ -37,9 +38,9 @@ namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.UpdateUserP
 
             var viewModel = _mapper.Map<UserViewModel>(userRegistered);
 
-            return result > 0 ? viewModel : throw new CustomException(
-                "Não foi possível alterar a senha do Usuário. Tente novamente!",
-                HttpStatusCode.InternalServerError);
+            return result > 0 ?
+                 new CustomResponse<UserViewModel>(viewModel, "Usuário alterado com sucesso!") :
+                 throw new CustomException("Não foi possível alterado o Usuário. Tente novamente!", HttpStatusCode.InternalServerError);
         }
     }
 }

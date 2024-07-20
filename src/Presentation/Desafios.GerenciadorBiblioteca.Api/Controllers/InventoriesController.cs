@@ -1,14 +1,12 @@
-using Desafios.GerenciadorBiblioteca.Api.Responses;
-using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Command.AddInventory;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Command.RemoveInventory;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Command.UpdateInventory;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Command.UpdateInventoryStatus;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetAllInventories;
-using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetAllInventoriesCount;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetInventoriesByFilter;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetInventoryById;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetInventoryByLibrary;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetInventoryDictByLibrary;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,56 +21,59 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> GetAll(GetAllInventoriesQuery request)
+        public async Task<IActionResult> GetAll(int page, int size)
         {
-            var data = await _mediator.Send(request);
-            var total = await _mediator.Send(new GetAllInventoriesCountQuery());
+            GetAllInventoriesQuery request = new(page, size);
 
-            var response = new CustomResponse<IEnumerable<Inventory>>(data, "Inventários Recupedados com Sucesso!", total);
+            var response = await _mediator.Send(request);
 
-            return data.Any() ? Ok(response) : NoContent();
+            return Ok(response);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(GetInventoryByIdQuery request)
+        public async Task<IActionResult> GetById(int id)
         {
-            var data = await _mediator.Send(request);
+            GetInventoryByIdQuery request = new(id);
 
-            var response = new CustomResponse<Inventory>(data, "Inventário Recupedado com Sucesso!");
+            var response = await _mediator.Send(request);
 
-            return data != null ? Ok(response) : NoContent();
+            return Ok(response);
         }
 
         [HttpGet("library/{libraryId}")]
-        public async Task<IActionResult> GetByLibrary(int libraryId, GetInventoryByLibraryQuery request)
+        public async Task<IActionResult> GetByLibrary(int libraryId, int page, int size)
         {
-            var data = await _mediator.Send(request);
-            var total = await _mediator.Send(new GetAllInventoriesCountQuery());
+            GetInventoryByLibraryQuery request = new(page, size, libraryId);
 
-            var response = new CustomResponse<IEnumerable<Inventory>>(data, "Inventários Recupedado com Sucesso!", total);
+            var response = await _mediator.Send(request);
 
-            return data != null ? Ok(response) : NoContent();
+            return Ok(response);
+        }
+
+        [HttpGet("library/{libraryId}/books/dict")]
+        public async Task<IActionResult> GetDictByLibrary(int libraryId)
+        {
+            GetInventoryDictByLibraryQuery request = new(libraryId);
+
+            var response = await _mediator.Send(request);
+
+            return Ok(response);
         }
 
         [HttpPost("filter")]
         public async Task<IActionResult> Filter(GetInventoriesByFilterQuery request)
         {
-            var data = await _mediator.Send(request);
-            var total = await _mediator.Send(new GetAllInventoriesCountQuery());
+            var response = await _mediator.Send(request);
 
-            var response = new CustomResponse<IEnumerable<Inventory>>(data, "Inventários Recupedados com Sucesso!", total);
-
-            return data.Any() ? Ok(response) : NoContent();
+            return Ok(response);
         }
 
         [HttpPost]
         public async Task<IActionResult> Add(AddInventoryCommand request)
         {
-            var data = await _mediator.Send(request);
+            var response = await _mediator.Send(request);
 
-            var response = new CustomResponse<Inventory>(data, "Inventário Adicionado com Sucesso!");
-
-            var locationUri = Url.Link(nameof(GetById), new { id = data.Id });
+            var locationUri = Url.Link(nameof(GetById), new { id = response.Data.Id });
 
             return Created(locationUri, response);
         }
@@ -80,29 +81,25 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateInventoryCommand request)
         {
-            var data = await _mediator.Send(request);
-
-            var response = new CustomResponse<Inventory>(data, "Inventários Atualizado com Sucesso!");
+            var response = await _mediator.Send(request);
 
             return Ok(response);
         }
 
         [HttpPut("status/{id}")]
-        public async Task<IActionResult> Update(int id, UpdateInventoryStatusCommand request)
+        public async Task<IActionResult> UpdateStatus(int id, UpdateInventoryStatusCommand request)
         {
-            var data = await _mediator.Send(request);
-
-            var response = new CustomResponse<Inventory>(data, "Inventários Atualizado com Sucesso!");
+            var response = await _mediator.Send(request);
 
             return Ok(response);
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Remove(int id, RemoveInventoryCommand request)
+        public async Task<IActionResult> Remove(int id)
         {
-            var data = await _mediator.Send(request);
+            RemoveInventoryCommand request = new(id);
 
-            var response = new CustomResponse<bool>(data, "Inventários Removido com Sucesso!");
+            var response = await _mediator.Send(request);
 
             return Ok(response);
         }

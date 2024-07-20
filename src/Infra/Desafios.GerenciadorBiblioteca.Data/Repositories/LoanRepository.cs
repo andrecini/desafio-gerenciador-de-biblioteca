@@ -43,7 +43,7 @@ namespace Desafios.GerenciadorBiblioteca.Data.Repositories
             if (!string.IsNullOrEmpty(request.BookName))
                 sb.AppendLine("AND LOWER(b.Title) LIKE LOWER(@BookName)");
             if (!string.IsNullOrEmpty(request.UserName))
-                sb.AppendLine("AND LOWER(b.Author) LIKE LOWER(@UserName)");
+                sb.AppendLine("AND LOWER(u.Name) LIKE LOWER(@UserName)");
             if (request.LoanDate != default)
                 sb.AppendLine("AND CAST(l.LoanDate AS DATE) = CAST(@LoanDate AS DATE)");
             if (request.LoanValidity != default)
@@ -58,7 +58,7 @@ namespace Desafios.GerenciadorBiblioteca.Data.Repositories
                 UserName = $"%{request.UserName}%",
                 request.LoanDate,
                 request.LoanValidity,
-                request.Status,
+                Status = (int)request.Status == 2 ? 0 : 1,
             });
         }
 

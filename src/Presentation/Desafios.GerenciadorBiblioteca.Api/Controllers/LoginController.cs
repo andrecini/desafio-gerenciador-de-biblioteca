@@ -19,11 +19,12 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(UserLoginCommand request)
         {
+            // refatorar para mandar o token via handler
             var data = await _mediator.Send(request);
 
-            var token = _tokenService.GenerateJwtToken(data.Id, data.Name, data.Role);
+            var token = _tokenService.GenerateJwtToken(data.Data.Id, data.Data.Name, data.Data.Role);
 
-            var response = new UserLoginViewModel(data, token);
+            var response = new UserLoginViewModel(data.Data, token);
 
             return Ok(response);
         }
@@ -31,11 +32,13 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         [HttpPut("{id}/password")]
         public async Task<IActionResult> ResetPassword(int id, UpdateUserPasswordCommand request)
         {
+            // refatorar para mandar o token via handler
+
             var data = await _mediator.Send(request);
 
-            var token = _tokenService.GenerateJwtToken(data.Id, data.Name, data.Role);
+            var token = _tokenService.GenerateJwtToken(data.Data.Id, data.Data.Name, data.Data.Role);
 
-            var response = new UserLoginViewModel(data, token);
+            var response = new UserLoginViewModel(data.Data, token);
 
             return Ok(response);
         }

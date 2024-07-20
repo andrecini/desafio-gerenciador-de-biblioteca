@@ -3,6 +3,7 @@ using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Desafios.GerenciadorBiblioteca.Domain.Enums;
 using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
+using Desafios.GerenciadorBiblioteca.Service.DTOs;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
 using Desafios.GerenciadorBiblioteca.Service.Helpers;
 using Desafios.GerenciadorBiblioteca.Service.Security.Interfaces;
@@ -11,13 +12,13 @@ using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.AddUser
 {
-    public class AddUserCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICipherService cipher) : IRequestHandler<AddUserCommand, UserViewModel>
+    public class AddUserCommandHandler(IUnitOfWork unitOfWork, IMapper mapper, ICipherService cipher) : IRequestHandler<AddUserCommand, CustomResponse<UserViewModel>>
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IMapper _mapper = mapper;
         private readonly ICipherService _cipher = cipher;
 
-        public async Task<UserViewModel> Handle(AddUserCommand request, CancellationToken cancellationToken)
+        public async Task<CustomResponse<UserViewModel>> Handle(AddUserCommand request, CancellationToken cancellationToken)
         {
             ValidatorHelper.ValidateEntity<AddUserCommandValidator, AddUserCommand>(request);
 
@@ -37,9 +38,9 @@ namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.AddUser
 
             var viewModel = _mapper.Map<UserViewModel>(entity);
 
-            return result > 0 ? viewModel : throw new CustomException(
-                "Não foi possível adicionar o Usuário. Tente novamente!",
-                HttpStatusCode.InternalServerError);
+            return result > 0 ? 
+                new CustomResponse<UserViewModel>(viewModel, "Usuário adicionado com sucesso!") : 
+                throw new CustomException("Não foi possível adicionar o Usuário. Tente novamente!", HttpStatusCode.InternalServerError);
         }
     }
 }

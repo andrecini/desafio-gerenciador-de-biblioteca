@@ -1,15 +1,16 @@
 ﻿using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
+using Desafios.GerenciadorBiblioteca.Service.DTOs;
 using Desafios.GerenciadorBiblioteca.Service.Helpers;
 using MediatR;
 
 namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetInventoryByLibrary
 {
-    public class GetInventoryByLibraryQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetInventoryByLibraryQuery, IEnumerable<Inventory>>
+    public class GetInventoryByLibraryQueryHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetInventoryByLibraryQuery, CustomResponse<IEnumerable<Inventory>>>
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-        public async Task<IEnumerable<Inventory>> Handle(GetInventoryByLibraryQuery request, CancellationToken cancellationToken)
+        public async Task<CustomResponse<IEnumerable<Inventory>>> Handle(GetInventoryByLibraryQuery request, CancellationToken cancellationToken)
         {
             ValidatorHelper.ValidateEntity<GetInventoryByLibraryQueryValidator, GetInventoryByLibraryQuery>(request);
 
@@ -17,7 +18,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetInv
 
             var paginatedData = data.Paginate(request.Page, request.Size);
 
-            return paginatedData;
+            return new CustomResponse<IEnumerable<Inventory>>(paginatedData, "Inventários recuperados com sucesso!", data.Count());
         }
     }
 }

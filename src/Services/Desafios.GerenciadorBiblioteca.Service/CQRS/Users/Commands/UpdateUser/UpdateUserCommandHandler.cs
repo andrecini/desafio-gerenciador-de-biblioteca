@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
+using Desafios.GerenciadorBiblioteca.Service.DTOs;
 using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
 using Desafios.GerenciadorBiblioteca.Service.Helpers;
 using MediatR;
@@ -8,9 +9,9 @@ using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.UpdateUser
 {
-    public class UpdateUserCommandHandler(IUnitOfWork unitOfWork, IMapper mapper) : IRequestHandler<UpdateUserCommand, UserViewModel>
+    public class UpdateUserCommandHandler(IUnitOfWork unitOfWork, IMapper mapper) : IRequestHandler<UpdateUserCommand, CustomResponse<UserViewModel>>
     {
-        public async Task<UserViewModel> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
+        public async Task<CustomResponse<UserViewModel>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
         {
             ValidatorHelper.ValidateEntity<UpdateUserCommandValidator, UpdateUserCommand>(request);
 
@@ -26,9 +27,9 @@ namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.UpdateUser
 
             var viewModel = mapper.Map<UserViewModel>(userRegistered);
 
-            return result > 0 ? viewModel : throw new CustomException(
-                "Não foi possível alterar o Usuário. Tente novamente!",
-                HttpStatusCode.InternalServerError);
+            return result > 0 ?
+                new CustomResponse<UserViewModel>(viewModel, "Usuário alterado com sucesso!") :
+                throw new CustomException("Não foi possível alterado o Usuário. Tente novamente!", HttpStatusCode.InternalServerError);
         }
     }
 }
