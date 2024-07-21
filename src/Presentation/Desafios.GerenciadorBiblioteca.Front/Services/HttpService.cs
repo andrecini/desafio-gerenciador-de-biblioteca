@@ -186,7 +186,7 @@ namespace Desafios.GerenciadorBiblioteca.Website.Services
             var response = new HttpServiceResponse
             {
                 StatusCode = ex.Call.Response != null ? (HttpStatusCode)ex.Call.Response.StatusCode : HttpStatusCode.InternalServerError,
-                Content = ex.Call.Response != null ? await ex.GetResponseStringAsync() : ex.Message
+                RawContent = ex.Call.Response != null ? await ex.GetResponseStringAsync() : ex.Message
             };
 
             if (response.StatusCode == HttpStatusCode.Unauthorized)

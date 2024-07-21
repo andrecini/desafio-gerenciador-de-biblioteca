@@ -3,6 +3,7 @@ using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Command.RemoveInve
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Command.UpdateInventory;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Command.UpdateInventoryStatus;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetAllInventories;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetDistinctInventoryDictByLibrary;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetInventoriesByFilter;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetInventoryById;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetInventoryByLibrary;
@@ -54,6 +55,16 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         public async Task<IActionResult> GetDictByLibrary(int libraryId)
         {
             GetInventoryDictByLibraryQuery request = new(libraryId);
+
+            var response = await _mediator.Send(request);
+
+            return Ok(response);
+        }
+
+        [HttpGet("library/{libraryId}/books/dict/distinct")]
+        public async Task<IActionResult> GetDistinctDictByLibrary(int libraryId)
+        {
+            GetDistinctInventoryDictByLibraryQuery request = new(libraryId);
 
             var response = await _mediator.Send(request);
 

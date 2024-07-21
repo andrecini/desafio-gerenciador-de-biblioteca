@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using Dapper;
+﻿using Dapper;
 using Desafios.GerenciadorBiblioteca.Data.Context;
 using Desafios.GerenciadorBiblioteca.Data.Repositories.Base;
 using Desafios.GerenciadorBiblioteca.Domain.Entities;

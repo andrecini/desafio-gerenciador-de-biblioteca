@@ -144,7 +144,7 @@ else
 
         if (!result.Canceled)
         {
-            var deleteResult = await httpService.DeleteAsync($"/api/loans/{Id}");
+            var deleteResult = await httpService.DeleteAsync($"/api/Loans/{Id}");
 
             if (!deleteResult.IsSuccess)
                 alertService.ShowErrors(deleteResult.ErrorDetails, deleteResult.StatusCode);
