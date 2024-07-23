@@ -4,7 +4,7 @@ using Desafios.GerenciadorBiblioteca.Domain.Enums;
 using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
 using Desafios.GerenciadorBiblioteca.Service.DTOs;
-using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
+using Desafios.GerenciadorBiblioteca.Service.DTOs.ViewModels;
 using Desafios.GerenciadorBiblioteca.Service.Helpers;
 using Desafios.GerenciadorBiblioteca.Service.Security.Interfaces;
 using MediatR;

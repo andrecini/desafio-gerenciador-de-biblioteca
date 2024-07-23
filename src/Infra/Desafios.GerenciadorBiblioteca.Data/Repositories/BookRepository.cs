@@ -73,7 +73,7 @@ namespace Desafios.GerenciadorBiblioteca.Data.Repositories
             {
                 request.LibraryId,
                 Title = $"%{request.Title}%",
-                Autor = $"%{request.Author}%",
+                Author = $"%{request.Author}%",
                 ISBN = $"%{request.ISBN}%",
                 request.Year,
                 request.Available,

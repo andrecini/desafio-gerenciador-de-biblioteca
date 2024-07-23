@@ -1,5 +1,8 @@
 ﻿@using System.ComponentModel.DataAnnotations
-@inject IUserService service
+@using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.AddUser
+@using Desafios.GerenciadorBiblioteca.Website.Services
+@inject HttpService httpService
+@inject AlertService alertService
 
 <MudDialog>
     <DialogContent>
@@ -34,9 +37,11 @@
     {
         if (form.IsValid)
         {
-            var dto = new UserRegisterInputModel(user.Name, user.Email, user.Phone, user.Password);
-            await service.AddAsync(dto);
-            MudDialog.Close(DialogResult.Ok(user));
+            AddUserCommand body = new(user.Name, user.Email, user.Phone, "Teste#123");
+            var result = await httpService.PostAsync<AddUserCommand>($"/api/Users", body);
+
+            if (result.IsSuccess) MudDialog.Close(DialogResult.Ok(true));
+            else alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
         }
     }
 

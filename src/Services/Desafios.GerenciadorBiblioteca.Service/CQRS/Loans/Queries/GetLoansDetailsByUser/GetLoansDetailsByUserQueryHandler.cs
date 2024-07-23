@@ -6,20 +6,20 @@ using Desafios.GerenciadorBiblioteca.Service.DTOs.ViewModels;
 using Desafios.GerenciadorBiblioteca.Service.Helpers;
 using MediatR;
 
-namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsByLibrary
+namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsByUser
 {
-    public class GetLoansDetailsByLibraryQueryHandler(IUnitOfWork unitOfWork, IMapper mapper) : IRequestHandler<GetLoansDetailsByLibraryQuery, CustomResponse<IEnumerable<LoanDetailsViewModel>>>
+    public class GetLoansDetailsByUserQueryHandler(IUnitOfWork unitOfWork, IMapper mapper) : IRequestHandler<GetLoansDetailsByUserQuery, CustomResponse<IEnumerable<LoanDetailsViewModel>>>
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IMapper _mapper = mapper;
 
-        public async Task<CustomResponse<IEnumerable<LoanDetailsViewModel>>> Handle(GetLoansDetailsByLibraryQuery request, CancellationToken cancellationToken)
+        public async Task<CustomResponse<IEnumerable<LoanDetailsViewModel>>> Handle(GetLoansDetailsByUserQuery request, CancellationToken cancellationToken)
         {
-            ValidatorHelper.ValidateEntity<GetLoansDetailsByLibraryQueryValidator, GetLoansDetailsByLibraryQuery>(request);
+            ValidatorHelper.ValidateEntity<GetLoansDetailsByUserQueryValidator, GetLoansDetailsByUserQuery>(request);
 
-            var queryRequest = _mapper.Map<LoanDetailsQueryByLibraryRequest>(request);
+            var queryRequest = _mapper.Map<LoanDetailsQueryByUserRequest>(request);
 
-            var queryResult = await _unitOfWork.Loans.GetLoanDetailsByLibraryAsync(queryRequest);
+            var queryResult = await _unitOfWork.Loans.GetLoanDetailsByUserAsync(queryRequest);
 
             var data = _mapper.Map<IEnumerable<LoanDetailsViewModel>>(queryResult);
 

@@ -72,7 +72,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         }
 
         [HttpPost("filter")]
-        public async Task<IActionResult> Filter(GetInventoriesByFilterQuery request)
+        public async Task<IActionResult> GetFiltered(GetInventoriesByFilterQuery request)
         {
             var response = await _mediator.Send(request);
 

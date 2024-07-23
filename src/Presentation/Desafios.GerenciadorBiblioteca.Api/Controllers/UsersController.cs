@@ -19,16 +19,19 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         private readonly IMediator _mediator = mediator;
 
         [HttpGet]
-        public async Task<IActionResult> GetAll(GetAllUsersQuery request)
+        public async Task<IActionResult> GetAll(int page, int size)
         {
+            GetAllUsersQuery request = new(page, size);
             var response = await _mediator.Send(request);
 
             return Ok(response);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(GetUserByIdQuery request)
+        public async Task<IActionResult> GetById(int id)
         {
+            GetUserByIdQuery request = new(id);
+
             var response = await _mediator.Send(request);
 
             return Ok(response);
@@ -68,9 +71,11 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
         
-        [HttpDelete]
-        public async Task<IActionResult> Remove(int id, RemoveUserCommand request)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Remove(int id)
         {
+            RemoveUserCommand request = new(id);
+
             var response = await _mediator.Send(request);
 
             return Ok(response);

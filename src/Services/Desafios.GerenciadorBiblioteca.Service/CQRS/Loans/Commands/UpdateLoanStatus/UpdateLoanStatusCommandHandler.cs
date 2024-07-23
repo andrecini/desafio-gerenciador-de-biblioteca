@@ -1,18 +1,18 @@
 ﻿using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Desafios.GerenciadorBiblioteca.Domain.Exceptions;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Command.UpdateInventoryStatus;
 using Desafios.GerenciadorBiblioteca.Service.DTOs;
 using Desafios.GerenciadorBiblioteca.Service.Helpers;
-using Desafios.GerenciadorBiblioteca.Service.Services.Interfaces;
 using MediatR;
 using System.Net;
 
 namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Commands.UpdateLoanStatus
 {
-    public class UpdateLoanStatusCommandHandler(IUnitOfWork unitOfWork, IInventoryService inventoryService) : IRequestHandler<UpdateLoanStatusCommand, CustomResponse<Loan>>
+    public class UpdateLoanStatusCommandHandler(IUnitOfWork unitOfWork, IMediator mediator) : IRequestHandler<UpdateLoanStatusCommand, CustomResponse<Loan>>
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
-        private readonly IInventoryService _inventoryService = inventoryService;
+        private readonly IMediator _mediator = mediator;
 
         public async Task<CustomResponse<Loan>> Handle(UpdateLoanStatusCommand request, CancellationToken cancellationToken)
         {
@@ -26,7 +26,8 @@ namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Commands.UpdateLoanS
             _unitOfWork.Loans.Update(loanRegistered);
             var result = await _unitOfWork.SaveAsync();
 
-            await _inventoryService.UpdateStatusAsync(loanRegistered.InventoryId, request.Returned);
+            UpdateInventoryStatusCommand updateStatusRequest = new(loanRegistered.InventoryId, false);
+            await _mediator.Send(updateStatusRequest);
 
             return result > 0 ?
                new CustomResponse<Loan>(loanRegistered, "Empréstimo alterar com sucesso!") :

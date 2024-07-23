@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
 using Desafios.GerenciadorBiblioteca.Service.DTOs;
-using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
+using Desafios.GerenciadorBiblioteca.Service.DTOs.ViewModels;
 using Desafios.GerenciadorBiblioteca.Service.Helpers;
 using MediatR;
 
@@ -20,7 +20,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Queries.GetAllUsers
 
             var viewModels = _mapper.Map<IEnumerable<UserViewModel>>(data);
 
-            var paginatedViewModels = viewModels.Take(request.Size).Skip(request.Page);
+            var paginatedViewModels = viewModels.Paginate(request.Page, request.Size);
 
             return new CustomResponse<IEnumerable<UserViewModel>>(paginatedViewModels, "Usuários recuperados com sucesso!", data.Count());
         }

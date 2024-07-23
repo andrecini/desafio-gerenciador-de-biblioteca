@@ -7,7 +7,9 @@ namespace Desafios.GerenciadorBiblioteca.Domain.Repositories
 {
     public interface ILoanRepository : IGenericRepository<Loan, int>
     {
-        Task<IEnumerable<LoanDetailsQueryResult>> GetLoanDetailsByLibraryAsync(LoanDetailsQueryRequest request);
-        Task<IEnumerable<LoanDetailsQueryResult>> GetLoanDetailsByFilterAsync(LoanDetailsFilteredQueryRequest request);
+        Task<IEnumerable<LoanDetailsQueryResult>> GetLoanDetailsByLibraryAsync(LoanDetailsQueryByLibraryRequest request);
+        Task<IEnumerable<LoanDetailsQueryResult>> GetLoanDetailsFilteredByLibraryAsync(LoanDetailsFilteredByLibraryQueryRequest request);
+        Task<IEnumerable<LoanDetailsQueryResult>> GetLoanDetailsByUserAsync(LoanDetailsQueryByUserRequest request);
+        Task<IEnumerable<LoanDetailsQueryResult>> GetLoanDetailsFilteredByUserAsync(LoanDetailsFilteredByUserQueryRequest request);
     }
 }

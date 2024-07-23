@@ -2,5 +2,5 @@
 
 namespace Desafios.GerenciadorBiblioteca.Domain.QueryModels.QueryRequests
 {
-    public record LoanDetailsQueryRequest(int LibraryId);
+    public record LoanDetailsQueryByLibraryRequest(int LibraryId);
 }

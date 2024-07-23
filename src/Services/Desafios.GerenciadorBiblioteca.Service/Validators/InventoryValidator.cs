@@ -1,4 +1,4 @@
-﻿using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
+﻿using Desafios.GerenciadorBiblioteca.Service.DTOs.InputModels;
 using FluentValidation;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Validators

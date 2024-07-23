@@ -1,14 +1,14 @@
 ﻿@using Desafios.GerenciadorBiblioteca.Domain.Enums
 @using Desafios.GerenciadorBiblioteca.Domain.Models.Filters
+@using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsFilteredByUser
+@using Desafios.GerenciadorBiblioteca.Service.DTOs.ViewModels
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Common
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Libraries.Custom.Dialogs
-
-@inject ILoanService loanService;
-@inject ILibraryService libraryService;
-@inject IBookService bookService;
-@inject IInventoryService inventoryService;
-@inject IUserService userService;
+@using Desafios.GerenciadorBiblioteca.Website.Models.Responses
+@using Desafios.GerenciadorBiblioteca.Website.Services
 @inject IDialogService dialogService
+@inject HttpService httpService
+@inject AlertService alertService
 
 <MudText Typo="Typo.h6">Livros</MudText>
 
@@ -23,30 +23,30 @@
             <MudSelectItem Value="2">Pendentes</MudSelectItem>
         </MudSelect>
         <MudButton Variant="Variant.Filled" Color="Color.Secondary" ButtonType="ButtonType.Reset" @onclick="ResetFormFiltersAsync">Limpar</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.FilterAlt" @onclick="FilterBooksViewModelAsync">Filtrar</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.FilterAlt" @onclick="FilterLoansDetailsAsync">Filtrar</MudButton>
     </MudForm>
 </MudContainer>
 
-@if (loansViewModels == null)
+@if (loansDetails == null)
 {
     <MudProgressCircular Color="Color.Default" Indeterminate="true" />
 }
 else
 {
-    <MudTable Items="loansViewModels" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true" Class="d-flex flex-column w-100">
+    <MudTable Items="loansDetails" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true" Class="d-flex flex-column w-100">
         <HeaderContent>
-            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<LoanViewModel, object>(x=>x.Id)">ID</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<LoanViewModel, object>(x=> x.BookName)" Class="w-100">Livro</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<LoanViewModel, object>(x=> x.LoanDate)">Data Empréstimo</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<LoanViewModel, object>(x=> x.LoanValidity)">Validade</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<LoanViewModel, object>(x=> x.Status)">Disponível</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<LoanDetailsViewModel, object>(x=>x.Id)">ID</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<LoanDetailsViewModel, object>(x=> x.BookName)" Class="w-100">Livro</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<LoanDetailsViewModel, object>(x=> x.LoanDate)">Data Empréstimo</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<LoanDetailsViewModel, object>(x=> x.LoanValidity)">Validade</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<LoanDetailsViewModel, object>(x=> x.Returned)">Status</MudTableSortLabel></MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="ID">@context.Id</MudTd>
             <MudTd DataLabel="Nome">@context.BookName</MudTd>
             <MudTd DataLabel="Data Empréstimo">@context.LoanDate.ToString("dd/MM/yyyy")</MudTd>
             <MudTd DataLabel="Validade">@context.LoanValidity.ToString("dd/MM/yyyy")</MudTd>
-            <MudTd DataLabel="Status">@(context.Status ? "Devolvido" : "Pendente")</MudTd>
+            <MudTd DataLabel="Status">@(context.Returned ? "Devolvido" : "Pendente")</MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager PageSizeOptions="new int[]{10, 20}" />
@@ -58,10 +58,7 @@ else
     [Parameter]
     public int Id { get; set; }
 
-    private List<LoanViewModel> loansViewModels = new();
-
-    private IEnumerable<Loan> loans;
-    private IEnumerable<Inventory> inventories;
+    private IEnumerable<LoanDetailsViewModel> loansDetails = [];
 
     private LoanFilter filter = new();
     private string bookFilter;
@@ -76,69 +73,35 @@ else
 
     private async Task InitializeDataAsync()
     {
-        await InitializeInventoriesAsync();
-        await InitializeLoansAsync();
-        await InitializeLoansViewModelAsync();
+        await InitializeLoansDetailsAsync();
     }
 
-    private async Task InitializeInventoriesAsync()
+    private async Task InitializeLoansDetailsAsync()
     {
-        inventories = await inventoryService.GetAllAsync();
+        var result = await httpService.GetAsync<CustomResponse<IEnumerable<LoanDetailsViewModel>>>($"/api/Loans/users/{Id}/details?page=1&size=10");
+
+        if (result.IsSuccess)
+            loansDetails = result.Content.Data;
+        else
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
     }
 
-    private async Task InitializeLoansAsync()
+    private async Task FilterLoansDetailsAsync()
     {
-        var inventoryIds = inventories.Select(inv => inv.Id).ToHashSet();
-        var allLoans = await loanService.GetByUserAsync(Id);
-        loans = allLoans.Where(loan => inventoryIds.Contains(loan.InventoryId));
-    }
-
-    private async Task InitializeLoansViewModelAsync()
-    {
-        var loanViewModels = new List<LoanViewModel>();
-
-        foreach (var loan in loans)
-        {
-            var inventory = inventories.FirstOrDefault(x => x.Id == loan.InventoryId);
-
-            if (inventory != null)
-            {
-                var book = await bookService.GetByIdAsync(inventory.BookId);
-                loanViewModels.Add(new LoanViewModel(loan, book.Title, loan.Returned));
-            }
-        }
-
-        loansViewModels = loanViewModels;
-    }
-
-    private async Task FilterBooksViewModelAsync()
-    {
-        await InitializeInventoriesAsync();
-
-        var booksIds = await GetFilteredBooksIdsAsync();
-        var inventoriesIds = GetFilteredInventoriesIds(booksIds);
-
         filter.LoanValidity = loanDateValidityFilter ?? new DateTime();
         filter.LoanDate = loanDateFilter ?? new DateTime();
         filter.Status = (LoanStatus)statusFilter;
 
-        loans = await loanService.GetByFilterAsync(filter);
-        loans = loans.Where(x => inventoriesIds.Contains(x.InventoryId) && x.UserId == Id);
+        GetLoansDetailsFilteredByUserQuery body = new(1, 10, Id, bookFilter, filter.LoanDate, filter.LoanValidity, filter.Status);
 
-        await InitializeLoansViewModelAsync();
+        var result = await httpService.PostAsync<GetLoansDetailsFilteredByUserQuery, CustomResponse<IEnumerable<LoanDetailsViewModel>>>($"/api/Loans/users/{Id}/details/filter", body);
+
+        if (result.IsSuccess)
+            loansDetails = result.Content.Data;
+        else
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
+
         StateHasChanged();
-    }
-
-    private async Task<HashSet<int>> GetFilteredBooksIdsAsync()
-    {
-        var filteredBooks = await bookService.GetByFilterAsync(new() { Title = bookFilter }) ?? new List<Book>();
-        return filteredBooks.Select(x => x.Id).ToHashSet();
-    }
-
-    private HashSet<int> GetFilteredInventoriesIds(HashSet<int> booksIds)
-    {
-        inventories = inventories.Where(x => booksIds.Contains(x.BookId));
-        return inventories.Select(x => x.Id).ToHashSet();
     }
 
     private async Task ResetFormFiltersAsync()
@@ -149,25 +112,7 @@ else
         loanDateValidityFilter = null;
         statusFilter = 0;
 
-        await FilterBooksViewModelAsync();
+        await FilterLoansDetailsAsync();
         StateHasChanged();
-    }
-
-    public class LoanViewModel
-    {
-        public LoanViewModel(Loan loan, string bookName, bool available)
-        {
-            Id = loan.Id;
-            BookName = bookName;
-            LoanDate = loan.LoanDate;
-            LoanValidity = loan.LoanValidity;
-            Status = available;
-        }
-
-        public int Id { get; set; }
-        public string BookName { get; set; }
-        public DateTime LoanDate { get; set; }
-        public DateTime LoanValidity { get; set; }
-        public bool Status { get; set; }
     }
 }

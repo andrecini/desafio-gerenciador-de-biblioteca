@@ -7,7 +7,9 @@ using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoanById;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansByFilter;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansByUser;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsByLibrary;
-using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsFiltered;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsByUser;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsFilteredByLibrary;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsFilteredByUser;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,8 +24,10 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> GetAll(GetAllLoansQuery request)
+        public async Task<IActionResult> GetAll(int page, int size)
         {
+            GetAllLoansQuery request = new(page, size);
+
             var response = await _mediator.Send(request);
 
             return Ok(response);
@@ -58,7 +62,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         }
 
         [HttpPost("library/{libraryId}/details/filter")]
-        public async Task<IActionResult> GetFilteredDetails(int libraryId, GetLoansDetailsFilteredQuery request)
+        public async Task<IActionResult> GetFilteredDetailsByLibrary(int libraryId, GetLoansDetailsFilteredByLibraryQuery request)
         {
             var response = await _mediator.Send(request);
 
@@ -69,6 +73,24 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         public async Task<IActionResult> GetDetailsByLibrary(int libraryId, int page, int size)
         {
             GetLoansDetailsByLibraryQuery request = new(page, size, libraryId);
+
+            var response = await _mediator.Send(request);
+
+            return Ok(response);
+        }
+
+        [HttpPost("users/{userId}/details/filter")]
+        public async Task<IActionResult> GetFilteredDetailsByUser(int userId, GetLoansDetailsFilteredByUserQuery request)
+        {
+            var response = await _mediator.Send(request);
+
+            return Ok(response);
+        }
+
+        [HttpGet("users/{userId}/details")]
+        public async Task<IActionResult> GetDetailsByUser(int userId, int page, int size)
+        {
+            GetLoansDetailsByUserQuery request = new(page, size, userId);
 
             var response = await _mediator.Send(request);
 

@@ -1,8 +1,6 @@
-﻿using Desafios.GerenciadorBiblioteca.Domain.Entities;
-using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
+﻿using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
 using Desafios.GerenciadorBiblioteca.Service.DTOs;
 using Desafios.GerenciadorBiblioteca.Service.Helpers;
-using Desafios.GerenciadorBiblioteca.Service.Services;
 using MediatR;
 
 namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetDistinctInventoryDictByLibrary

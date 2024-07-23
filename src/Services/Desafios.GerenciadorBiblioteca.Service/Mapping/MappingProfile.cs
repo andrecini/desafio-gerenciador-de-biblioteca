@@ -9,10 +9,12 @@ using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Command.AddInvento
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Commands.AddLibrary;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Commands.AddLoan;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsByLibrary;
-using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsFiltered;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsByUser;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsFilteredByLibrary;
+using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsFilteredByUser;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.AddUser;
-using Desafios.GerenciadorBiblioteca.Service.DTOs.Requests;
-using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
+using Desafios.GerenciadorBiblioteca.Service.DTOs.InputModels;
+using Desafios.GerenciadorBiblioteca.Service.DTOs.ViewModels;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Desafios.GerenciadorBiblioteca.Service.Mapping
@@ -85,16 +87,26 @@ namespace Desafios.GerenciadorBiblioteca.Service.Mapping
                 .ForMember(x => x.LoanDate, opt => opt.MapFrom(src => src.LoanDate))
                 .ForMember(x => x.LoanValidity, opt => opt.MapFrom(src => src.LoanValidity));
 
-            CreateMap<GetLoansDetailsByLibraryQuery, LoanDetailsQueryRequest>()
+            CreateMap<GetLoansDetailsByLibraryQuery, LoanDetailsQueryByLibraryRequest>()
                 .ForMember(x => x.LibraryId, opt => opt.MapFrom(src => src.LibraryId));
 
-            CreateMap<GetLoansDetailsFilteredQuery, LoanDetailsFilteredQueryRequest>()
+            CreateMap<GetLoansDetailsByUserQuery, LoanDetailsQueryByUserRequest>()
+                .ForMember(x => x.UserId, opt => opt.MapFrom(src => src.UserId));
+
+            CreateMap<GetLoansDetailsFilteredByLibraryQuery, LoanDetailsFilteredByLibraryQueryRequest>()
                 .ForMember(x => x.LibraryId, opt => opt.MapFrom(src => src.LibraryId))
                 .ForMember(x => x.LoanDate, opt => opt.MapFrom(src => src.LoanDate))
                 .ForMember(x => x.LoanValidity, opt => opt.MapFrom(src => src.LoanValidity))
                 .ForMember(x => x.Status, opt => opt.MapFrom(src => src.Status))
                 .ForMember(x => x.BookName, opt => opt.MapFrom(src => src.BookName))
                 .ForMember(x => x.UserName, opt => opt.MapFrom(src => src.UserName));
+
+            CreateMap<GetLoansDetailsFilteredByUserQuery, LoanDetailsFilteredByUserQueryRequest>()
+                .ForMember(x => x.UserId, opt => opt.MapFrom(src => src.UserId))
+                .ForMember(x => x.LoanDate, opt => opt.MapFrom(src => src.LoanDate))
+                .ForMember(x => x.LoanValidity, opt => opt.MapFrom(src => src.LoanValidity))
+                .ForMember(x => x.Status, opt => opt.MapFrom(src => src.Status))
+                .ForMember(x => x.BookName, opt => opt.MapFrom(src => src.BookName));
 
             CreateMap<LoanDetailsQueryResult, LoanDetailsViewModel>()
                 .ForMember(x => x.Id, opt => opt.MapFrom(src => src.Id))

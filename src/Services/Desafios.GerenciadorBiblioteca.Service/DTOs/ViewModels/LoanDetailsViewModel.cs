@@ -1,4 +1,4 @@
-﻿namespace Desafios.GerenciadorBiblioteca.Service.DTOs.Responses
+﻿namespace Desafios.GerenciadorBiblioteca.Service.DTOs.ViewModels
 {
     public record LoanDetailsViewModel(
         int Id,

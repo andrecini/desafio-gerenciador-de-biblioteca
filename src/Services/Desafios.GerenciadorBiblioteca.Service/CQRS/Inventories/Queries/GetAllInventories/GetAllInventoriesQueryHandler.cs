@@ -16,7 +16,7 @@ namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetAll
 
             var data = await _unitOfWork.Inventories.GetAllAsync();
 
-            var paginatedData = data.Take(request.Size).Skip(request.Size);
+            var paginatedData = data.Take(request.Size).Skip(request.Page);
 
             return new CustomResponse<IEnumerable<Inventory>>(paginatedData, "Inventários recuperados com sucesso!", data.Count());
         }

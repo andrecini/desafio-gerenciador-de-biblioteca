@@ -2,7 +2,7 @@
 using Desafios.GerenciadorBiblioteca.Domain.QueryModels.QueryRequests;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
 using Desafios.GerenciadorBiblioteca.Service.DTOs;
-using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
+using Desafios.GerenciadorBiblioteca.Service.DTOs.ViewModels;
 using Desafios.GerenciadorBiblioteca.Service.Helpers;
 using MediatR;
 

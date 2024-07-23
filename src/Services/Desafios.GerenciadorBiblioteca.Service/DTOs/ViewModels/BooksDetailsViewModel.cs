@@ -1,8 +1,9 @@
 ﻿using Desafios.GerenciadorBiblioteca.Domain.Entities;
 
-namespace Desafios.GerenciadorBiblioteca.Service.DTOs.Responses
+namespace Desafios.GerenciadorBiblioteca.Service.DTOs.ViewModels
 {
-    public record BookDetailsViewModel {
+    public record BookDetailsViewModel
+    {
 
         public BookDetailsViewModel() { }
 

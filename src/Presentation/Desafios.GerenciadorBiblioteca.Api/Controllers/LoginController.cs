@@ -1,6 +1,6 @@
 ﻿using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.UpdateUserPassword;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.UserLogin;
-using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses;
+using Desafios.GerenciadorBiblioteca.Service.DTOs.ViewModels;
 using Desafios.GerenciadorBiblioteca.Service.Security.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

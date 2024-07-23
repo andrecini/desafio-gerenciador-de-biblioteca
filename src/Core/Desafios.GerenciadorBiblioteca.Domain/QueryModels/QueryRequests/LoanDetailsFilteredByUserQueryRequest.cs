@@ -2,12 +2,11 @@
 
 namespace Desafios.GerenciadorBiblioteca.Domain.QueryModels.QueryRequests
 {
-    public record LoanDetailsFilteredQueryRequest(
+    public record LoanDetailsFilteredByUserQueryRequest(
         int Page,
         int Size,
-        int LibraryId,
+        int UserId,
         string BookName,
-        string UserName,
         DateTime LoanDate,
         DateTime LoanValidity,
         LoanStatus Status);

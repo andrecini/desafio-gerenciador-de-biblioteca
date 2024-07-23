@@ -77,8 +77,6 @@
 
         if (form.IsValid)
         {
-            var dto = new LoanInputModel(inventoryId, userId, loanDate.Value, loanValidity.Value);
-
             AddLoanCommand body = new(inventoryId, userId, loanDate.Value, loanValidity.Value);
 
             var result = await httpService.PostAsync<AddLoanCommand, CustomResponse<Loan>>($"/api/Loans", body);

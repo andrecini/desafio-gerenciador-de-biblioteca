@@ -1,9 +1,13 @@
 ﻿@page "/users/details/{Id:int}"
 @using System.ComponentModel.DataAnnotations
-@using Desafios.GerenciadorBiblioteca.Service.DTOs.Responses
+@using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.UpdateUser
+@using Desafios.GerenciadorBiblioteca.Service.DTOs.InputModels
+@using Desafios.GerenciadorBiblioteca.Service.DTOs.ViewModels
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Users.Custom.Panels
-@inject ISnackbar Snackbar
-@inject IUserService userService;
+@using Desafios.GerenciadorBiblioteca.Website.Models.Responses
+@using Desafios.GerenciadorBiblioteca.Website.Services
+@inject HttpService httpService
+@inject AlertService alertService
 
 <PageTitle>Usuáros</PageTitle>
 
@@ -52,10 +56,17 @@
 
     private async Task InitializeUserAsync()
     {
-        user = await userService.GetByIdAsync(Id);
-        name = user.Name;
-        email = user.Email;
-        phone = user.Phone;
+        var result = await httpService.GetAsync<CustomResponse<UserViewModel>>($"/api/Users/{Id}");
+
+        if (result.IsSuccess)
+        {
+            user = result.Content.Data;
+            name = user.Name;
+            email = user.Email;
+            phone = user.Phone;
+        }
+        else
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
     }
 
     private async Task EditUserAsync()
@@ -64,12 +75,13 @@
 
         if (form.IsValid)
         {
-            var dto = new UserUpdateInputModel(name, email, phone);
-            await userService.UpdateAsync(Id, dto);
+            UpdateUserCommand body = new(Id, user.Name, user.Email, user.Phone);
+            var result = await httpService.PutAsync<UpdateUserCommand, CustomResponse<UserViewModel>>($"/api/Users/{Id}", body);
 
-            Snackbar.Clear();
-            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopEnd;
-            Snackbar.Add("Dados alterados com sucesso!", Severity.Success);
+            if (result.IsSuccess)
+                user = result.Content.Data;
+            else
+                alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
         }
     }
 

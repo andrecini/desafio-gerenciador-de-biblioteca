@@ -1,11 +1,11 @@
 ﻿@page "/loans/details/{Id:int}"
 @using System.ComponentModel.DataAnnotations
+@using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Commands.UpdateLoan
+@using Desafios.GerenciadorBiblioteca.Service.DTOs
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Loans.Custom.Panels
-@inject ISnackbar Snackbar
-@inject ILoanService loanService
-@inject IInventoryService inventoryService
-@inject IBookService bookService
-@inject IUserService userService
+@using Desafios.GerenciadorBiblioteca.Website.Services
+@inject HttpService httpService
+@inject AlertService alertService
 
 <PageTitle>Empréstimo</PageTitle>
 
@@ -99,13 +99,13 @@
 
         if (form.IsValid)
         {
-            var dto = new LoanInputModel(loan.InventoryId, loan.UserId, loanDate.Value, loanValidity.Value);
-            await loanService.UpdateAsync(Id, dto);
-            await loanService.UpdateStatusAsync(Id, loan.Returned);
+            UpdateLoanCommand body = new(Id, loan.InventoryId, loan.UserId, loanDate.Value, loanValidity.Value);
+            var result = await httpService.PutAsync<UpdateLoanCommand, CustomResponse<Loan>>($"/api/Loans/{Id}", body);
 
-            Snackbar.Clear();
-            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopEnd;
-            Snackbar.Add("Dados alterados com sucesso!", Severity.Success);
+            if (result.IsSuccess)
+                loan = result.Content.Data;
+            else
+                alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
         }
     }
 
@@ -137,7 +137,12 @@
 
     private async Task InitializeLoanAsync()
     {
-        loan = await loanService.GetByIdAsync(Id);
+        var result = await httpService.GetAsync<CustomResponse<Loan>>($"/api/Libraries/{Id}");
+
+        if (result.IsSuccess)
+            loan = result.Content.Data;
+        else
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
     }
 
     private async Task InitializeDictionariesAsync()
@@ -148,33 +153,27 @@
 
     private async Task InitializeBooksDictAsync()
     {
-        var books = await bookService.GetAllAsync();
-        var inventories = await inventoryService.GetAllAsync();
-        var inventoriesAvailables = inventories.Where(x => x.Available).ToHashSet();
-        var inventoryActual = await inventoryService.GetByIdAsync(loan.InventoryId);
+        var result = await httpService.GetAsync<CustomResponse<Dictionary<int, string>>>($"/api/Inventories/library/{Id}/books/dict");
 
-        if (!inventoriesAvailables.Contains(inventoryActual))
-            inventoriesAvailables.Add(inventoryActual);
-
-        var inventoriesBooksIds = inventoriesAvailables.Select(x => x.BookId).ToHashSet();
-        var filteredBooks = books.Where(x => inventoriesBooksIds.Contains(x.Id));
-
-        foreach (var inventory in inventoriesAvailables)
+        if (result.IsSuccess)
+            inventoriesDictionary = result.Content.Data;
+        else
         {
-            var book = filteredBooks.FirstOrDefault(b => b.Id == inventory.BookId);
-            if (book != null)
-            {
-                inventoriesDictionary[inventory.Id] = book.Title;
-            }
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
+            inventoriesDictionary = [];
         }
     }
 
     private async Task InitializeUsersDictAsync()
     {
-        var users = await userService.GetAllAsync();
-        foreach (var user in users)
+        var result = await httpService.GetAsync<CustomResponse<Dictionary<int, string>>>($"/api/Users/dict");
+
+        if (result.IsSuccess)
+            usersDictionary = result.Content.Data;
+        else
         {
-            usersDictionary[user.Id] = user.Name;
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
+            usersDictionary = [];
         }
     }
 }

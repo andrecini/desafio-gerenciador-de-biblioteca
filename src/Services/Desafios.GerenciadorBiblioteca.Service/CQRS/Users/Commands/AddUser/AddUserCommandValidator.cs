@@ -28,8 +28,8 @@ namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.AddUser
             RuleFor(b => b.Password)
                 .NotNull().NotEmpty()
                 .WithMessage("A Senha é obrigatória.")
-                .Length(8)
-                .WithMessage("A Senha deve ter no mínimo 8 caracteres e pelo menos 1 símbolo.");
+                .Must(x => x.Length >= 8 && x.Length <= 24)
+                .WithMessage("A Senha deve ter no mínimo 8 e no máximo 24 caracteres.");
         }
     }
 }
