@@ -1,11 +1,10 @@
 ﻿@page "/"
 @using System.Globalization
-@inject ILibraryService libraryService;
-@inject IUserService userService;
-@inject IBookService bookService;
-@inject ILoanService loanService;
-@inject IInventoryService inventoryService;
-
+@using Desafios.GerenciadorBiblioteca.Service.DTOs.ViewModels
+@using Desafios.GerenciadorBiblioteca.Website.Models.Responses
+@using Desafios.GerenciadorBiblioteca.Website.Services
+@inject HttpService httpService
+@inject AlertService alertService
 
 <PageTitle>Dashboard</PageTitle>
 
@@ -115,7 +114,7 @@
     }
 
     <MudContainer Class="d-flex flex-column align-start justify-start pa-0 ma-0 gap-5 h-100 mh-100 w-40" MaxWidth="MaxWidth.False">
-        
+
         <MudPaper Width="100%" Height="100%" MaxHeight="100%" Class="pa-5 gap-5" Elevation="4">
             <MudTable Items="viewModels" Hover="true" SortLabel="Sort By" Elevation="1" Class="d-flex flex-column w-100 h-100 mh-100">
                 <ToolBarContent>
@@ -139,7 +138,7 @@
 @code {
     private IEnumerable<Library> libraries;
     private IEnumerable<Book> books;
-    private IEnumerable<User> users;
+    private IEnumerable<UserViewModel> users;
     private IEnumerable<Loan> loans;
     private IEnumerable<Inventory> inventories;
 
@@ -170,11 +169,26 @@
 
     private async Task InitializEnumerablesAsync()
     {
-        libraries = await libraryService.GetAllAsync();
-        books = await bookService.GetAllAsync();
-        users = await userService.GetAllAsync();
-        loans = await loanService.GetAllAsync();
-        inventories = await inventoryService.GetAllAsync();
+        libraries = await InitializeEnumerableAsync<Library>("/api/Libraries?page=0&size=0");
+        users = await InitializeEnumerableAsync<UserViewModel>("/api/Users?page=0&size=0");
+        books = await InitializeEnumerableAsync<Book>("/api/Books?page=0&size=0");
+        inventories = await InitializeEnumerableAsync<Inventory>("/api/Inventories?page=0&size=0");
+        loans = await InitializeEnumerableAsync<Loan>("/api/Loans?page=0&size=0");
+    }
+
+    private async Task<IEnumerable<T>> InitializeEnumerableAsync<T>(string uri)
+    {
+        List<T> output = new();
+
+        var result = await httpService.GetAsync<CustomResponse<IEnumerable<T>>>(uri);
+
+        if (result.IsSuccess)
+            return output = result.Content.Data.ToList();
+        else
+        {
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
+            return output = [];
+        }
     }
 
     private void InitializAmoutDatas()

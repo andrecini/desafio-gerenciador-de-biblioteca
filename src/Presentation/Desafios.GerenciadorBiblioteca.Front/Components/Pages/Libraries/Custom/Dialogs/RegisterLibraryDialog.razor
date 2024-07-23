@@ -1,4 +1,8 @@
-﻿@inject ILibraryService service
+﻿@using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Commands.AddLibrary
+@using Desafios.GerenciadorBiblioteca.Website.Models.Responses
+@using Desafios.GerenciadorBiblioteca.Website.Services
+@inject HttpService httpService
+@inject AlertService alertService
 
 <MudDialog>
     <DialogContent>
@@ -36,9 +40,13 @@
 
         if (form.IsValid)
         {
-            var dto = new LibraryDTO(library.Name, library.CNPJ, library.Phone);
-            await service.AddAsync(dto);
-            MudDialog.Close(DialogResult.Ok(library));
+            AddLibraryCommand body = new(library.Name, library.CNPJ, library.Phone);
+            var result = await httpService.PostAsync<AddLibraryCommand, CustomResponse<Library>>($"/api/Libraries", body);
+
+            if (result.IsSuccess)
+                MudDialog.Close(DialogResult.Ok(library));
+            else
+                alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
         }
     }
 

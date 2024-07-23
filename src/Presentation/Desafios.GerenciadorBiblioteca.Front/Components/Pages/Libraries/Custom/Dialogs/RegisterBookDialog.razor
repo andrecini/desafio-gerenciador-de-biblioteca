@@ -1,5 +1,8 @@
-﻿@inject IInventoryService inventoryService
-@inject IBookService bookService
+﻿@using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Command.AddInventory
+@using Desafios.GerenciadorBiblioteca.Website.Models.Responses
+@using Desafios.GerenciadorBiblioteca.Website.Services
+@inject HttpService httpService
+@inject AlertService alertService
 
 <MudDialog>
     <DialogContent>
@@ -49,9 +52,11 @@
 
         if (form.IsValid)
         {
-            var dto = new InventoryDTO(LibraryId, bookId);
-            await inventoryService.AddAsync(dto);
-            MudDialog.Close(DialogResult.Ok(true));
+            AddInventoryCommand body = new(LibraryId, bookId);
+            var result = await httpService.PostAsync<AddInventoryCommand, CustomResponse<Inventory>>($"/api/Inventories", body);
+
+            if (result.IsSuccess) MudDialog.Close(DialogResult.Ok(true));
+            else alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
         }
     }
 
@@ -64,15 +69,14 @@
 
     private async Task InitializeBooksDictAsync()
     {
-        var books = await bookService.GetAllAsync();
-        var inventories = await inventoryService.GetByLibraryAsync(LibraryId);
-        var inventoriesBooksIds = inventories.Select(x => x.BookId).ToHashSet();
+        var result = await httpService.GetAsync<CustomResponse<Dictionary<int, string>>>($"/api/Inventories/library/{LibraryId}/books/dict/distinct");
 
-        var distinctBooks = books.Where(x => !inventoriesBooksIds.Contains(x.Id));
-
-        foreach (var book in distinctBooks)
-        {
-            booksDictionary.Add(book.Id, book.Title);
+        if (result.IsSuccess)
+            booksDictionary = result.Content.Data;
+        else
+        {                                                
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
+            booksDictionary = [];
         }
     }
 }

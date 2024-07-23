@@ -1,8 +1,10 @@
 ﻿@page "/books/details/{Id:int}"
-@using System.ComponentModel.DataAnnotations
+@using Desafios.GerenciadorBiblioteca.Service.CQRS.Books.Commands.UpdateBook
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Books.Custom.Panels
-@inject ISnackbar Snackbar
-@inject IBookService bookService;
+@using Desafios.GerenciadorBiblioteca.Website.Models.Responses
+@using Desafios.GerenciadorBiblioteca.Website.Services
+@inject AlertService alertService
+@inject HttpService httpService;
 
 <PageTitle>Livros</PageTitle>
 
@@ -45,27 +47,37 @@
     protected override async Task OnInitializedAsync()
     {
         await InitializeLibraryAsync();
+        yearInput = book.Year.ToString();
     }
 
     private async Task InitializeLibraryAsync()
     {
-        book = await bookService.GetByIdAsync(Id);
-        yearInput = book.Year.ToString();
+        var result = await httpService.GetAsync<CustomResponse<Book>>($"/api/Books/{Id}");
+
+        if (!result.IsSuccess)
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
+        else
+            book = result.Content.Data;
     }
 
     private async Task EditLibraryAsync()
     {
         await form.Validate();
-        
+
         if (form.IsValid)
         {
             book.Year = Convert.ToInt32(yearInput);
-            var dto = new BookDTO(book.Title, book.Author, book.ISBN, book.Year);
-            await bookService.UpdateAsync(Id, dto);
+            var body = new UpdateBookCommand(Id, book.Title, book.Author, book.ISBN, book.Year.Value);
 
-            Snackbar.Clear();
-            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopEnd;
-            Snackbar.Add("Dados alterados com sucesso!", Severity.Success);
+            var result = await httpService.PutAsync<UpdateBookCommand, CustomResponse<Book>>($"/api/Books/{Id}", body);
+
+            if (!result.IsSuccess)
+                alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
+            else
+            {
+                alertService.ShowErrors(["Dados alterados com sucesso!"], result.StatusCode);
+                book = result.Content.Data;
+            }
         }
     }
 

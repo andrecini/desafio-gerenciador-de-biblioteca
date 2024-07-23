@@ -1,7 +1,8 @@
-﻿@inject ILoanService loanService
-@inject IInventoryService inventoryService
-@inject IBookService bookService
-@inject IUserService userService
+﻿@using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Commands.AddLoan
+@using Desafios.GerenciadorBiblioteca.Website.Models.Responses
+@using Desafios.GerenciadorBiblioteca.Website.Services
+@inject HttpService httpService
+@inject AlertService alertService
 
 <MudDialog>
     <DialogContent>
@@ -34,7 +35,7 @@
                            @bind-Date="loanDate" />
 
             <MudDatePicker ShowToolbar="false" Label="Data Validade" Class="mb-2"
-                           HelperText="A Data de Validade dever ser pelo menos 1 dia maior do que a Data de Rmpréstimo"
+                           HelperText="A Data de Validade dever ser pelo menos 1 dia maior do que a Data de Empréstimo"
                            Validation="@(new Func<DateTime?, string>(ValidateLoanValidity))" Required="true"
                            @bind-Date="loanValidity" />
         </MudForm>
@@ -76,9 +77,17 @@
 
         if (form.IsValid)
         {
-            var dto = new LoanDTO(inventoryId, userId, loanDate.Value, loanValidity.Value);
-            await loanService.AddAsync(dto);
-            MudDialog.Close(DialogResult.Ok(true));
+            AddLoanCommand body = new(inventoryId, userId, loanDate.Value, loanValidity.Value);
+
+            var result = await httpService.PostAsync<AddLoanCommand, CustomResponse<Loan>>($"/api/Loans", body);
+
+            if (result.IsSuccess)
+            {
+                MudDialog.Close(DialogResult.Ok(result.Content.Data));
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+                alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
         }
     }
 
@@ -113,7 +122,7 @@
         if (loanDate == null)
             return null;
 
-        if (loanValidity < loanDate.Value.AddDays(1))
+        if (loanValidity.Value.Date < loanDate.Value.AddDays(1).Date)
             return "Data de Validade inválida. Intervalo entre a Data de Empréstimo e a Data de Validade deve ser de no mínimo 1 dia.";
 
         return null;
@@ -121,30 +130,27 @@
 
     private async Task InitializeBooksDictAsync()
     {
-        var books = await bookService.GetAllAsync();
-        var inventories = await inventoryService.GetByLibraryAsync(LibraryId);
-        var availableInventories = inventories.Where(x => x.Available);
-        var availableBookIds = availableInventories.Select(x => x.BookId).ToHashSet();
+        var result = await httpService.GetAsync<CustomResponse<Dictionary<int, string>>>($"/api/Inventories/library/{LibraryId}/books/dict");
 
-        var filteredBooks = books.Where(x => availableBookIds.Contains(x.Id));
-
-        foreach (var inventory in availableInventories)
+        if (result.IsSuccess)
+            inventoriesDictionary = result.Content.Data;
+        else
         {
-            var book = filteredBooks.FirstOrDefault(b => b.Id == inventory.BookId);
-            if (book != null)
-            {
-                inventoriesDictionary[inventory.Id] = book.Title;
-            }
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
+            inventoriesDictionary = [];
         }
     }
 
     private async Task InitializeUsersDictAsync()
     {
-        var users = await userService.GetAllAsync();
+        var result = await httpService.GetAsync<CustomResponse<Dictionary<int, string>>>($"/api/Users/dict");
 
-        foreach (var user in users)
+        if (result.IsSuccess)
+            usersDictionary = result.Content.Data;
+        else
         {
-            usersDictionary[user.Id] = user.Name;
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
+            usersDictionary = [];
         }
     }
 }

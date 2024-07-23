@@ -1,9 +1,14 @@
 ﻿@page "/libraries"
+@using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Commands.RemoveLibrary
+@using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Queries.GetLibraryByName
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Common
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Libraries.Custom.Dialogs
+@using Desafios.GerenciadorBiblioteca.Website.Models.Responses
+@using Desafios.GerenciadorBiblioteca.Website.Services
 @rendermode InteractiveServer
-@inject ILibraryService libraryService
 @inject IDialogService DialogService
+@inject HttpService httpService
+@inject AlertService alertService
 
 <PageTitle>Bibliotecas</PageTitle>
 
@@ -53,28 +58,64 @@ else
             </MudTd>
         </RowTemplate>
         <PagerContent>
-            <MudTablePager PageSizeOptions="new int[]{10, 20}" />
+            <MudPagination SelectedChanged="OnPageChangedHandler" Count="@((int)Math.Ceiling((double)totalItems / size))" Selected="page" Class="pa-4" />
         </PagerContent>
     </MudTable>
 }
 
 @code {
+    private MudTable<IEnumerable<Library>> table;
     private IEnumerable<Library> libraries;
     private string libraryNameFilter = string.Empty;
+    private bool isFiltered = false;
+    private int totalItems = 0;
+    private int page = 1;
+    private int size = 10;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadLibrariesAsync();
     }
 
+    private async Task OnPageChangedHandler(int i)
+    {
+        page = i;
+
+        if (!isFiltered) await LoadLibrariesAsync();
+        else await FilterLibsHandleAsync();
+    }
+
+
     private async Task LoadLibrariesAsync()
     {
-        libraries = await libraryService.GetAllAsync();
+        isFiltered = false;
+
+        var result = await httpService.GetAsync<CustomResponse<IEnumerable<Library>>>($"/api/libraries?page={page}&size={size}");
+
+        if (result.IsSuccess)
+        {
+            libraries = result.Content.Data;
+            totalItems = result.Content.Total;
+        }
+        else
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
     }
 
     private async Task FilterLibsHandleAsync()
     {
-        libraries = await libraryService.GetByNameAsync(libraryNameFilter);
+        isFiltered = true;
+
+        GetLibrariesByNameQuery body = new(page, size, libraryNameFilter);
+        var result = await httpService.PostAsync<GetLibrariesByNameQuery, CustomResponse<IEnumerable<Library>>>($"/api/Libraries/filter", body);
+
+        if (result.IsSuccess)
+        {
+            libraries = result.Content.Data;
+            totalItems = result.Content.Total;
+        }
+        else
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
+
         StateHasChanged();
     }
 
@@ -91,7 +132,13 @@ else
 
         if (!result.Canceled)
         {
-            await libraryService.RemoveAsync(id);
+            RemoveLibraryCommand body = new(id);
+
+            var deleteResult = await httpService.DeleteAsync<RemoveLibraryCommand>($"/api/Libraries/{id}", body);
+
+            if (!deleteResult.IsSuccess)
+                alertService.ShowErrors(deleteResult.ErrorDetails, deleteResult.StatusCode);
+
             await LoadLibrariesAsync();
         }
     }
@@ -110,6 +157,7 @@ else
 
     private async Task ResetFormFiltersAsync()
     {
+        isFiltered = false;
         libraryNameFilter = string.Empty;
         await FilterLibsHandleAsync();
     }

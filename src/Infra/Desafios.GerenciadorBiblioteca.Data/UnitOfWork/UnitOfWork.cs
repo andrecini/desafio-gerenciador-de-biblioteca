@@ -2,6 +2,7 @@
 using Desafios.GerenciadorBiblioteca.Data.Repositories;
 using Desafios.GerenciadorBiblioteca.Domain.Repositories;
 using Desafios.GerenciadorBiblioteca.Domain.UnitOfWork;
+using Microsoft.Extensions.Configuration;
 
 namespace Desafios.GerenciadorBiblioteca.Data.UnitOfWork
 {
@@ -15,15 +16,15 @@ namespace Desafios.GerenciadorBiblioteca.Data.UnitOfWork
 
         private readonly LibraryDbContext _context;
 
-        public UnitOfWork(LibraryDbContext context)
+        public UnitOfWork(LibraryDbContext context, IConfiguration configuration)
         {
             _context = context;
 
-            Books = new BookRepository(_context);
-            Libraries = new LibraryRepository(_context);
+            Books = new BookRepository(_context, configuration);
+            Libraries = new LibraryRepository(_context, configuration);
             Users = new UserRepository(_context);
             Inventories = new InventoryRepository(_context);
-            Loans = new LoanRepository(_context);
+            Loans = new LoanRepository(_context, configuration);
         }
 
         public async Task<int> SaveAsync()

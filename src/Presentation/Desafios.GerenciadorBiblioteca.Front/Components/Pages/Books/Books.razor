@@ -1,18 +1,19 @@
 ﻿@page "/books"
-@using Desafios.GerenciadorBiblioteca.Domain.Entities.Filters
+@using Desafios.GerenciadorBiblioteca.Domain.Models.Filters
+@using Desafios.GerenciadorBiblioteca.Service.CQRS.Books.Commands.RemoveBook
+@using Desafios.GerenciadorBiblioteca.Service.CQRS.Books.Queries.GetBooksByFilter
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Books.Custom.Dialogs
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Common
+@using Desafios.GerenciadorBiblioteca.Website.Models.Responses
+@using Desafios.GerenciadorBiblioteca.Website.Services
 @rendermode InteractiveServer
-@inject IBookService bookService
 @inject IDialogService dialogService
+@inject HttpService httpService
+@inject AlertService alertService
 
-<PageTitle>Usuários</PageTitle>
+<PageTitle>Livros</PageTitle>
 
-<MudText Typo="Typo.h5" GutterBottom="true">Usuários</MudText>
-
-
-
-<MudText Typo="Typo.h6">Livros</MudText>
+<MudText Typo="Typo.h5" GutterBottom="true">Livros</MudText>
 
 <MudContainer Class="d-flex flex-row align-end pa-0 mb-5 ma-0 gap-5" MaxWidth="MaxWidth.False">
     <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-row align-end pa-0 ma-0 gap-5 w-100">
@@ -61,15 +62,12 @@ else
             </MudTd>
         </RowTemplate>
         <PagerContent>
-            <MudTablePager PageSizeOptions="new int[]{10, 20}" />
+            <MudPagination SelectedChanged="OnPageChangedHandler" Count="@((int)Math.Ceiling((double)totalItems / size))" Selected="page" Class="pa-4" />
         </PagerContent>
     </MudTable>
 }
 
 @code {
-    [Parameter]
-    public int Id { get; set; }
-
     private IEnumerable<Book> books;
     private BookFilter filter = new();
     private string yearFilter;
@@ -78,14 +76,32 @@ else
     private bool success;
     private string[] errors = [];
 
+    private bool isFiltered = false;
+    private int totalItems = 0;
+    private int page = 1;
+    private int size = 10;
+
     protected override async Task OnInitializedAsync()
     {
         await InitializeBooksAsync();
     }
 
+    private async Task OnPageChangedHandler(int i)
+    {
+        page = i;
+
+        if (!isFiltered) await InitializeBooksAsync();
+        else await FilterBooksViewModelAsync();
+    }
+
     private async Task InitializeBooksAsync()
     {
-        books = await bookService.GetAllAsync();
+        var result = await httpService.GetAsync<CustomResponse<IEnumerable<Book>>>($"/api/Books?page={page}&size={size}");
+
+        if (result.IsSuccess)
+            books = result.Content.Data;
+        else
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
     }
 
     private async Task FilterBooksViewModelAsync()
@@ -93,7 +109,15 @@ else
         if (!form.IsValid)
             return;
 
-        books = await bookService.GetByFilterAsync(filter);
+        GetBooksByFilterQuery body = new(page, size, filter.Title, filter.Author, filter.ISBN, filter.Year);
+        var result = await httpService.PostAsync<GetBooksByFilterQuery, CustomResponse<IEnumerable<Book>>>($"/api/Books/filter", body);
+
+        if (result.IsSuccess)
+            books = result.Content.Data;
+        else
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
+        
+
         StateHasChanged();
     }
 
@@ -140,11 +164,15 @@ else
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
 
         var dialog = await dialogService.ShowAsync<CommonDeleteDialog>("Excluir", parameters, options);
-        var result = await dialog.Result;
+        var dialogResult = await dialog.Result;
 
-        if (!result.Canceled)
+        if (!dialogResult.Canceled)
         {
-            await bookService.RemoveAsync(id);
+            var result = await httpService.DeleteAsync($"/api/Books/{id}");
+
+            if (!result.IsSuccess)
+                alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
+
             await InitializeBooksAsync();
         }
     }
@@ -154,9 +182,9 @@ else
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
 
         var dialog = await dialogService.ShowAsync<RegisterBookDialog>("Cadastrar", options);
-        var result = await dialog.Result;
+        var dialogResult = await dialog.Result;
 
-        if (!result.Canceled)
+        if (!dialogResult.Canceled)
         {
             await InitializeBooksAsync();
         }

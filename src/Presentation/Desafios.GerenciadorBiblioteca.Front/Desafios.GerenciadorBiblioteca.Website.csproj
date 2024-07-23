@@ -12,6 +12,7 @@
 
   
   <ItemGroup>
+    <PackageReference Include="Flurl.Http" Version="4.0.2" />
     <PackageReference Include="MudBlazor" Version="7.0.0" />
 
   </ItemGroup>
@@ -31,6 +32,13 @@
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Components\CustomDeleteConfirmDialog.razor" />
     <_ContentIncludedByDefault Remove="wwwroot\reset.css" />
+  </ItemGroup>
+
+  
+  <ItemGroup>
+    <Content Update="Components\Pages\Libraries\Custom\Dialogs\EditLoanDialog.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
   </ItemGroup>
   
 </Project>

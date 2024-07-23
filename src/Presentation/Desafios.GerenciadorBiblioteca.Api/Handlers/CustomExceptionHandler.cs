@@ -16,7 +16,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Handlers
 
             _logger.LogError("Aviso: {Message}", customException.ErrorDetails);
 
-            var response = new CustomErrorResponse(customException.ErrorDetails, "CustomException");
+            var response = new CustomResponse<string[]>(customException.ErrorDetails, "CustomException");
 
             httpContext.Response.StatusCode = (int)customException.StatusCode;
             await httpContext.Response.WriteAsJsonAsync(response, cancellationToken: cancellationToken);
