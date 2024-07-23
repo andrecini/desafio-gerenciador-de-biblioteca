@@ -49,7 +49,7 @@ else
             <MudTd DataLabel="Status">@(context.Returned ? "Devolvido" : "Pendente")</MudTd>
         </RowTemplate>
         <PagerContent>
-            <MudTablePager PageSizeOptions="new int[]{10, 20}" />
+            <MudPagination SelectedChanged="OnPageChangedHandler" Count="@((int)Math.Ceiling((double)totalItems / size))" Selected="page" Class="pa-4" />
         </PagerContent>
     </MudTable>
 }
@@ -66,14 +66,22 @@ else
     private DateTime? loanDateValidityFilter;
     private int statusFilter;
 
+    private bool isFiltered = false;
+    private int totalItems = 0;
+    private int page = 1;
+    private int size = 10;
+
     protected override async Task OnInitializedAsync()
     {
-        await InitializeDataAsync();
+        await InitializeLoansDetailsAsync();
     }
 
-    private async Task InitializeDataAsync()
+    private async Task OnPageChangedHandler(int i)
     {
-        await InitializeLoansDetailsAsync();
+        page = i;
+
+        if (!isFiltered) await InitializeLoansDetailsAsync();
+        else await FilterLoansDetailsAsync();
     }
 
     private async Task InitializeLoansDetailsAsync()

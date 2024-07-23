@@ -7,12 +7,12 @@ namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Queries.GetAllUsers
         public GetAllUsersQueryValidator()
         {
             RuleFor(x => x.Page)
-                .GreaterThanOrEqualTo(1)
-                .WithMessage("A Página deve ser maior ou igual a 1.");
+                .GreaterThanOrEqualTo(0)
+                .WithMessage("A Página deve ser maior ou igual a 0.");
 
             RuleFor(x => x.Size)
-                .GreaterThanOrEqualTo(5)
-                .WithMessage("O Tamanho da Página deve ser maior ou igual a 5.");
+                .GreaterThanOrEqualTo(0)
+                .WithMessage("O Tamanho da Página deve ser maior ou igual a 0.");
         }
     }
 }

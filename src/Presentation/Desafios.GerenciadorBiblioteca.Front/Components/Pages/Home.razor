@@ -169,11 +169,11 @@
 
     private async Task InitializEnumerablesAsync()
     {
-        libraries = await InitializeEnumerableAsync<Library>("/api/Libraries?page=1&size=10");
-        users = await InitializeEnumerableAsync<UserViewModel>("/api/Users?page=1&size=10");
-        books = await InitializeEnumerableAsync<Book>("/api/Books?page=1&size=10");
-        inventories = await InitializeEnumerableAsync<Inventory>("/api/Inventories?page=1&size=10");
-        loans = await InitializeEnumerableAsync<Loan>("/api/Loans?page=1&size=10");
+        libraries = await InitializeEnumerableAsync<Library>("/api/Libraries?page=0&size=0");
+        users = await InitializeEnumerableAsync<UserViewModel>("/api/Users?page=0&size=0");
+        books = await InitializeEnumerableAsync<Book>("/api/Books?page=0&size=0");
+        inventories = await InitializeEnumerableAsync<Inventory>("/api/Inventories?page=0&size=0");
+        loans = await InitializeEnumerableAsync<Loan>("/api/Loans?page=0&size=0");
     }
 
     private async Task<IEnumerable<T>> InitializeEnumerableAsync<T>(string uri)

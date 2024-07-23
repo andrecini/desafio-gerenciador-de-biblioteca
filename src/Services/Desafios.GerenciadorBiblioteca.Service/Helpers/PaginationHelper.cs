@@ -4,9 +4,7 @@
     {
         public static IEnumerable<T> Paginate<T>(this IEnumerable<T> source, int page, int size)
         {
-            if (page < 1) page = 1;
-
-            if (size < 1) size = 10;
+            if (page == 0 && size == 0) return source;
 
             return source.Skip((page - 1) * size).Take(size);
         }

@@ -27,7 +27,7 @@ namespace Desafios.GerenciadorBiblioteca.Website.Services
             };
         }
 
-        private IFlurlRequest CreateRequest(string uri)
+        private FlurlRequest CreateRequest(string uri)
         {
             var tokenModel = _authService.GetTokenModel();
 

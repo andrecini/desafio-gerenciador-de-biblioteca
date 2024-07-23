@@ -1,4 +1,5 @@
 ﻿@using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Commands.AddLoan
+@using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Commands.UpdateLoan
 @using Desafios.GerenciadorBiblioteca.Website.Models.Responses
 @using Desafios.GerenciadorBiblioteca.Website.Services
 @inject HttpService httpService
@@ -42,7 +43,7 @@
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancelar</MudButton>
-        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="SubmitAsync">Cadastrar</MudButton>
+        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="SubmitAsync">Editar</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -52,7 +53,12 @@
 
     [Parameter]
     public int LibraryId { get; set; }
+    [Parameter]
+    public int LoanId { get; set; }
+    [Parameter]
+    public string BookName { get; set; }
 
+    private Loan loan = new();
     private Dictionary<int, string> inventoriesDictionary = new();
     private Dictionary<int, string> usersDictionary = new();
 
@@ -69,6 +75,51 @@
     {
         await InitializeBooksDictAsync();
         await InitializeUsersDictAsync();
+        await InitializeLoanAsync();
+        inventoriesDictionary.Add(loan.InventoryId, BookName);
+    }
+
+    private async Task InitializeLoanAsync()
+    {
+        var result = await httpService.GetAsync<CustomResponse<Loan>>($"/api/Loans/{LoanId}");
+
+        if (result.IsSuccess)
+        {
+            loan = result.Content.Data;
+
+            inventoryId = loan.InventoryId;
+            userId = loan.UserId;
+            loanDate = loan.LoanDate;
+            loanValidity = loan.LoanValidity;
+        }
+        else
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
+    }
+
+    private async Task InitializeBooksDictAsync()
+    {
+        var result = await httpService.GetAsync<CustomResponse<Dictionary<int, string>>>($"/api/Inventories/library/{LibraryId}/books/dict");
+
+        if (result.IsSuccess)
+            inventoriesDictionary = result.Content.Data;
+        else
+        {
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
+            inventoriesDictionary = [];
+        }
+    }
+
+    private async Task InitializeUsersDictAsync()
+    {
+        var result = await httpService.GetAsync<CustomResponse<Dictionary<int, string>>>($"/api/Users/dict");
+
+        if (result.IsSuccess)
+            usersDictionary = result.Content.Data;
+        else
+        {
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
+            usersDictionary = [];
+        }
     }
 
     private async Task SubmitAsync()
@@ -77,9 +128,8 @@
 
         if (form.IsValid)
         {
-            AddLoanCommand body = new(inventoryId, userId, loanDate.Value, loanValidity.Value);
-
-            var result = await httpService.PostAsync<AddLoanCommand, CustomResponse<Loan>>($"/api/Loans", body);
+            UpdateLoanCommand body = new(LoanId, loan.InventoryId, loan.UserId, loanDate.Value, loanValidity.Value);
+            var result = await httpService.PutAsync<UpdateLoanCommand, CustomResponse<Loan>>($"/api/Loans/{LoanId}", body);
 
             if (result.IsSuccess)
             {
@@ -123,34 +173,8 @@
             return null;
 
         if (loanValidity.Value.Date < loanDate.Value.AddDays(1).Date)
-            return "Data de Validade inválida. Intervalo entre a Data de Empréstimo e a Data de Validade deve ser de no mínimo 1 dia.";
+        return "Data de Validade inválida. Intervalo entre a Data de Empréstimo e a Data de Validade deve ser de no mínimo 1 dia.";
 
         return null;
-    }
-
-    private async Task InitializeBooksDictAsync()
-    {
-        var result = await httpService.GetAsync<CustomResponse<Dictionary<int, string>>>($"/api/Inventories/library/{LibraryId}/books/dict");
-
-        if (result.IsSuccess)
-            inventoriesDictionary = result.Content.Data;
-        else
-        {
-            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
-            inventoriesDictionary = [];
-        }
-    }
-
-    private async Task InitializeUsersDictAsync()
-    {
-        var result = await httpService.GetAsync<CustomResponse<Dictionary<int, string>>>($"/api/Users/dict");
-
-        if (result.IsSuccess)
-            usersDictionary = result.Content.Data;
-        else
-        {
-            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
-            usersDictionary = [];
-        }
     }
 }

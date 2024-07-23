@@ -23,7 +23,7 @@
     <MudForm Class="d-flex flex-row align-end gap-5">
         <MudTextField @bind-Value="userNameFilter" Immediate="true" Label="Nome do Usuário" Class="ma-0" />
         <MudButton Variant="Variant.Filled" Color="Color.Secondary" ButtonType="ButtonType.Reset" @onclick="ResetFormFiltersAsync">Limpar</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.FilterAlt" @onclick="FilterLibsHandleAsync">Filtrar</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.FilterAlt" @onclick="FilterUsersHandleAsync">Filtrar</MudButton>
     </MudForm>
 </MudContainer>
 
@@ -59,7 +59,7 @@ else
             </MudTd>
         </RowTemplate>
         <PagerContent>
-            <MudTablePager PageSizeOptions="new int[]{10, 20}" />
+            <MudPagination SelectedChanged="OnPageChangedHandler" Count="@((int)Math.Ceiling((double)totalItems / size))" Selected="page" Class="pa-4" />
         </PagerContent>
     </MudTable>
 }
@@ -69,9 +69,22 @@ else
 
     private string userNameFilter = string.Empty;
 
+    private bool isFiltered = false;
+    private int totalItems = 0;
+    private int page = 1;
+    private int size = 10;
+
     protected override async Task OnInitializedAsync()
     {
         await LoadUsersAsync();
+    }
+
+    private async Task OnPageChangedHandler(int i)
+    {
+        page = i;
+
+        if (!isFiltered) await LoadUsersAsync();
+        else await FilterUsersHandleAsync();
     }
 
     private async Task LoadUsersAsync()
@@ -84,7 +97,7 @@ else
             alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
     }
 
-    private async Task FilterLibsHandleAsync()
+    private async Task FilterUsersHandleAsync()
     {
         GetUsersByNameQuery body = new(1, 10, userNameFilter);
         var result = await httpService.PostAsync<GetUsersByNameQuery, CustomResponse<IEnumerable<UserViewModel>>>($"/api/Users/filter", body);
@@ -138,6 +151,6 @@ else
     private async Task ResetFormFiltersAsync()
     {
         userNameFilter = string.Empty;
-        await FilterLibsHandleAsync();
+        await FilterUsersHandleAsync();
     }
 }

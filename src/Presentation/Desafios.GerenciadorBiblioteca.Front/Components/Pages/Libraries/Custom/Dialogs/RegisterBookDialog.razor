@@ -53,7 +53,7 @@
         if (form.IsValid)
         {
             AddInventoryCommand body = new(LibraryId, bookId);
-            var result = await httpService.PostAsync<AddInventoryCommand, CustomResponse<Dictionary<int, string>>>($"/api/Inventories", body);
+            var result = await httpService.PostAsync<AddInventoryCommand, CustomResponse<Inventory>>($"/api/Inventories", body);
 
             if (result.IsSuccess) MudDialog.Close(DialogResult.Ok(true));
             else alertService.ShowErrors(result.ErrorDetails, result.StatusCode);

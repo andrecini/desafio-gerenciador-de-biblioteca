@@ -33,5 +33,12 @@
     <_ContentIncludedByDefault Remove="Components\CustomDeleteConfirmDialog.razor" />
     <_ContentIncludedByDefault Remove="wwwroot\reset.css" />
   </ItemGroup>
+
+  
+  <ItemGroup>
+    <Content Update="Components\Pages\Libraries\Custom\Dialogs\EditLoanDialog.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
   
 </Project>

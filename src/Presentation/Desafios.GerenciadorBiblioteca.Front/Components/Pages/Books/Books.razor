@@ -62,7 +62,7 @@ else
             </MudTd>
         </RowTemplate>
         <PagerContent>
-            <MudTablePager PageSizeOptions="new int[]{10, 20}" />
+            <MudPagination SelectedChanged="OnPageChangedHandler" Count="@((int)Math.Ceiling((double)totalItems / size))" Selected="page" Class="pa-4" />
         </PagerContent>
     </MudTable>
 }
@@ -76,14 +76,27 @@ else
     private bool success;
     private string[] errors = [];
 
+    private bool isFiltered = false;
+    private int totalItems = 0;
+    private int page = 1;
+    private int size = 10;
+
     protected override async Task OnInitializedAsync()
     {
         await InitializeBooksAsync();
     }
 
+    private async Task OnPageChangedHandler(int i)
+    {
+        page = i;
+
+        if (!isFiltered) await InitializeBooksAsync();
+        else await FilterBooksViewModelAsync();
+    }
+
     private async Task InitializeBooksAsync()
     {
-        var result = await httpService.GetAsync<CustomResponse<IEnumerable<Book>>>($"/api/Books?page=1&size=10");
+        var result = await httpService.GetAsync<CustomResponse<IEnumerable<Book>>>($"/api/Books?page={page}&size={size}");
 
         if (result.IsSuccess)
             books = result.Content.Data;
@@ -96,7 +109,7 @@ else
         if (!form.IsValid)
             return;
 
-        GetBooksByFilterQuery body = new(1, 10, filter.Title, filter.Author, filter.ISBN, filter.Year);
+        GetBooksByFilterQuery body = new(page, size, filter.Title, filter.Author, filter.ISBN, filter.Year);
         var result = await httpService.PostAsync<GetBooksByFilterQuery, CustomResponse<IEnumerable<Book>>>($"/api/Books/filter", body);
 
         if (result.IsSuccess)

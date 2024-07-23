@@ -43,7 +43,7 @@ else
             <col />
             <col />
             <col />
-            <col width="280" />
+            <col width="200" />
         </ColGroup>
         <HeaderContent>
             <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<LoanDetailsViewModel, object>(x =>  x.Id)">ID</MudTableSortLabel></MudTh>
@@ -62,12 +62,12 @@ else
             <MudTd DataLabel="Responsáve">@context.Username</MudTd>
             <MudTd DataLabel="Status">@(context.Returned ? "Devolvido" : "Pendente")</MudTd>
             <MudTd DataLabel="Ações" Class="d-flex gap-2">
-                <MudButton Href="@($"/loans/details/{context.Id}")" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Search">Detalhes</MudButton>
+                <MudButton @onclick="@((e) => EditDialogHandleAsync(context.Id, context.BookName))" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Edit">Editar</MudButton>
                 <MudButton @onclick="@((e) => DeleteDialogHandleAsync(context.Id))" Variant="Variant.Outlined" Color="Color.Error" EndIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error">Excluir</MudButton>
             </MudTd>
         </RowTemplate>
         <PagerContent>
-            <MudTablePager PageSizeOptions="new int[]{10, 20}" />
+            <MudPagination SelectedChanged="OnPageChangedHandler" Count="@((int)Math.Ceiling((double)totalItems / size))" Selected="page" Class="pa-4" />
         </PagerContent>
     </MudTable>
 }
@@ -75,7 +75,7 @@ else
 @code {
 
     [Parameter]
-    public int Id { get; set; }
+    public int LibraryId { get; set; }
 
     private IEnumerable<LoanDetailsViewModel> loansDetails = new List<LoanDetailsViewModel>();
 
@@ -86,14 +86,27 @@ else
     private DateTime? loanDateValidityFilter;
     private int statusFilter;
 
+    private bool isFiltered = false;
+    private int totalItems = 0;
+    private int page = 1;
+    private int size = 10;
+
     protected override async Task OnInitializedAsync()
     {
         await InitializeLoansDetailsAsync();
     }
 
+    private async Task OnPageChangedHandler(int i)
+    {
+        page = i;
+
+        if (!isFiltered) await InitializeLoansDetailsAsync();
+        else await FilterLoansDetailsAsync();
+    }
+
     private async Task InitializeLoansDetailsAsync()
     {
-        var result = await httpService.GetAsync<CustomResponse<IEnumerable<LoanDetailsViewModel>>>($"/api/Loans/library/{Id}/details?page=1&size=10");
+        var result = await httpService.GetAsync<CustomResponse<IEnumerable<LoanDetailsViewModel>>>($"/api/Loans/library/{LibraryId}/details?page={page}&size={size}");
 
         if (result.IsSuccess)
             loansDetails = result.Content.Data;
@@ -107,9 +120,9 @@ else
         filter.LoanDate = loanDateFilter ?? new DateTime();
         filter.Status = (LoanStatus)statusFilter;
 
-        GetLoansDetailsFilteredByLibraryQuery body = new(1, 10, Id, bookFilter, userFilter, filter.LoanDate, filter.LoanValidity, filter.Status);
+        GetLoansDetailsFilteredByLibraryQuery body = new(page, size, LibraryId, bookFilter, userFilter, filter.LoanDate, filter.LoanValidity, filter.Status);
 
-        var result = await httpService.PostAsync<GetLoansDetailsFilteredByLibraryQuery, CustomResponse<IEnumerable<LoanDetailsViewModel>>>($"/api/Loans/library/{Id}/details/filter", body);
+        var result = await httpService.PostAsync<GetLoansDetailsFilteredByLibraryQuery, CustomResponse<IEnumerable<LoanDetailsViewModel>>>($"/api/Loans/library/{LibraryId}/details/filter", body);
 
         if (result.IsSuccess)
             loansDetails = result.Content.Data;
@@ -144,7 +157,7 @@ else
 
         if (!result.Canceled)
         {
-            var deleteResult = await httpService.DeleteAsync($"/api/Loans/{Id}");
+            var deleteResult = await httpService.DeleteAsync($"/api/Loans/{LibraryId}");
 
             if (!deleteResult.IsSuccess)
                 alertService.ShowErrors(deleteResult.ErrorDetails, deleteResult.StatusCode);
@@ -157,11 +170,30 @@ else
     {
         var parameters = new DialogParameters<RegisterLoanDialog>
         {
-            { x => x.LibraryId, Id },
+            { x => x.LibraryId, LibraryId },
         };
 
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
         var dialog = await dialogService.ShowAsync<RegisterLoanDialog>("Cadastrar", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await InitializeLoansDetailsAsync();
+        }
+    }
+
+    private async Task EditDialogHandleAsync(int id, string bookName)
+    {
+        var parameters = new DialogParameters<EditLoanDialog>
+        {
+            { x => x.LoanId, id },
+            { x => x.LibraryId, LibraryId },
+            { x => x.BookName, bookName },
+        };
+
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+        var dialog = await dialogService.ShowAsync<EditLoanDialog>("Editar", parameters, options);
         var result = await dialog.Result;
 
         if (!result.Canceled)

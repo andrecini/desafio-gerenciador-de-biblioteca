@@ -14,23 +14,21 @@ namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetDis
             ValidatorHelper.ValidateEntity<GetDistinctInventoryDictByLibraryQueryValidator, GetDistinctInventoryDictByLibraryQuery>(request);
 
             var books = await _unitOfWork.Books.GetAllAsync();
-            var inventories = await _unitOfWork.Inventories.FindAsync(x => x.LibraryId == request.LibraryId);
-            var bookIds = inventories.Select(x => x.BookId).ToHashSet();
+            var inventories = await _unitOfWork.Inventories.GetAllAsync();
 
-            var filteredBooks = books.Where(x => !bookIds.Contains(x.Id));
+            var libraryInventories = inventories.Where(x => x.LibraryId.Equals(request.LibraryId));
+            var unavailableBooksIds = libraryInventories.Select(x => x.BookId).ToHashSet();
+
+            var availableBooks = books.Where(x => !unavailableBooksIds.Contains(x.Id));
 
             Dictionary<int, string> dict = [];
 
-            foreach (var inventory in inventories)
+            foreach (var book in availableBooks)
             {
-                var book = filteredBooks.FirstOrDefault(b => b.Id == inventory.BookId);
-                if (book != null)
-                {
-                    dict.Add(inventory.Id, book.Title);
-                }
+                dict.Add(book.Id, book.Title);
             }
 
-            return new CustomResponse<Dictionary<int, string>>(dict, "Dicionério de Inventários recuperados com sucesso!");
+            return new CustomResponse<Dictionary<int, string>>(dict, "Dicionário de Inventários recuperados com sucesso!");
         }
     }
 }
