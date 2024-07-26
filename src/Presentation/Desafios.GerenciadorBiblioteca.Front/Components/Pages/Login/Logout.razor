@@ -2,7 +2,7 @@
 @using Desafios.GerenciadorBiblioteca.Website.Services.Auth
 @using Microsoft.AspNetCore.Components.Authorization
 @inject TokenStorageService tokenStorageService
-@inject AuthenticationStateProvider authStateProvider;
+@inject AuthService authService;
 
 @inject NavigationManager navigator
 
@@ -11,8 +11,7 @@
     {
         if (firstRender)
         {
-            await tokenStorageService.ClearTokenIdentity();
-            await authStateProvider.GetAuthenticationStateAsync();
+            await authService.Logout();
             StateHasChanged();
             navigator.NavigateTo("/");
         }

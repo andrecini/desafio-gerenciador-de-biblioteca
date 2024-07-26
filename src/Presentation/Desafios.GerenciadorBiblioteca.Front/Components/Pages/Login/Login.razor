@@ -12,7 +12,6 @@
 @inject AlertService alertService
 @inject AuthService authService
 @inject NavigationManager navigator
-@inject TokenStorageService tokenStorageService;
 
 <MudContainer MaxWidth="MaxWidth.False" Class="d-flex h-100 mx-100 ma-0 pa-0" Style="width: 50%; max-width: 50%">
     <MudImage ObjectFit="ObjectFit.Cover" ObjectPosition="ObjectPosition.Right" Src="login-backgroud.svg" Alt="Swedish Farm House" Class="rounded-lg w-100 mw-100" />
@@ -57,7 +56,7 @@
     {
         if (firstRender)
         {
-            var isOpen = await VerifyUserSessionIsOpenAsync();
+            var isOpen = await authService.VerifyUserSessionIsOpenAsync();
 
             if (isOpen)
             {
@@ -97,31 +96,6 @@
             }
             else
                 alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
-        }
-    }
-
-    private async Task<bool> VerifyUserSessionIsOpenAsync()
-    {
-        try
-        {
-            var token = await tokenStorageService.GetTokenIdentity();
-
-            if (token == null)
-                return false;
-
-            if (token.ValidTo >= DateTime.Now)
-            {
-                token.ValidTo = DateTime.Now;
-                await authService.Login(token);
-                return true;
-            }
-
-            await tokenStorageService.ClearTokenIdentity();
-            return false;
-        }
-        catch
-        {
-            return false;
         }
     }
 }
