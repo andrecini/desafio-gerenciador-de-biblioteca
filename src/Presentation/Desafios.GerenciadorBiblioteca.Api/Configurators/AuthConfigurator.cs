@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -11,7 +12,16 @@ namespace Desafios.GerenciadorBiblioteca.Api.Configurators
             services
                 .AddAuthorization(options =>
                 {
-                    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+                    options.AddPolicy("Common", new AuthorizationPolicyBuilder()
+                        .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+                        .RequireAuthenticatedUser()
+                        .Build());
+
+                    options.AddPolicy("Administrator", new AuthorizationPolicyBuilder()
+                        .RequireRole("Administrator")
+                        .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+                        .RequireAuthenticatedUser()
+                        .Build());
                 })
                 .AddAuthentication(options =>
                 {
@@ -25,13 +35,13 @@ namespace Desafios.GerenciadorBiblioteca.Api.Configurators
                     options.RequireHttpsMetadata = false;
                     options.TokenValidationParameters = new TokenValidationParameters()
                     {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"])),
+                        ValidateIssuer = true,
                         ValidIssuer = configuration["Jwt:Issuer"],
+                        ValidateAudience = true,
                         ValidAudience = configuration["Jwt:Issuer"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]))
+                        ValidateLifetime = true,
                     };
                 });
         }

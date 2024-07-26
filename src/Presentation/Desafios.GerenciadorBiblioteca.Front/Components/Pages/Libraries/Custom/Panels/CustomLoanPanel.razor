@@ -91,20 +91,24 @@ else
     private int page = 1;
     private int size = 10;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await InitializeLoansDetailsAsync();
+        if (firstRender)
+        {
+            await InitializeDataAsync();
+            StateHasChanged();
+        }
     }
 
     private async Task OnPageChangedHandler(int i)
     {
         page = i;
 
-        if (!isFiltered) await InitializeLoansDetailsAsync();
+        if (!isFiltered) await InitializeDataAsync();
         else await FilterLoansDetailsAsync();
     }
 
-    private async Task InitializeLoansDetailsAsync()
+    private async Task InitializeDataAsync()
     {
         var result = await httpService.GetAsync<CustomResponse<IEnumerable<LoanDetailsViewModel>>>($"/api/Loans/library/{LibraryId}/details?page={page}&size={size}");
 
@@ -162,7 +166,7 @@ else
             if (!deleteResult.IsSuccess)
                 alertService.ShowErrors(deleteResult.ErrorDetails, deleteResult.StatusCode);
 
-            await InitializeLoansDetailsAsync();
+            await InitializeDataAsync();
         }
     }
 
@@ -179,7 +183,7 @@ else
 
         if (!result.Canceled)
         {
-            await InitializeLoansDetailsAsync();
+            await InitializeDataAsync();
         }
     }
 
@@ -198,7 +202,7 @@ else
 
         if (!result.Canceled)
         {
-            await InitializeLoansDetailsAsync();
+            await InitializeDataAsync();
         }
     }
 }

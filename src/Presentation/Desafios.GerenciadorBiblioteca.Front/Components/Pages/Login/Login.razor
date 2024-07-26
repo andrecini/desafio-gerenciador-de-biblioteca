@@ -1,5 +1,127 @@
-﻿<h3>Login</h3>
+﻿@page "/"
+@using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.UserLogin
+@using Desafios.GerenciadorBiblioteca.Service.DTOs.ViewModels
+@using Desafios.GerenciadorBiblioteca.Website.Components.Layout
+@using System.ComponentModel.DataAnnotations
+@using Desafios.GerenciadorBiblioteca.Website.Models.Responses
+@using Desafios.GerenciadorBiblioteca.Website.Services
+@using Desafios.GerenciadorBiblioteca.Website.Services.Auth
+@using Microsoft.AspNetCore.Components.Authorization
+@layout LoginLayout
+@inject HttpService httpService
+@inject AlertService alertService
+@inject AuthService authService
+@inject NavigationManager navigator
+@inject TokenStorageService tokenStorageService;
+
+<MudContainer MaxWidth="MaxWidth.False" Class="d-flex h-100 mx-100 ma-0 pa-0" Style="width: 50%; max-width: 50%">
+    <MudImage ObjectFit="ObjectFit.Cover" ObjectPosition="ObjectPosition.Right" Src="login-backgroud.svg" Alt="Swedish Farm House" Class="rounded-lg w-100 mw-100" />
+</MudContainer>
+
+<MudCard Outlined="false" Elevation="5" Class="ma-auto py-10 px-10">
+    <MudCardHeader Class="d-flex flex-column align-start pa-0">
+        <MudText Typo="Typo.h4" Class="mb-1">Bem-Vindo!</MudText>
+        <MudText Typo="Typo.subtitle1" Class="mb-0">Digite seu Email e Senha para acessar o Sistema.</MudText>
+    </MudCardHeader>
+    <MudCardContent Class="pa-0">
+        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+
+            <MudTextField @bind-Value="email" Label="Email" Variant="Variant.Text" Adornment="Adornment.End" InputType="InputType.Email"
+                          AdornmentIcon="@Icons.Material.Filled.Email" AdornmentColor="Color.Primary" Immediate="true" Class="mb-6"
+                          Validation="@(new EmailAddressAttribute() {ErrorMessage = "Email Inválido"})" RequiredError="O email é obrigatório" />
+
+            <MudTextField @bind-Value="password" Label="Senha" Variant="Variant.Text" InputType="inputPasswordType"
+                          Adornment="Adornment.End" AdornmentIcon="@inputPassordIcon" AdornmentColor="Color.Primary" Class="mb-1"
+                          OnAdornmentClick="ChangeInputPasswordVisibility" AdornmentAriaLabel="Show Password" Immediate="true"
+                          RequiredError="A senha é obrigatória!" />
+        </MudForm>
+    </MudCardContent>
+    <MudDivider DividerType="DividerType.Middle" Class="my-6 mx-0" />
+    <MudCardActions Class="pa-0">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="w-100" @onclick="HandleLoginAsync">Acessar</MudButton>
+    </MudCardActions>
+</MudCard>
 
 @code {
+    private MudForm form;
+    private bool success;
+    private string[] errors = [];
+    private string? email;
+    private string? password;
 
+    private bool passwordIsVisible = false;
+    private InputType inputPasswordType = InputType.Password;
+    private string inputPassordIcon = Icons.Material.Filled.VisibilityOff;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var isOpen = await VerifyUserSessionIsOpenAsync();
+
+            if (isOpen)
+            {
+                navigator.NavigateTo("/home");
+            }
+        }
+    }
+
+    private void ChangeInputPasswordVisibility()
+    {
+        if (passwordIsVisible)
+        {
+            inputPasswordType = InputType.Password;
+            inputPassordIcon = Icons.Material.Filled.VisibilityOff;
+            passwordIsVisible = !passwordIsVisible;
+        }
+        else
+        {
+            inputPasswordType = InputType.Text;
+            inputPassordIcon = Icons.Material.Filled.Visibility;
+            passwordIsVisible = !passwordIsVisible;
+        }
+    }
+
+    private async Task HandleLoginAsync()
+    {
+        if (form.IsValid)
+        {
+            UserLoginCommand body = new(email, password);
+            var result = await httpService.PostAsync<UserLoginCommand, CustomResponse<TokenModel>>($"/api/Login", body);
+
+            if (result.IsSuccess)
+            {
+                var tokenModel = result.Content.Data;
+                await authService.Login(tokenModel);
+                navigator.NavigateTo("/home");
+            }
+            else
+                alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
+        }
+    }
+
+    private async Task<bool> VerifyUserSessionIsOpenAsync()
+    {
+        try
+        {
+            var token = await tokenStorageService.GetTokenIdentity();
+
+            if (token == null)
+                return false;
+
+            if (token.ValidTo >= DateTime.Now)
+            {
+                token.ValidTo = DateTime.Now;
+                await authService.Login(token);
+                return true;
+            }
+
+            await tokenStorageService.ClearTokenIdentity();
+            return false;
+        }
+        catch
+        {
+            return false;
+        }
+    }
 }

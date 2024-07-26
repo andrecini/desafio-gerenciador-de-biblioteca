@@ -9,6 +9,7 @@ using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetInvento
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetInventoryByLibrary;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Inventories.Queries.GetInventoryDictByLibrary;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Desafios.GerenciadorBiblioteca.Api.Controllers
@@ -20,7 +21,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         private readonly ILogger<InventoriesController> _logger = logger;
         private readonly IMediator _mediator = mediator;
 
-
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAll(int page, int size)
         {
@@ -31,6 +32,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -41,6 +43,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpGet("library/{libraryId}")]
         public async Task<IActionResult> GetByLibrary(int libraryId, int page, int size)
         {
@@ -51,6 +54,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpGet("library/{libraryId}/books/dict")]
         public async Task<IActionResult> GetDictByLibrary(int libraryId)
         {
@@ -61,6 +65,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpGet("library/{libraryId}/books/dict/distinct")]
         public async Task<IActionResult> GetDistinctDictByLibrary(int libraryId)
         {
@@ -71,6 +76,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpPost("filter")]
         public async Task<IActionResult> GetFiltered(GetInventoriesByFilterQuery request)
         {
@@ -79,6 +85,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Add(AddInventoryCommand request)
         {
@@ -89,6 +96,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Created(locationUri, response);
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateInventoryCommand request)
         {
@@ -97,6 +105,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpPut("status/{id}")]
         public async Task<IActionResult> UpdateStatus(int id, UpdateInventoryStatusCommand request)
         {
@@ -105,6 +114,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Remove(int id)
         {

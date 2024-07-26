@@ -7,6 +7,7 @@ using Desafios.GerenciadorBiblioteca.Service.CQRS.Books.Queries.GetBooksByFilter
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Books.Queries.GetBooksDetailsByFilter;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Books.Queries.GetBooksDetailsByLibrary;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Desafios.GerenciadorBiblioteca.Api.Controllers
@@ -18,6 +19,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         private readonly ILogger<BooksController> _logger = logger;
         private readonly IMediator _mediator = mediator;
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAll(int page, int size)
         {
@@ -28,6 +30,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -38,6 +41,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpPost("filter")]
         public async Task<IActionResult> Filter(GetBooksByFilterQuery request)
         {
@@ -46,6 +50,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpGet("library/{libraryId}/details")]
         public async Task<IActionResult> GetDetailsByLibrary(int libraryId, int page, int size)
         {
@@ -56,6 +61,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpPost("library/{libraryId}/details/filter")]
         public async Task<IActionResult> GetDetailsByFilter(GetBooksDetailsByFilterQuery request)
         {
@@ -64,6 +70,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Add(AddBookCommand request)
         {
@@ -74,6 +81,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Created(locationUri, response);
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateBookCommand request)
         {
@@ -82,6 +90,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
         
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Remove(int id)
         {

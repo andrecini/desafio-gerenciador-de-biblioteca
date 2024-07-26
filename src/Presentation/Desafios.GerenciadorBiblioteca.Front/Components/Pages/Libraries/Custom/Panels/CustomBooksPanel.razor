@@ -91,20 +91,24 @@ else
     private int page = 1;
     private int size = 10;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await InitializeBooksDetailsAsync();
+        if (firstRender)
+        {
+            await InitializeDataAsync();
+            StateHasChanged();
+        }
     }
 
     private async Task OnPageChangedHandler(int i)
     {
         page = i;
 
-        if (!isFiltered) await InitializeBooksDetailsAsync();
+        if (!isFiltered) await InitializeDataAsync();
         else await FilterBooksDetailsAsync();
     }
 
-    private async Task InitializeBooksDetailsAsync()
+    private async Task InitializeDataAsync()
     {
         var result = await httpService.GetAsync<CustomResponse<IEnumerable<BookDetailsViewModel>>>($"/api/Books/library/{Id}/details?page={page}&size={size}");
 
@@ -179,7 +183,7 @@ else
             if (!deleteResult.IsSuccess)
                 alertService.ShowErrors(deleteResult.ErrorDetails, deleteResult.StatusCode);
 
-            await InitializeBooksDetailsAsync();
+            await InitializeDataAsync();
         }
     }
 
@@ -196,7 +200,7 @@ else
 
         if (!result.Canceled)
         {
-            await InitializeBooksDetailsAsync();
+            await InitializeDataAsync();
         }
     }
 }

@@ -40,10 +40,32 @@
     private bool success;
     private string[] errors = [];
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await InitializeDataAsync();
+            StateHasChanged();
+        }
+    }
+
+    private async Task InitializeDataAsync()
     {
         await InitializeBooksDictAsync();
         helperText = "Se o livro não estiver listado, adicione-o à nossa base de dados na aba \"Livros\".";
+    }
+
+    private async Task InitializeBooksDictAsync()
+    {
+        var result = await httpService.GetAsync<CustomResponse<Dictionary<int, string>>>($"/api/Inventories/library/{LibraryId}/books/dict/distinct");
+
+        if (result.IsSuccess)
+            booksDictionary = result.Content.Data;
+        else
+        {                                                
+            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
+            booksDictionary = [];
+        }
     }
 
     private async Task SubmitAsync()
@@ -65,18 +87,5 @@
     private string ValidateBook(int bookId)
     {
         return bookId <= 0 ? "O Livro é obrigatório" : null;
-    }
-
-    private async Task InitializeBooksDictAsync()
-    {
-        var result = await httpService.GetAsync<CustomResponse<Dictionary<int, string>>>($"/api/Inventories/library/{LibraryId}/books/dict/distinct");
-
-        if (result.IsSuccess)
-            booksDictionary = result.Content.Data;
-        else
-        {                                                
-            alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
-            booksDictionary = [];
-        }
     }
 }

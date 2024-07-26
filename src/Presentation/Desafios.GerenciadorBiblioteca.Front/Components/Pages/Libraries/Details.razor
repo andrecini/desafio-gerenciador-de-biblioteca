@@ -46,12 +46,16 @@
     private bool success;
     private string[] errors = [];
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await InitializeLibraryAsync();
+        if (firstRender)
+        {
+            await InitializeDataAsync();
+            StateHasChanged();
+        }
     }
 
-    private async Task InitializeLibraryAsync()
+    private async Task InitializeDataAsync()
     {
         var result = await httpService.GetAsync<CustomResponse<Library>>($"/api/Libraries/{Id}");
 

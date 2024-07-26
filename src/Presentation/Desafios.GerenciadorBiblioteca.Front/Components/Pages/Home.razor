@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/home"
 @using System.Globalization
 @using Desafios.GerenciadorBiblioteca.Service.DTOs.ViewModels
 @using Desafios.GerenciadorBiblioteca.Website.Models.Responses
@@ -8,9 +8,9 @@
 
 <PageTitle>Dashboard</PageTitle>
 
-<MudText Typo="Typo.h5" GutterBottom="true">Dashboard</MudText>
+<MudText Typo="Typo.h5" GutterBottom="true" Class="pb-4">Dashboard</MudText>
 
-<MudContainer Class="d-flex flex-row pa-0 ma-0 gap-5" MaxWidth="MaxWidth.False">
+<MudContainer Class="d-flex flex-row pa-0 ma-0 gap-5 h-25" MaxWidth="MaxWidth.False">
     <MudCard Elevation="4" Class="w-100">
         <MudCardContent>
             <MudText Typo="Typo.h6" GutterBottom="true">Total Bibliotecas</MudText>
@@ -72,7 +72,7 @@
 
     @if (series.Any())
     {
-        <MudPaper Width="60%" Height="100%" MaxHeight="100%" Elevation="4">
+        <MudPaper Width="60%" Height="100%" MaxHeight="100%" Class="d-flex flex-column justify-space-evenly" Elevation="4">
             <MudContainer Class="d-flex flex-row align-center justify-center pa-0 mt-5 gap-2 w-100" MaxWidth="MaxWidth.False">
                 <MudIcon Icon="@Icons.Material.Outlined.WorkspacePremium" />
                 <MudText Typo="Typo.h6" GutterBottom="true" Align="Align.Center" Class="ma-0">
@@ -86,13 +86,13 @@
                             display: flex;
                             align-items: center;
                             justify-content: center;
-                            height: 90% !important;
+                            height: 80% !important;
                             width: 100% !important
                         }
 
                         .mud-chart-line {
                             height: 100% !important;
-                            width: 90% !important
+                            width: 100% !important
                         }
 
                         .mud-charts-xaxis {
@@ -113,10 +113,10 @@
         </MudPaper>
     }
 
-    <MudContainer Class="d-flex flex-column align-start justify-start pa-0 ma-0 gap-5 h-100 mh-100 w-40" MaxWidth="MaxWidth.False">
+    <MudContainer Class="d-flex flex-column align-start justify-start pa-0 ma-0 gap-5 h-auto mh-100 w-40" MaxWidth="MaxWidth.False">
 
-        <MudPaper Width="100%" Height="100%" MaxHeight="100%" Class="pa-5 gap-5" Elevation="4">
-            <MudTable Items="viewModels" Hover="true" SortLabel="Sort By" Elevation="1" Class="d-flex flex-column w-100 h-100 mh-100">
+        <MudPaper Width="100%" Height="100%" MaxHeight="100%" Class="d-flex pa-5 gap-5 overflow-y-scroll" Elevation="4">
+            <MudTable Items="viewModels" Hover="true" SortLabel="Sort By" Elevation="1" Class="d-flex flex-column w-100 h-100 mh-100 overflow-y-scroll">
                 <ToolBarContent>
                     <MudText Typo="Typo.h6" GutterBottom="true">Empréstimos em Atraso</MudText>
                 </ToolBarContent>
@@ -135,6 +135,11 @@
     </MudContainer>
 
 </MudContainer>
+
+<MudOverlay @bind-Visible="isLoading" DarkBackground="true" ZIndex="9999" >
+    <MudProgressCircular Color="Color.Surface" Indeterminate="true" />
+</MudOverlay>
+
 @code {
     private IEnumerable<Library> libraries;
     private IEnumerable<Book> books;
@@ -154,9 +159,20 @@
 
     private List<LoanOverdueViewModel> viewModels = new();
 
-    protected override async Task OnInitializedAsync()
+    private bool isLoading = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await InitializeDataAsync();
+        if (firstRender)
+        {
+            isLoading = true;
+            StateHasChanged();
+
+            await InitializeDataAsync();
+
+            isLoading = false;
+            StateHasChanged();
+        }
     }
 
     private async Task InitializeDataAsync()

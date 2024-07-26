@@ -19,12 +19,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(UserLoginCommand request)
         {
-            // refatorar para mandar o token via handler
-            var data = await _mediator.Send(request);
-
-            var token = _tokenService.GenerateJwtToken(data.Data.Id, data.Data.Name, data.Data.Role);
-
-            var response = new UserLoginViewModel(data.Data, token);
+            var response = await _mediator.Send(request);
 
             return Ok(response);
         }

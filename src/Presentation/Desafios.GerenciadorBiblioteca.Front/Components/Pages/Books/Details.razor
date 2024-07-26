@@ -44,10 +44,14 @@
     private bool success;
     private string[] errors = [];
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await InitializeLibraryAsync();
-        yearInput = book.Year.ToString();
+        if (firstRender)
+        {
+            await InitializeLibraryAsync();
+            yearInput = book.Year.ToString();
+            StateHasChanged();
+        }
     }
 
     private async Task InitializeLibraryAsync()

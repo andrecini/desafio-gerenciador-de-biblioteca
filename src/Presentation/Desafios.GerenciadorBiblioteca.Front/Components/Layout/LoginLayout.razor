@@ -1,0 +1,23 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="_theme" />
+<MudDialogProvider @rendermode="InteractiveServer" FullWidth="true" />
+<MudPopoverProvider @rendermode="InteractiveServer" />
+<MudSnackbarProvider/>
+
+<MudLayout Class="d-flex h-100 mh-100">
+    <MudMainContent Class="d-flex flex-row h-100 mh-100 pa-0 ma-0">
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private MudTheme _theme = new();
+    private bool _isDarkMode = true;
+    private bool _drawerOpen = true;
+
+    private void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+}

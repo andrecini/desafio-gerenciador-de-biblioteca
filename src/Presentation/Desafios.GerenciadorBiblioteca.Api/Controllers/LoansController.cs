@@ -11,6 +11,7 @@ using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsB
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsFilteredByLibrary;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Loans.Queries.GetLoansDetailsFilteredByUser;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Desafios.GerenciadorBiblioteca.Api.Controllers
@@ -23,6 +24,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         private readonly IMediator _mediator = mediator;
 
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAll(int page, int size)
         {
@@ -33,6 +35,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -43,6 +46,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetByUser(int userId, int page, int size)
         {
@@ -53,6 +57,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpPost("filter")]
         public async Task<IActionResult> GetFiltered(GetLoansByFilterQuery request)
         {
@@ -61,6 +66,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpPost("library/{libraryId}/details/filter")]
         public async Task<IActionResult> GetFilteredDetailsByLibrary(int libraryId, GetLoansDetailsFilteredByLibraryQuery request)
         {
@@ -69,6 +75,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpGet("library/{libraryId}/details")]
         public async Task<IActionResult> GetDetailsByLibrary(int libraryId, int page, int size)
         {
@@ -79,6 +86,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpPost("users/{userId}/details/filter")]
         public async Task<IActionResult> GetFilteredDetailsByUser(int userId, GetLoansDetailsFilteredByUserQuery request)
         {
@@ -87,6 +95,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpGet("users/{userId}/details")]
         public async Task<IActionResult> GetDetailsByUser(int userId, int page, int size)
         {
@@ -97,6 +106,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Add(AddLoanCommand request)
         {
@@ -107,6 +117,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Created(locationUri, response);
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateLoanCommand request)
         {
@@ -115,6 +126,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpPut("{id}/status")]
         public async Task<IActionResult> UpdateStatus(int id, UpdateLoanStatusCommand request)
         {
@@ -123,6 +135,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Remove(int id)
         {

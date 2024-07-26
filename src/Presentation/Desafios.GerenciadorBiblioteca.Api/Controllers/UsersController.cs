@@ -7,6 +7,7 @@ using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Queries.GetUserById;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Queries.GetUserByName;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Queries.GetUsersDict;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Desafios.GerenciadorBiblioteca.Api.Controllers
@@ -18,6 +19,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         private readonly ILogger<UsersController> _logger = logger;
         private readonly IMediator _mediator = mediator;
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAll(int page, int size)
         {
@@ -27,6 +29,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -37,6 +40,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpGet("dict")]
         public async Task<IActionResult> GetUsersDict()
         {
@@ -45,6 +49,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpPost("filter")]
         public async Task<IActionResult> GetFiltered(GetUsersByNameQuery request)
         {
@@ -53,6 +58,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Add(AddUserCommand request)
         {
@@ -63,6 +69,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Created(locationUri, response);
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateUserCommand request)
         {
@@ -71,6 +78,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
         
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Remove(int id)
         {

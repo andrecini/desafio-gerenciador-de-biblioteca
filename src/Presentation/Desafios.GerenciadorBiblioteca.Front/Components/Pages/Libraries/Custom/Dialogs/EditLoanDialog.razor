@@ -71,7 +71,16 @@
     private bool success;
     private string[] errors = [];
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await InitializeDataAsync();
+            StateHasChanged();
+        }
+    }
+
+    private async Task InitializeDataAsync()
     {
         await InitializeBooksDictAsync();
         await InitializeUsersDictAsync();

@@ -1,58 +1,25 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
-using System.Security.Claims;
-using System.Text.Json;
-using Desafios.GerenciadorBiblioteca.Service.DTOs.ViewModels;
+﻿using Desafios.GerenciadorBiblioteca.Service.DTOs.ViewModels;
+using Desafios.GerenciadorBiblioteca.Website.Models.Responses;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace Desafios.GerenciadorBiblioteca.Website.Services.Auth
 {
-    public class AuthService
+    public class AuthService(TokenStorageService tokenService, AuthenticationStateProvider authenticationStateProvider)
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly TokenStorageService _tokenService = tokenService;
+        private readonly AuthenticationStateProvider _authenticationStateProvider = authenticationStateProvider;
 
-        public AuthService(IHttpContextAccessor httpContextAccessor)
+        public async Task Login(TokenModel tokenViewModel)
         {
-            _httpContextAccessor = httpContextAccessor;
+            await _tokenService.SetTokenIdentity(tokenViewModel);
+            await _authenticationStateProvider.GetAuthenticationStateAsync();
+        }
+        public async Task Logout(TokenModel tokenViewModel)
+        {
+            await _tokenService.ClearTokenIdentity();
+            await _authenticationStateProvider.GetAuthenticationStateAsync();
         }
 
-        public async Task LoginAsync(TokenViewModel tokenModel)
-        {
-            var claims = JwtParserService.ParseClaimsFromJwt(tokenModel.Token);
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
-
-            await _httpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, new AuthenticationProperties
-            {
-                IsPersistent = true,
-                ExpiresUtc = tokenModel.ValidTo
-            });
-
-            var tokenModelJson = JsonSerializer.Serialize(tokenModel);
-
-            // Store the serialized TokenModel in a cookie
-            _httpContextAccessor.HttpContext.Response.Cookies.Append("AuthToken", tokenModelJson, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = tokenModel.ValidTo
-            });
-        }
-
-        public async Task LogoutAsync()
-        {
-            await _httpContextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            _httpContextAccessor.HttpContext.Response.Cookies.Delete("AuthToken");
-        }
-
-        public TokenViewModel GetTokenModel()
-        {
-            if (_httpContextAccessor.HttpContext.Request.Cookies.TryGetValue("AuthToken", out string tokenModelJson))
-            {
-                return JsonSerializer.Deserialize<TokenViewModel>(tokenModelJson);
-            }
-
-            return null;
-        }
+       
     }
 }

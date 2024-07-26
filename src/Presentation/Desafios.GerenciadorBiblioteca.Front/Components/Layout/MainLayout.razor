@@ -1,18 +1,22 @@
-﻿@inherits LayoutComponentBase
+﻿@using Desafios.GerenciadorBiblioteca.Website.Services.Auth
+@using Microsoft.AspNetCore.Components.Authorization
+@inherits LayoutComponentBase
+@inject TokenStorageService tokenStorageService;
+@inject AuthenticationStateProvider authStateProvider;
 
 <MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="_theme" />
 <MudDialogProvider @rendermode="InteractiveServer" FullWidth="true" />
 <MudPopoverProvider @rendermode="InteractiveServer" />
-<MudSnackbarProvider/>
+<MudSnackbarProvider />
 
 <MudLayout>
     <MudAppBar Color="Color.Primary" Fixed="false">
         <MudIconButton Icon="@Icons.Material.Filled.Book" Color="Color.Inherit" />
         <MudText Typo="Typo.h6" Class="ml-3">Desafio 1 - Gerenciador de Bibliotecas</MudText>
         <MudSpacer />
-        <MudSwitch @bind-Value="_isDarkMode"/>
+        <MudSwitch @bind-Value="_isDarkMode" />
     </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2" Class="h-100 mh-100">
         <NavMenu />
     </MudDrawer>
     <MudMainContent Class="px-4 py-8">
@@ -24,6 +28,16 @@
     private MudTheme _theme = new();
     private bool _isDarkMode = true;
     private bool _drawerOpen = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await tokenStorageService.SetTokenIdentityProperty();
+            await authStateProvider.GetAuthenticationStateAsync();
+            StateHasChanged();
+        }
+    }
 
     private void DrawerToggle()
     {

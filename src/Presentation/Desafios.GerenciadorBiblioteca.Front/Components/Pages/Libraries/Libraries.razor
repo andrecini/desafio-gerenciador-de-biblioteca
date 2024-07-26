@@ -72,21 +72,24 @@ else
     private int page = 1;
     private int size = 10;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await LoadLibrariesAsync();
+        if (firstRender)
+        {
+            await InitializeDataAsync();
+            StateHasChanged();
+        }
     }
 
     private async Task OnPageChangedHandler(int i)
     {
         page = i;
 
-        if (!isFiltered) await LoadLibrariesAsync();
+        if (!isFiltered) await InitializeDataAsync();
         else await FilterLibsHandleAsync();
     }
 
-
-    private async Task LoadLibrariesAsync()
+    private async Task InitializeDataAsync()
     {
         isFiltered = false;
 
@@ -139,7 +142,7 @@ else
             if (!deleteResult.IsSuccess)
                 alertService.ShowErrors(deleteResult.ErrorDetails, deleteResult.StatusCode);
 
-            await LoadLibrariesAsync();
+            await InitializeDataAsync();
         }
     }
 
@@ -150,9 +153,7 @@ else
         var result = await dialog.Result;
 
         if (!result.Canceled)
-        {
-            await LoadLibrariesAsync();
-        }
+            await InitializeDataAsync();
     }
 
     private async Task ResetFormFiltersAsync()
