@@ -3,8 +3,10 @@
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Books.Custom.Panels
 @using Desafios.GerenciadorBiblioteca.Website.Models.Responses
 @using Desafios.GerenciadorBiblioteca.Website.Services
+@using Desafios.GerenciadorBiblioteca.Website.Services.Auth
 @inject AlertService alertService
 @inject HttpService httpService;
+@inject AuthService authService
 
 <PageTitle>Livros</PageTitle>
 
@@ -12,20 +14,23 @@
 
 <MudContainer Class="d-flex flex-row align-center pa-0 mt-5 mb-5 ma-0 gap-5 w-100" MaxWidth="MaxWidth.False">
     <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-row align-start pa-0 ma-0 gap-5 w-100">
-        <MudTextField T="string" Label="Título" Required="true" RequiredError="O Título do Livro é obrigatório" @bind-Value="book.Title" />
+        <MudTextField T="string" Label="Título" Required="true" RequiredError="O Título do Livro é obrigatório" @bind-Value="book.Title" ReadOnly="@(isAdmin)" />
 
-        <MudTextField T="string" Label="Autor" Required="true" RequiredError="O Autor do Livro é obrigatório" @bind-Value="book.Author" />
+        <MudTextField T="string" Label="Autor" Required="true" RequiredError="O Autor do Livro é obrigatório" @bind-Value="book.Author" ReadOnly="@(isAdmin)" />
 
         <MudTextField T="string" Label="ISBN" HelperText="Digite apenas Números"
                       Validation="@(new Func<string, string>(ValidateISBN))" Required="true"
-                      RequiredError="O ISBN é obrigatório!" @bind-Value="book.ISBN" />
+                      RequiredError="O ISBN é obrigatório!" @bind-Value="book.ISBN" ReadOnly="@(isAdmin)" />
 
         <MudTextField T="string" Label="Ano" HelperText="Digite apenas Números"
                       Validation="@(new Func<string, string>(ValidateYear))" Required="true"
-                      RequiredError="O Ano é obrigatório!" @bind-Value="yearInput" />
+                      RequiredError="O Ano é obrigatório!" @bind-Value="yearInput" ReadOnly="@(isAdmin)" />
     </MudForm>
 
-    <MudButton Variant="Variant.Filled" Color="Color.Tertiary" StartIcon="@Icons.Material.Filled.Save" @onclick="EditLibraryAsync">Salvar</MudButton>
+    @if (isAdmin)
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Tertiary" StartIcon="@Icons.Material.Filled.Save" @onclick="EditLibraryAsync">Salvar</MudButton>
+    }
 </MudContainer>
 
 <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" Class="h-100 mh-100 w-100 mw-100" PanelClass="pa-6 h-100 mh-100 overflow-y-auto">
@@ -44,17 +49,20 @@
     private bool success;
     private string[] errors = [];
 
+    private bool isAdmin;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await InitializeLibraryAsync();
+            isAdmin = await authService.VerifyIfUserIsAdmin();
+            await InitializeDataAsync();
             yearInput = book.Year.ToString();
             StateHasChanged();
         }
     }
 
-    private async Task InitializeLibraryAsync()
+    private async Task InitializeDataAsync()
     {
         var result = await httpService.GetAsync<CustomResponse<Book>>($"/api/Books/{Id}");
 

@@ -6,10 +6,12 @@
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Common
 @using Desafios.GerenciadorBiblioteca.Website.Models.Responses
 @using Desafios.GerenciadorBiblioteca.Website.Services
+@using Desafios.GerenciadorBiblioteca.Website.Services.Auth
 @rendermode InteractiveServer
 @inject IDialogService dialogService
 @inject HttpService httpService
 @inject AlertService alertService
+@inject AuthService authService
 
 <PageTitle>Livros</PageTitle>
 
@@ -17,7 +19,10 @@
 
 <MudContainer Class="d-flex flex-row align-end pa-0 mb-5 ma-0 gap-5" MaxWidth="MaxWidth.False">
     <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-row align-end pa-0 ma-0 gap-5 w-100">
-        <MudButton Variant="Variant.Outlined" Color="Color.Success" StartIcon="@Icons.Material.Filled.AddCircle" IconColor="Color.Success" @onclick="RegisterDialogHandleAsync">Cadastrar</MudButton>
+        @if (isAdmin)
+        {
+            <MudButton Variant="Variant.Outlined" Color="Color.Success" StartIcon="@Icons.Material.Filled.AddCircle" IconColor="Color.Success" @onclick="RegisterDialogHandleAsync">Cadastrar</MudButton>
+        }
         <MudTextField @bind-Value="filter.Title" Immediate="true" Label="Título" Class="ma-0" />
         <MudTextField @bind-Value="filter.Author" Immediate="true" Label="Autor" Class="ma-0" />
         <MudTextField @bind-Value="filter.ISBN" Immediate="true" Label="ISBN" Class="ma-0" />
@@ -58,7 +63,10 @@ else
             <MudTd DataLabel="Ano">@context.Year</MudTd>
             <MudTd DataLabel="Ações" Class="d-flex gap-2">
                 <MudButton Href="@($"/books/details/{context.Id}")" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Search">Detalhes</MudButton>
-                <MudButton @onclick="@((e) => DeleteDialogHandleAsync(context.Id))" Variant="Variant.Outlined" Color="Color.Error" EndIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error">Excluir</MudButton>
+                @if (isAdmin)
+                {
+                    <MudButton @onclick="@((e) => DeleteDialogHandleAsync(context.Id))" Variant="Variant.Outlined" Color="Color.Error" EndIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error">Excluir</MudButton>
+                }
             </MudTd>
         </RowTemplate>
         <PagerContent>
@@ -81,10 +89,13 @@ else
     private int page = 1;
     private int size = 10;
 
+    private bool isAdmin;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            isAdmin = await authService.VerifyIfUserIsAdmin();
             await InitializeDataAsync();
             StateHasChanged();
         }
@@ -120,7 +131,7 @@ else
             books = result.Content.Data;
         else
             alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
-        
+
 
         StateHasChanged();
     }
@@ -194,4 +205,3 @@ else
         }
     }
 }
-
