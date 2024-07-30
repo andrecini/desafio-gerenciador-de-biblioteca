@@ -1,0 +1,155 @@
+﻿@page "/register"
+@using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.AddUser
+@using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.UserLogin
+@using Desafios.GerenciadorBiblioteca.Service.DTOs.ViewModels
+@using Desafios.GerenciadorBiblioteca.Website.Components.Layout
+@using System.ComponentModel.DataAnnotations
+@using Desafios.GerenciadorBiblioteca.Website.Models.Responses
+@using Desafios.GerenciadorBiblioteca.Website.Services
+@using Desafios.GerenciadorBiblioteca.Website.Services.Auth
+@using Microsoft.AspNetCore.Components.Authorization
+@layout LoginLayout
+@inject HttpService httpService
+@inject AlertService alertService
+@inject AuthService authService
+@inject NavigationManager navigator
+
+<MudContainer MaxWidth="MaxWidth.False" Class="d-flex h-100 mx-100 ma-0 pa-0" Style="width: 50%; max-width: 50%">
+    <MudImage ObjectFit="ObjectFit.Cover" ObjectPosition="ObjectPosition.Right" Src="login-backgroud.svg" Alt="Swedish Farm House" Class="rounded-lg w-100 mw-100" />
+</MudContainer>
+
+<MudCard Outlined="false" Elevation="5" Class="ma-auto py-10 px-10">
+    <MudCardHeader Class="d-flex flex-column align-start pa-0">
+        <MudText Typo="Typo.h4" Class="mb-1"><b>Cadastro</b></MudText>
+        <MudText Typo="Typo.subtitle1" Class="mb-0">Digite seus dados para ter acesso ao nosso Sistema.</MudText>
+    </MudCardHeader>
+    <MudCardContent Class="pa-0">
+        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+
+            <MudTextField T="string" Label="Nome" Required="true" RequiredError="O Nome do Usuário é obrigatório" @bind-Value="name" />
+
+            <MudTextField T="string" Label="Email" Required="true" RequiredError="O Email é obrigatório" @bind-Value="email"
+                          Validation="@(new EmailAddressAttribute() {ErrorMessage = "Email Inválido"})"/>
+
+            <MudTextField T="string" Label="Telefone" HelperText="Digite apenas Números"
+                          InputType="InputType.Telephone"
+                          Validation="@(new Func<string, string>(ValidatePhone))" Required="true"
+                          RequiredError="O Telefone é obrigatório!" @bind-Value="phone" />
+
+            <MudTextField @bind-Value="password" Label="Senha" Variant="Variant.Text" InputType="inputPasswordType"
+                          Adornment="Adornment.End" AdornmentIcon="@inputPassordIcon" AdornmentColor="Color.Primary" Class="mb-1"
+                          OnAdornmentClick="ChangeInputPasswordVisibility" AdornmentAriaLabel="Show Password" Immediate="true"
+                          RequiredError="A senha é obrigatória!" Validation="@(new Func<string, string>(ValidatePassword))" />
+
+            <MudTextField @bind-Value="passwordConfirmation" Label="Confirmação de Senha" Variant="Variant.Text" InputType="inputPasswordConfirmationType"
+                          Adornment="Adornment.End" AdornmentIcon="@inputPassordConfirmationIcon" AdornmentColor="Color.Primary" Class="mb-1"
+                          OnAdornmentClick="ChangeInputPasswordConfirmationVisibility" AdornmentAriaLabel="Show Password" Immediate="true" 
+                          RequiredError="A senha é obrigatória!" Validation="@(new Func<string, string>(ValidatePasswordConfirmation))" />
+        </MudForm>
+    </MudCardContent>
+    <MudDivider DividerType="DividerType.Middle" Class="my-6 mx-0" />
+    <MudCardActions Class="pa-0">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="w-100" @onclick="HandleLoginAsync">Cadastrar</MudButton>
+    </MudCardActions>
+</MudCard>
+
+@code {
+    private MudForm form;
+    private bool success;
+    private string[] errors = [];
+    private string? name;
+    private string? email;
+    private string? phone;
+    private string? password;
+    private string? passwordConfirmation;
+
+    private bool passwordIsVisible = false;
+    private bool passwordConfirmationIsVisible = false;
+    private InputType inputPasswordType = InputType.Password;
+    private InputType inputPasswordConfirmationType = InputType.Password;
+    private string inputPassordIcon = Icons.Material.Filled.Visibility;
+    private string inputPassordConfirmationIcon = Icons.Material.Filled.Visibility;
+
+    private void ChangeInputPasswordVisibility()
+    {
+        if (passwordIsVisible)
+        {
+            inputPasswordType = InputType.Password;
+            inputPassordIcon = Icons.Material.Filled.Visibility;
+            passwordIsVisible = !passwordIsVisible;
+        }
+        else
+        {
+            inputPasswordType = InputType.Text;
+            inputPassordIcon = Icons.Material.Filled.VisibilityOff;
+            passwordIsVisible = !passwordIsVisible;
+        }
+    }
+
+    private void ChangeInputPasswordConfirmationVisibility()
+    {
+        if (passwordConfirmationIsVisible)
+        {
+            inputPasswordConfirmationType = InputType.Password;
+            inputPassordConfirmationIcon = Icons.Material.Filled.Visibility;
+            passwordConfirmationIsVisible = !passwordConfirmationIsVisible;
+        }
+        else
+        {
+            inputPasswordConfirmationType = InputType.Text;
+            inputPassordConfirmationIcon = Icons.Material.Filled.VisibilityOff;
+            passwordConfirmationIsVisible = !passwordConfirmationIsVisible;
+        }
+    }
+
+    private async Task HandleLoginAsync()
+    {
+        if (form.IsValid)
+        {
+            AddUserCommand body = new(name, email, phone, password);
+            var result = await httpService.PostAsync<AddUserCommand>($"/api/Users", body);
+
+            if (result.IsSuccess) navigator.NavigateTo("/");
+            else alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
+        }
+    }
+
+    private string ValidatePhone(string phone)
+    {
+        if (string.IsNullOrEmpty(phone))
+            return "O Telefone é obrigatório";
+
+        if (!phone.All(char.IsDigit))
+            return "O Telefone deve conter apenas números";
+
+        if (phone.Length != 11)
+            return "O Telefone deve ter 11 dígitos";
+
+        return null;
+    }
+
+    private string ValidatePassword(string password)
+    {
+        if (string.IsNullOrEmpty(password))
+            return "A Senha é obrigatória";
+
+        if (password.Length < 8)
+            return "A Senha deve ter pelo menos 8 caracteres";
+
+        return null;
+    }
+
+    private string ValidatePasswordConfirmation(string passwordConfirmation)
+    {
+        if (string.IsNullOrEmpty(passwordConfirmation))
+            return "A Senha é obrigatória";
+
+        if (passwordConfirmation.Length < 8)
+            return "A Senha deve ter pelo menos 8 caracteres";
+
+        if (passwordConfirmation != password)
+            return "As senhas não coincidem";
+
+        return null;
+    }
+}

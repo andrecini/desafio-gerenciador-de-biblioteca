@@ -13,12 +13,11 @@ namespace Desafios.GerenciadorBiblioteca.Hangfire.Jobs
         public async Task Execute()
         {
             var response = await _mediator.Send(new GetOverdueLoansIdsQuery());
-            var infos = response.Data;
 
             if (response.Total == 0)
                 return;
 
-            foreach (var info in infos)
+            foreach (var info in response.Data)
             {
                 var content = EmailTemplateHelper.GetOverdueLoanEmailTemplate(info.Username, info.BookName, info.LoanDate, info.LoanValidity);
 

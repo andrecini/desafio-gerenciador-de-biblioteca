@@ -34,10 +34,12 @@
                           OnAdornmentClick="ChangeInputPasswordVisibility" AdornmentAriaLabel="Show Password" Immediate="true"
                           RequiredError="A senha é obrigatória!" />
         </MudForm>
+        <MudLink Class="d-flex w-100 justify-end mt-2" Href="/confirmation">Esqueceu sua senha? Clique Aqui!</MudLink>
     </MudCardContent>
     <MudDivider DividerType="DividerType.Middle" Class="my-6 mx-0" />
-    <MudCardActions Class="pa-0">
+    <MudCardActions Class="d-flex flex-column gap-5 pa-0">
         <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="w-100" @onclick="HandleLoginAsync">Acessar</MudButton>
+        <MudButton Variant="Variant.Outlined" Color="Color.Tertiary" Class="w-100" @onclick="@(() => navigator.NavigateTo("/register"))">Registre-se</MudButton>
     </MudCardActions>
 </MudCard>
 
@@ -50,7 +52,7 @@
 
     private bool passwordIsVisible = false;
     private InputType inputPasswordType = InputType.Password;
-    private string inputPassordIcon = Icons.Material.Filled.VisibilityOff;
+    private string inputPassordIcon = Icons.Material.Filled.Visibility;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -70,13 +72,13 @@
         if (passwordIsVisible)
         {
             inputPasswordType = InputType.Password;
-            inputPassordIcon = Icons.Material.Filled.VisibilityOff;
+            inputPassordIcon = Icons.Material.Filled.Visibility;
             passwordIsVisible = !passwordIsVisible;
         }
         else
         {
             inputPasswordType = InputType.Text;
-            inputPassordIcon = Icons.Material.Filled.Visibility;
+            inputPassordIcon = Icons.Material.Filled.VisibilityOff;
             passwordIsVisible = !passwordIsVisible;
         }
     }

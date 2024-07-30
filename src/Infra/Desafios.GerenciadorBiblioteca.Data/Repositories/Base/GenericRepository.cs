@@ -1,4 +1,5 @@
 ﻿using Desafios.GerenciadorBiblioteca.Data.Context;
+using Desafios.GerenciadorBiblioteca.Domain.Entities;
 using Desafios.GerenciadorBiblioteca.Domain.Entities.Base;
 using Desafios.GerenciadorBiblioteca.Domain.Repositories.Base;
 using Microsoft.EntityFrameworkCore;
@@ -35,9 +36,10 @@ namespace Desafios.GerenciadorBiblioteca.Data.Repositories.Base
             return entity; 
         }
 
-
         public void Update(TEntity entity) => _dbSet.Update(entity);
 
         public void Remove(TEntity entity) => _dbSet.Remove(entity);
+
+        public void RemoveRange(IEnumerable<TEntity> entities) => _dbSet.RemoveRange(entities);
     }
 }

@@ -19,6 +19,8 @@ builder.Services.AddApplicationModule();
 builder.Services.AddDataModule(builder.Configuration);
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<OverdueLoanAlarmJob>();
+builder.Services.AddScoped<RemoveExpiredVerificationCodesJob>();
+builder.Services.AddScoped<SendVerificationCodeJob>();
 
 var conn = builder.Configuration.GetConnectionString("DefaultConnection");
 

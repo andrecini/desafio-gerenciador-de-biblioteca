@@ -7,7 +7,7 @@
 <MudDialog>
     <DialogContent>
         <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
-            <MudTextField T="string" Label="Nome" Required="true" RequiredError="O Nome do Livro é obrigatório" @bind-Value="user.Name" />
+            <MudTextField T="string" Label="Nome" Required="true" RequiredError="O Nome do Usuário é obrigatório" @bind-Value="user.Name" />
 
             <MudTextField T="string" Label="Email" Required="true" RequiredError="O Email é obrigatório" @bind-Value="user.Email"
                           Validation="@(new EmailAddressAttribute() {ErrorMessage = "Email Inválido"})" />

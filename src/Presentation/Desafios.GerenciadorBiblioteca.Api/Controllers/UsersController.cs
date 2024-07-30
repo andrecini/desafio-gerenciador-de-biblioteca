@@ -58,7 +58,6 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
-        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Add(AddUserCommand request)
         {

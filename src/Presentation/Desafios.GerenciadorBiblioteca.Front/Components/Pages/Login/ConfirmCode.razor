@@ -1,0 +1,81 @@
+﻿@page "/confirmation/{UserId:int}/code"
+@using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.UserLogin
+@using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Queries.GetUserByEmail
+@using Desafios.GerenciadorBiblioteca.Service.CQRS.VerificationCodes.Commands.ValidateVerificationCode
+@using Desafios.GerenciadorBiblioteca.Service.DTOs.ViewModels
+@using Desafios.GerenciadorBiblioteca.Website.Components.Layout
+@using System.ComponentModel.DataAnnotations
+@using Desafios.GerenciadorBiblioteca.Website.Models.Responses
+@using Desafios.GerenciadorBiblioteca.Website.Services
+@using Desafios.GerenciadorBiblioteca.Website.Services.Auth
+@using Microsoft.AspNetCore.Components.Authorization
+@layout LoginLayout
+@inject HttpService httpService
+@inject AlertService alertService
+@inject AuthService authService
+@inject NavigationManager navigator
+
+<MudContainer MaxWidth="MaxWidth.False" Class="d-flex h-100 mx-100 ma-0 pa-0" Style="width: 50%; max-width: 50%">
+    <MudImage ObjectFit="ObjectFit.Cover" ObjectPosition="ObjectPosition.Right" Src="login-backgroud.svg" Alt="Swedish Farm House" Class="rounded-lg w-100 mw-100" />
+</MudContainer>
+
+<MudCard Outlined="false" Elevation="5" Class="ma-auto py-10 px-10">
+    <MudCardHeader Class="d-flex flex-column align-start pa-0">
+        <MudText Typo="Typo.h4" Class="mb-1"><b>Confirme sua Identidade!</b></MudText>
+        <MudText Typo="Typo.subtitle1" Class="mb-0">Digite o <b>Código de confirmação</b> que enviamos para o seu Email.</MudText>
+    </MudCardHeader>
+    <MudCardContent Class="pa-0">
+        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+
+            <MudTextField T="string" Label="Código de Confirmação" HelperText="Digite apenas Números"
+                          InputType="InputType.Text" Validation="@(new Func<string, string>(ValidateCode))" 
+                          Required="true" RequiredError="O Código de Confirmação é obrigatório!" @bind-Value="code" />
+        </MudForm>
+    </MudCardContent>
+    <MudDivider DividerType="DividerType.Middle" Class="my-6 mx-0" />
+    <MudCardActions Class="d-flex flex-column gap-5 pa-0">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="w-100" @onclick="HandleConfirmationAsync">Confirmar</MudButton>
+    </MudCardActions>
+</MudCard>
+
+@code {
+    [Parameter]
+    public int UserId { get; set; }
+
+    private MudForm form;
+    private bool success;
+    private string[] errors = [];
+    private string? code;
+
+    private async Task HandleConfirmationAsync()
+    {
+        if (form.IsValid)
+        {
+            ValidateVerificationCodeCommand body = new(UserId, code);
+            var result = await httpService.PostAsync<ValidateVerificationCodeCommand, CustomResponse<TokenModel>>($"/api/Login/code/confirmation", body);
+
+            if (result.IsSuccess)
+            {
+                var tokenModel = result.Content.Data;
+                await authService.Login(tokenModel);
+                navigator.NavigateTo($"/user/{result.Content.Data.Id}/reset/password");
+            }
+            else
+                alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
+        }
+    }
+
+    private string ValidateCode(string phone)
+    {
+        if (string.IsNullOrEmpty(phone))
+            return "O Código de Confirmação é obrigatório";
+
+        if (!phone.All(char.IsDigit))
+            return "O Código de Confirmação deve deve conter apenas números";
+
+        if (phone.Length != 6)
+            return "O Código de Confirmação deve ter 6 dígitos";
+
+        return null;
+    }
+}

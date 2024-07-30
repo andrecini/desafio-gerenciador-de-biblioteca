@@ -99,6 +99,20 @@ namespace Desafios.GerenciadorBiblioteca.Website.Services
             }
         }
 
+        public async Task<HttpServiceResponse> PutAsync<TRequest>(string uri, TRequest data)
+        {
+            try
+            {
+                var request = await CreateRequest(uri);
+                var response = await request.PutJsonAsync(data);
+                return await ProcessResponse(response);
+            }
+            catch (FlurlHttpException ex)
+            {
+                return await ProcessErrorResponse(ex);
+            }
+        }
+
         public async Task<HttpServiceResponse> DeleteAsync<TRequest>(string uri, TRequest data)
         {
             try

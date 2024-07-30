@@ -1,0 +1,61 @@
+﻿@page "/confirmation"
+@using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.UserLogin
+@using Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Queries.GetUserByEmail
+@using Desafios.GerenciadorBiblioteca.Service.DTOs.ViewModels
+@using Desafios.GerenciadorBiblioteca.Website.Components.Layout
+@using System.ComponentModel.DataAnnotations
+@using Desafios.GerenciadorBiblioteca.Website.Models.Responses
+@using Desafios.GerenciadorBiblioteca.Website.Services
+@using Desafios.GerenciadorBiblioteca.Website.Services.Auth
+@using Microsoft.AspNetCore.Components.Authorization
+@layout LoginLayout
+@inject HttpService httpService
+@inject AlertService alertService
+@inject AuthService authService
+@inject NavigationManager navigator
+
+<MudContainer MaxWidth="MaxWidth.False" Class="d-flex h-100 mx-100 ma-0 pa-0" Style="width: 50%; max-width: 50%">
+    <MudImage ObjectFit="ObjectFit.Cover" ObjectPosition="ObjectPosition.Right" Src="login-backgroud.svg" Alt="Swedish Farm House" Class="rounded-lg w-100 mw-100" />
+</MudContainer>
+
+<MudCard Outlined="false" Elevation="5" Class="ma-auto py-10 px-10">
+    <MudCardHeader Class="d-flex flex-column align-start pa-0">
+        <MudText Typo="Typo.h4" Class="mb-1"><b>Confirme sua Identidade!</b></MudText>
+        <MudText Typo="Typo.subtitle1" Class="mb-0">Digite seu <b>Email</b> para enviarmos um código de confirmação.</MudText>
+    </MudCardHeader>
+    <MudCardContent Class="pa-0">
+        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+
+            <MudTextField @bind-Value="email" Label="Email" Variant="Variant.Text" Adornment="Adornment.End" InputType="InputType.Email"
+                          AdornmentIcon="@Icons.Material.Filled.Email" AdornmentColor="Color.Primary" Immediate="true" Class="mb-6"
+                          Validation="@(new EmailAddressAttribute() {ErrorMessage = "Email Inválido"})" RequiredError="O email é obrigatório" />
+        </MudForm>
+    </MudCardContent>
+    <MudDivider DividerType="DividerType.Middle" Class="mb-6 mx-0" />
+    <MudCardActions Class="d-flex flex-column gap-5 pa-0">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="w-100" @onclick="HandleConfirmationAsync">Confirmar</MudButton>
+    </MudCardActions>
+</MudCard>
+
+@code {
+    private MudForm form;
+    private bool success;
+    private string[] errors = [];
+    private string? email;
+
+    private async Task HandleConfirmationAsync()
+    {
+        if (form.IsValid)
+        {
+            GetUserByEmailQuery body = new(email);
+            var result = await httpService.PostAsync<GetUserByEmailQuery, CustomResponse<UserViewModel>>($"/api/Login/user/confirmation", body);
+            
+            if (result.IsSuccess)
+            {
+                navigator.NavigateTo($"/confirmation/{result.Content.Data.Id}/code");
+            }
+            else
+                alertService.ShowErrors(result.ErrorDetails, result.StatusCode);
+        }
+    }
+}
