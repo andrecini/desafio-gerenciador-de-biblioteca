@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Desafios.GerenciadorBibliot
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Desafios.GerenciadorBiblioteca.Tests", "src\Testes\Desafios.GerenciadorBiblioteca.Tests\Desafios.GerenciadorBiblioteca.Tests.csproj", "{980A764E-7D93-4022-962A-C566A4FE76A1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Desafios.GerenciadorBiblioteca.Hangfire", "Desafios.GerenciadorBiblioteca.Hangfire\Desafios.GerenciadorBiblioteca.Hangfire.csproj", "{42B18A57-51E1-45B7-985F-E63CC1A47EB2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Desafios.GerenciadorBiblioteca.Hangfire", "src\Infra\Desafios.GerenciadorBiblioteca.Hangfire\Desafios.GerenciadorBiblioteca.Hangfire.csproj", "{42B18A57-51E1-45B7-985F-E63CC1A47EB2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -16,9 +16,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\Core\Desafios.GerenciadorBiblioteca.Domain\Desafios.GerenciadorBiblioteca.Domain.csproj" />
-    <ProjectReference Include="..\src\Infra\Desafios.GerenciadorBiblioteca.Data\Desafios.GerenciadorBiblioteca.Data.csproj" />
-    <ProjectReference Include="..\src\Services\Desafios.GerenciadorBiblioteca.Service\Desafios.GerenciadorBiblioteca.Service.csproj" />
+    <ProjectReference Include="..\..\Core\Desafios.GerenciadorBiblioteca.Domain\Desafios.GerenciadorBiblioteca.Domain.csproj" />
+    <ProjectReference Include="..\..\Services\Desafios.GerenciadorBiblioteca.Service\Desafios.GerenciadorBiblioteca.Service.csproj" />
+    <ProjectReference Include="..\Desafios.GerenciadorBiblioteca.Data\Desafios.GerenciadorBiblioteca.Data.csproj" />
   </ItemGroup>
 
 </Project>
