@@ -22,6 +22,7 @@ namespace Desafios.GerenciadorBiblioteca.Data
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IInventoryRepository, InventoryRepository>();
             services.AddTransient<ILoanRepository, LoanRepository>();
+            services.AddTransient<IVerificationCodeRepository, VerificationCodeRepository>();
 
             return services;
         }

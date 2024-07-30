@@ -157,5 +157,30 @@ namespace Desafios.GerenciadorBiblioteca.Data.Repositories
                 Status = (int)request.Status == 2 ? 0 : 1,
             });
         }
+
+        public async Task<IEnumerable<OverdueLoansDetailsQueryResult>> GetOverdueLoanDetailsAsync(DateTime actualDate)
+        {
+            using SqlConnection connection = new(_connectionString);
+
+            StringBuilder sb = new();
+
+            sb.AppendLine(@"SELECT DISTINCT
+	                            l.LoanDate AS LoanDate,
+	                            l.LoanValidity AS LoanValidity,
+                                b.Title AS BookName,
+                                u.Name AS Username,
+	                            u.Email As Email
+                            FROM Loans AS l
+                            INNER JOIN Inventories AS i
+                            ON l.InventoryId = i.BookId
+                            INNER JOIN Books AS b
+                            ON i.BookId = b.Id
+                            INNER JOIN Users AS u
+                            ON l.UserId = u.Id
+                            WHERE CAST(l.LoanValidity AS DATE) < CAST(@actualDate AS DATE)
+                            AND l.Returned = 0");
+
+            return await connection.QueryAsync<OverdueLoansDetailsQueryResult>(sb.ToString(), new { actualDate });
+        }
     }
 }

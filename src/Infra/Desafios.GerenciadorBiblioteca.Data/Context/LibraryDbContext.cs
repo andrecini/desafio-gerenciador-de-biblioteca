@@ -11,6 +11,7 @@ namespace Desafios.GerenciadorBiblioteca.Data.Context
         public DbSet<User> Users { get; set; }
         public DbSet<Inventory> Inventories { get; set; }
         public DbSet<Loan> Loans { get; set; }
+        public DbSet<VerificationCode> VerificationCodes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -22,6 +23,7 @@ namespace Desafios.GerenciadorBiblioteca.Data.Context
             builder.ApplyConfiguration(new UserConfigurator());
             builder.ApplyConfiguration(new InventoryConfigurator());
             builder.ApplyConfiguration(new LoanConfigurator());
+            builder.ApplyConfiguration(new VerificationCodeConfigurator());
         }
     }
 }

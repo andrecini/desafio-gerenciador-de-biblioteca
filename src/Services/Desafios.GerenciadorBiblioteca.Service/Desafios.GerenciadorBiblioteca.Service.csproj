@@ -18,4 +18,8 @@
     <ProjectReference Include="..\..\Infra\Desafios.GerenciadorBiblioteca.Data\Desafios.GerenciadorBiblioteca.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="CQRS\VerificationCodes\Commands\RemoveMultipleVerificationCodes\" />
+  </ItemGroup>
+
 </Project>

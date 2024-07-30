@@ -13,6 +13,7 @@ namespace Desafios.GerenciadorBiblioteca.Data.UnitOfWork
         public IUserRepository Users { get; private set; }
         public IInventoryRepository Inventories { get; private set; }
         public ILoanRepository Loans { get; private set; }
+        public IVerificationCodeRepository VerificationCodes { get; private set; }
 
         private readonly LibraryDbContext _context;
 
@@ -25,6 +26,7 @@ namespace Desafios.GerenciadorBiblioteca.Data.UnitOfWork
             Users = new UserRepository(_context);
             Inventories = new InventoryRepository(_context);
             Loans = new LoanRepository(_context, configuration);
+            VerificationCodes = new VerificationCodeRepository(_context, configuration);
         }
 
         public async Task<int> SaveAsync()

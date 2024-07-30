@@ -15,5 +15,7 @@ namespace Desafios.GerenciadorBiblioteca.Domain.Entities
 
         [JsonIgnore]
         public ICollection<Loan>? Loans { get; set; }
+        [JsonIgnore]
+        public ICollection<VerificationCode>? VerificationCodes { get; set; }
     }
 }
