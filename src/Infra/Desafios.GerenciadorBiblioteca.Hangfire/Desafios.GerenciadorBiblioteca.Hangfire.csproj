@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>399a7cde-8d4e-49be-a00c-0de95e4c3074</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Hangfire" Version="1.8.14" />
+    <PackageReference Include="Hangfire.SqlServer" Version="1.8.14" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.1" />
+    <PackageReference Include="SendGrid" Version="9.29.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Desafios.GerenciadorBiblioteca.Domain\Desafios.GerenciadorBiblioteca.Domain.csproj" />
+    <ProjectReference Include="..\..\Services\Desafios.GerenciadorBiblioteca.Service\Desafios.GerenciadorBiblioteca.Service.csproj" />
+    <ProjectReference Include="..\Desafios.GerenciadorBiblioteca.Data\Desafios.GerenciadorBiblioteca.Data.csproj" />
+  </ItemGroup>
+
+</Project>

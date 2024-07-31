@@ -1,6 +1,10 @@
-﻿<MudNavMenu>
-    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard" Class="pt-3 pb-1">Dashboard</MudNavLink>
+﻿@using Microsoft.AspNetCore.Components.Authorization
+
+<MudNavMenu Class="d-flex flex-column h-100 mh-100">
+    <MudNavLink Href="/home" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard" Class="pt-3 pb-1">Dashboard</MudNavLink>
     <MudNavLink Href="/libraries" Icon="@Icons.Material.Filled.LocalLibrary" Class="pt-1 pb-1">Bibliotecas</MudNavLink>
-    <MudNavLink Href="/users" Icon="@Icons.Material.Filled.PersonAddAlt1" Class="py-1">Usuários</MudNavLink>
+    <AuthorizeView Roles="Administrator">
+        <MudNavLink Href="/users" Icon="@Icons.Material.Filled.PersonAddAlt1" Class="py-1">Usuários</MudNavLink>
+    </AuthorizeView>
     <MudNavLink Href="/books" Icon="@Icons.Material.Filled.MenuBook" Class="py-1">Livros</MudNavLink>
 </MudNavMenu>

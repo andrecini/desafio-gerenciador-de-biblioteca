@@ -118,6 +118,13 @@ namespace Desafios.GerenciadorBiblioteca.Service.Mapping
                 .ForMember(x => x.Username, opt => opt.MapFrom(src => src.Username))
                 .ForMember(x => x.BookName, opt => opt.MapFrom(src => src.BookName));
 
+            CreateMap<OverdueLoansDetailsQueryResult, OverdueLoansDetailsViewModel>()
+                .ForMember(x => x.LoanDate, opt => opt.MapFrom(src => src.LoanDate))
+                .ForMember(x => x.LoanValidity, opt => opt.MapFrom(src => src.LoanValidity))
+                .ForMember(x => x.Username, opt => opt.MapFrom(src => src.Username))
+                .ForMember(x => x.BookName, opt => opt.MapFrom(src => src.BookName))
+                .ForMember(x => x.Email, opt => opt.MapFrom(src => src.Email));
+
         }
     }
 }

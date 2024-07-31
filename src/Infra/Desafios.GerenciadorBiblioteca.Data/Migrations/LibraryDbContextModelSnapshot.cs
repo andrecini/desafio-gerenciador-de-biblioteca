@@ -174,6 +174,31 @@ namespace Desafios.GerenciadorBiblioteca.Data.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Entities.VerificationCode", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ValidTo")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("VerificationCodes");
+                });
+
             modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Entities.Inventory", b =>
                 {
                     b.HasOne("Desafios.GerenciadorBiblioteca.Domain.Entities.Book", "Book")
@@ -212,6 +237,17 @@ namespace Desafios.GerenciadorBiblioteca.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Entities.VerificationCode", b =>
+                {
+                    b.HasOne("Desafios.GerenciadorBiblioteca.Domain.Entities.User", "User")
+                        .WithMany("VerificationCodes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Entities.Book", b =>
                 {
                     b.Navigation("Inventories");
@@ -230,6 +266,8 @@ namespace Desafios.GerenciadorBiblioteca.Data.Migrations
             modelBuilder.Entity("Desafios.GerenciadorBiblioteca.Domain.Entities.User", b =>
                 {
                     b.Navigation("Loans");
+
+                    b.Navigation("VerificationCodes");
                 });
 #pragma warning restore 612, 618
         }

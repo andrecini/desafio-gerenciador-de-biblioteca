@@ -16,8 +16,8 @@ namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.UserLogin
             RuleFor(b => b.Password)
                 .NotNull().NotEmpty()
                 .WithMessage("A Senha é obrigatória.")
-                .Length(8)
-                .WithMessage("A Senha deve ter no mínimo 8 caracteres e pelo menos 1 símbolo.");
+                .MinimumLength(8)
+                .WithMessage("A Senha deve ter no mínimo 8 caracteres.");
         }
     }
 }

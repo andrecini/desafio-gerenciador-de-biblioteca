@@ -4,5 +4,5 @@ using MediatR;
 
 namespace Desafios.GerenciadorBiblioteca.Service.CQRS.Users.Commands.UserLogin
 {
-    public record UserLoginCommand(string Email, string Password) : IRequest<CustomResponse<UserViewModel>>;
+    public record UserLoginCommand(string Email, string Password) : IRequest<CustomResponse<TokenViewModel>>;
 }

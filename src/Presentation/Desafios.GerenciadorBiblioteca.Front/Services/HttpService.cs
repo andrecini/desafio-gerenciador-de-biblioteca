@@ -12,13 +12,13 @@ namespace Desafios.GerenciadorBiblioteca.Website.Services
     public class HttpService
     {
         private readonly string _baseUrl;
-        private readonly AuthService _authService;
+        private readonly TokenStorageService _tokenService;
         private readonly JsonSerializerOptions _options;
 
-        public HttpService(string baseUrl, AuthService authService)
+        public HttpService(string baseUrl, TokenStorageService tokenService)
         {
             _baseUrl = baseUrl;
-            _authService = authService;
+            _tokenService = tokenService;
             _options = new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -27,11 +27,10 @@ namespace Desafios.GerenciadorBiblioteca.Website.Services
             };
         }
 
-        private FlurlRequest CreateRequest(string uri)
+        private async Task<FlurlRequest> CreateRequest(string uri)
         {
-            var tokenModel = _authService.GetTokenModel();
-
-            var token = tokenModel?.Token;
+            var tokenModel = await _tokenService.GetTokenIdentity();
+            var token = tokenModel.Token;
 
             return new FlurlRequest(_baseUrl + uri)
                 .AllowHttpStatus("2xx")
@@ -48,7 +47,8 @@ namespace Desafios.GerenciadorBiblioteca.Website.Services
         {
             try
             {
-                var response = await CreateRequest(uri).GetAsync();
+                var request = await CreateRequest(uri); 
+                var response = await request.GetAsync();
                 return await ProcessResponse<T>(response);
             }
             catch (FlurlHttpException ex)
@@ -61,7 +61,8 @@ namespace Desafios.GerenciadorBiblioteca.Website.Services
         {
             try
             {
-                var response = await CreateRequest(uri).PostJsonAsync(data);
+                var request = await CreateRequest(uri);
+                var response = await request.PostJsonAsync(data);
                 return await ProcessResponse(response);
             }
             catch (FlurlHttpException ex)
@@ -74,7 +75,8 @@ namespace Desafios.GerenciadorBiblioteca.Website.Services
         {
             try
             {
-                var response = await CreateRequest(uri).PostJsonAsync(data);
+                var request = await CreateRequest(uri);
+                var response = await request.PostJsonAsync(data);
                 return await ProcessResponse<T>(response);
             }
             catch (FlurlHttpException ex)
@@ -87,7 +89,8 @@ namespace Desafios.GerenciadorBiblioteca.Website.Services
         {
             try
             {
-                var response = await CreateRequest(uri).PutJsonAsync(data);
+                var request = await CreateRequest(uri);
+                var response = await request.PutJsonAsync(data);
                 return await ProcessResponse<T>(response);
             }
             catch (FlurlHttpException ex)
@@ -96,11 +99,26 @@ namespace Desafios.GerenciadorBiblioteca.Website.Services
             }
         }
 
+        public async Task<HttpServiceResponse> PutAsync<TRequest>(string uri, TRequest data)
+        {
+            try
+            {
+                var request = await CreateRequest(uri);
+                var response = await request.PutJsonAsync(data);
+                return await ProcessResponse(response);
+            }
+            catch (FlurlHttpException ex)
+            {
+                return await ProcessErrorResponse(ex);
+            }
+        }
+
         public async Task<HttpServiceResponse> DeleteAsync<TRequest>(string uri, TRequest data)
         {
             try
             {
-                var response = await CreateRequest(uri).SendJsonAsync(HttpMethod.Delete, data);
+                var request = await CreateRequest(uri);
+                var response = await request.SendJsonAsync(HttpMethod.Delete, data);
                 return await ProcessResponse(response);
             }
             catch (FlurlHttpException ex)
@@ -113,7 +131,8 @@ namespace Desafios.GerenciadorBiblioteca.Website.Services
         {
             try
             {
-                var response = await CreateRequest(uri).SendAsync(HttpMethod.Delete);
+                var request = await CreateRequest(uri);
+                var response = await request.SendAsync(HttpMethod.Delete);
                 return await ProcessResponse(response);
             }
             catch (FlurlHttpException ex)

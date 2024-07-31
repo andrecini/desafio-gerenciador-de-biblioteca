@@ -1,18 +1,43 @@
-﻿@inherits LayoutComponentBase
+﻿@using Desafios.GerenciadorBiblioteca.Domain.Enums
+@using Desafios.GerenciadorBiblioteca.Website.Models.Responses
+@using Desafios.GerenciadorBiblioteca.Website.Services.Auth
+@using Microsoft.AspNetCore.Components.Authorization
+@inherits LayoutComponentBase
+@inject TokenStorageService tokenStorageService;
+@inject AuthenticationStateProvider authStateProvider;
 
 <MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="_theme" />
 <MudDialogProvider @rendermode="InteractiveServer" FullWidth="true" />
 <MudPopoverProvider @rendermode="InteractiveServer" />
-<MudSnackbarProvider/>
+<MudSnackbarProvider />
 
 <MudLayout>
     <MudAppBar Color="Color.Primary" Fixed="false">
         <MudIconButton Icon="@Icons.Material.Filled.Book" Color="Color.Inherit" />
         <MudText Typo="Typo.h6" Class="ml-3">Desafio 1 - Gerenciador de Bibliotecas</MudText>
         <MudSpacer />
-        <MudSwitch @bind-Value="_isDarkMode"/>
+
+        <MudAvatar Color="@(token.Role == Roles.Administrator ? Color.Success : Color.Dark)" Size="Size.Small" Class="mx-2">@(string.IsNullOrEmpty(token.Name) ? "U" : token.Name[0])</MudAvatar>
+        <MudText Typo="Typo.body1">Olá, @token.Name</MudText>
+
+        <MudMenu Icon="@Icons.Material.Filled.MoreVert" AriaLabel="Open user menu" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopLeft" Class="px-2">
+            <MudSwitch @bind-Value="_isDarkMode" Size="Size.Medium" Class="mx-2 my-1"
+                       ThumbIcon="@(_isDarkMode ? Icons.Material.Filled.DarkMode : Icons.Material.Filled.LightMode)"
+                       ThumbIconColor="_isDarkMode ? Color.Primary : Color.Warning">
+                <MudSpacer />
+
+                <MudText Typo="Typo.body1">
+                    @(_isDarkMode ? "Modo Escuro" : "Modo Claro")
+                </MudText>
+            </MudSwitch>
+            <MudNavLink Href="/logout" Icon="@Icons.Material.Filled.Logout" Class="d-flex py-1">
+                <MudText Typo="Typo.body1" Class="ms-1">
+                    Logout
+                </MudText>
+            </MudNavLink>
+        </MudMenu>
     </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2" Class="h-100 mh-100">
         <NavMenu />
     </MudDrawer>
     <MudMainContent Class="px-4 py-8">
@@ -21,9 +46,24 @@
 </MudLayout>
 
 @code {
+    [CascadingParameter]
+    public bool IsAdmin { get; set; }
+
     private MudTheme _theme = new();
     private bool _isDarkMode = true;
     private bool _drawerOpen = true;
+    private TokenModel token = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            token = await tokenStorageService.GetTokenIdentity();
+            await tokenStorageService.SetTokenIdentityProperty();
+            await authStateProvider.GetAuthenticationStateAsync();
+            StateHasChanged();
+        }
+    }
 
     private void DrawerToggle()
     {

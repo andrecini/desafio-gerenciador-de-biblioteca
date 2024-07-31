@@ -11,5 +11,6 @@ namespace Desafios.GerenciadorBiblioteca.Domain.Repositories
         Task<IEnumerable<LoanDetailsQueryResult>> GetLoanDetailsFilteredByLibraryAsync(LoanDetailsFilteredByLibraryQueryRequest request);
         Task<IEnumerable<LoanDetailsQueryResult>> GetLoanDetailsByUserAsync(LoanDetailsQueryByUserRequest request);
         Task<IEnumerable<LoanDetailsQueryResult>> GetLoanDetailsFilteredByUserAsync(LoanDetailsFilteredByUserQueryRequest request);
+        Task<IEnumerable<OverdueLoansDetailsQueryResult>> GetOverdueLoanDetailsAsync(DateTime actualDate);
     }
 }

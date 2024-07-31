@@ -57,20 +57,24 @@ else
     private int page = 1;
     private int size = 10;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await InitializeLibrariesAsync();
+        if (firstRender)
+        {
+            await InitializeDataAsync();
+            StateHasChanged();
+        }
     }
 
     private async Task OnPageChangedHandler(int i)
     {
         page = i;
 
-        if (!isFiltered) await InitializeLibrariesAsync();
+        if (!isFiltered) await InitializeDataAsync();
         else await FilterLibsHandleAsync();
     }
 
-    private async Task InitializeLibrariesAsync()
+    private async Task InitializeDataAsync()
     {
         var result = await httpService.GetAsync<CustomResponse<IEnumerable<Library>>>($"/api/Libraries/book/{Id}?page={page}&size={size}");
 

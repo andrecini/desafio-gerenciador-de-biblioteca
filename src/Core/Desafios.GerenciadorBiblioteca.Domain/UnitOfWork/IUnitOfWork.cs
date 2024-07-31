@@ -9,6 +9,7 @@ namespace Desafios.GerenciadorBiblioteca.Domain.UnitOfWork
         IUserRepository Users { get; }
         IInventoryRepository Inventories { get; }
         ILoanRepository Loans { get; }
+        IVerificationCodeRepository VerificationCodes { get; }
 
         Task<int> SaveAsync();
     }

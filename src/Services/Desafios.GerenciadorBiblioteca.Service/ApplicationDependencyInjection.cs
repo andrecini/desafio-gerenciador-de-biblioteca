@@ -14,6 +14,7 @@ namespace Desafios.GerenciadorBiblioteca.Service
 
             services.AddTransient<ICipherService, CipherService>();
             services.AddTransient<ITokenService, TokenService>();
+            services.AddTransient<IHangfireApiManager, HangfireApiManager>();
 
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
 

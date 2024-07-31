@@ -19,5 +19,6 @@ namespace Desafios.GerenciadorBiblioteca.Domain.Repositories.Base
 
         void Remove(TEntity entity);
 
+        void RemoveRange(IEnumerable<TEntity> entities);
     }
 }

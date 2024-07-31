@@ -1,0 +1,19 @@
+﻿@page "/logout"
+@using Desafios.GerenciadorBiblioteca.Website.Services.Auth
+@using Microsoft.AspNetCore.Components.Authorization
+@inject TokenStorageService tokenStorageService
+@inject AuthService authService;
+
+@inject NavigationManager navigator
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await authService.Logout();
+            StateHasChanged();
+            navigator.NavigateTo("/");
+        }
+    }
+}

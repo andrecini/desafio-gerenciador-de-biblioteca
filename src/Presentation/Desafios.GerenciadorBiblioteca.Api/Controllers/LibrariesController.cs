@@ -7,6 +7,7 @@ using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Queries.GetLibraries
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Queries.GetLibraryById;
 using Desafios.GerenciadorBiblioteca.Service.CQRS.Libraries.Queries.GetLibraryByName;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Desafios.GerenciadorBiblioteca.Api.Controllers
@@ -19,6 +20,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
         private readonly IMediator _mediator = mediator;
 
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAll(int page, int size)
         {
@@ -29,6 +31,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpGet("book/{bookId}")]
         public async Task<IActionResult> GetLibrariesByBook(int bookId, int page, int size)
         {
@@ -38,6 +41,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpPost("book/{id}/filtered")]
         public async Task<IActionResult> PostLibrariesByBookFiltered(int bookId, GetLibrariesByBookFilteredQuery request)
         {
@@ -46,6 +50,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -56,6 +61,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpPost("filter")]
         public async Task<IActionResult> Filter(GetLibrariesByNameQuery request)
         {
@@ -64,6 +70,7 @@ namespace Desafios.GerenciadorBiblioteca.Api.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Add(AddLibraryCommand request)
         {

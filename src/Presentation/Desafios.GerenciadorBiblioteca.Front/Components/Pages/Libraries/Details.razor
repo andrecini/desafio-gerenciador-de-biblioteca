@@ -3,8 +3,10 @@
 @using Desafios.GerenciadorBiblioteca.Website.Components.Pages.Libraries.Custom.Panels
 @using Desafios.GerenciadorBiblioteca.Website.Models.Responses
 @using Desafios.GerenciadorBiblioteca.Website.Services
+@using Desafios.GerenciadorBiblioteca.Website.Services.Auth
 @inject HttpService httpService
 @inject AlertService alertService
+@inject AuthService authService
 
 <PageTitle>Bibliotecas</PageTitle>
 
@@ -12,19 +14,23 @@
 
 <MudContainer Class="d-flex flex-row align-center pa-0 mt-5 mb-5 ma-0 gap-5 w-100" MaxWidth="MaxWidth.False">
     <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors" Class="d-flex flex-row align-start pa-0 ma-0 gap-5 w-100">
-        <MudTextField @bind-Value="library.Name" Label="Nome" Required="true" RequiredError="O Nome da Biblioteca é obrigatório"/>
+        <MudTextField @bind-Value="library.Name" Label="Nome" Required="true"
+                      RequiredError="O Nome da Biblioteca é obrigatório" ReadOnly="@(!isAdmin)" />
 
         <MudTextField @bind-Value="library.CNPJ" Label="CNPJ" HelperText="Digite apenas Números"
                       Validation="@(new Func<string, string>(ValidateCNPJ))" Required="true"
-                      RequiredError="O CNPJ é obrigatório" />
+                      RequiredError="O CNPJ é obrigatório" ReadOnly="@(!isAdmin)"/>
 
         <MudTextField @bind-Value="library.Phone" Label="Telefone" HelperText="Digite apenas Números"
                       InputType="InputType.Telephone"
                       Validation="@(new Func<string, string>(ValidatePhone))" Required="true"
-                      RequiredError="O Telefone é obrigatório!" />
+                      RequiredError="O Telefone é obrigatório!" ReadOnly="@(!isAdmin)" />
     </MudForm>
 
-    <MudButton Variant="Variant.Filled" Color="Color.Tertiary" StartIcon="@Icons.Material.Filled.Save" @onclick="EditLibraryAsync">Salvar</MudButton>
+    @if (isAdmin)
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Tertiary" StartIcon="@Icons.Material.Filled.Save" @onclick="EditLibraryAsync">Salvar</MudButton>
+    }
 </MudContainer>
 
 <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" Class="h-100 mh-100 w-100 mw-100" PanelClass="pa-6 h-100 mh-100 overflow-y-auto">
@@ -32,9 +38,12 @@
         <CustomBooksPanel Id="Id" />
     </MudTabPanel>
 
-    <MudTabPanel Text="Empréstimos" Class="h-100 w-100">
-        <CustomLoanPanel LibraryId="Id" />
-    </MudTabPanel>
+    @if (isAdmin)
+    {
+        <MudTabPanel Text="Empréstimos" Class="h-100 w-100">
+            <CustomLoanPanel LibraryId="Id" />
+        </MudTabPanel>
+    }
 </MudTabs>
 
 @code {
@@ -46,12 +55,19 @@
     private bool success;
     private string[] errors = [];
 
-    protected override async Task OnInitializedAsync()
+    private bool isAdmin;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await InitializeLibraryAsync();
+        if (firstRender)
+        {
+            isAdmin = await authService.VerifyIfUserIsAdmin();
+            await InitializeDataAsync();
+            StateHasChanged();
+        }
     }
 
-    private async Task InitializeLibraryAsync()
+    private async Task InitializeDataAsync()
     {
         var result = await httpService.GetAsync<CustomResponse<Library>>($"/api/Libraries/{Id}");
 
